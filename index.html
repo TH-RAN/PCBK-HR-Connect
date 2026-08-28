@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Leave Connect AI - ระบบบริหารจัดการวันลาและสถิติกำลังคน</title>
+    <title>PCBK-HR-Connect - ระบบบริหารจัดการวันลาและสถิติกำลังคน</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -40,6 +40,15 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+        /* Hide number input spinners for cleaner spreadsheet UI */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
@@ -54,12 +63,9 @@
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
-                            <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">HR Leave Connect</h1>
-                            <span class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold flex items-center shadow-xs">
-                                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gemini AI
-                            </span>
+                            <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK-HR-Connect</h1>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-500">ระบบจัดการวันลา สถิติกำลังคน และผู้ช่วยวิเคราะห์ AI</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500">ระบบจัดการวันลาและตารางสรุปสถิติประจำปี</p>
                     </div>
                 </div>
 
@@ -99,11 +105,6 @@
                     <span>รายการอนุมัติ</span>
                     <span id="badge-pending-count" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </button>
-                <button onclick="switchTab('ai-assistant')" id="tab-btn-ai-assistant" class="tab-btn text-purple-700 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:bg-purple-50 font-medium">
-                    <i class="fa-solid fa-robot text-purple-600"></i>
-                    <span>HR AI Advisor</span>
-                    <span class="bg-purple-100 text-purple-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold">AI</span>
-                </button>
             </div>
         </div>
     </header>
@@ -118,7 +119,7 @@
                 <div class="relative z-10 space-y-1">
                     <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>ระบบอัปเดตข้อมูลอัตโนมัติและวิเคราะห์สถานะสด</span>
+                        <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
                     <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังคำนวณข้อมูล...</p>
@@ -149,8 +150,8 @@
                             <i class="fa-solid fa-umbrella-beach"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-rose-600 mt-2" id="kpi-total-vacation-used">54.75 วัน</div>
-                    <p class="text-xs text-slate-500 mt-1">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">5.0</strong> วัน/คน</p>
+                    <div class="text-3xl font-extrabold text-rose-600 mt-2" id="kpi-total-vacation-used">0 วัน</div>
+                    <p class="text-xs text-slate-500 mt-1">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> วัน/คน</p>
                 </div>
 
                 <!-- KPI 3: สิทธิ์พักร้อนคงเหลือรวม -->
@@ -161,7 +162,7 @@
                             <i class="fa-solid fa-hourglass-half"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-amber-600 mt-2" id="kpi-total-vacation-rem">116.75 วัน</div>
+                    <div class="text-3xl font-extrabold text-amber-600 mt-2" id="kpi-total-vacation-rem">0 วัน</div>
                     <p class="text-xs text-emerald-600 font-semibold mt-1">+1 วัน/เดือน (ทบสะสมปีถัดไปได้)</p>
                 </div>
 
@@ -173,7 +174,7 @@
                             <i class="fa-solid fa-bed-pulse"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-slate-800 mt-2" id="kpi-total-sick-used">16.5 วัน</div>
+                    <div class="text-3xl font-extrabold text-slate-800 mt-2" id="kpi-total-sick-used">0 วัน</div>
                     <p class="text-xs text-slate-500 mt-1">โควตาไม่เกิน 30 วันทำการ/ปี</p>
                 </div>
             </div>
@@ -198,16 +199,18 @@
             </div>
         </section>
 
-        <!-- ================= TAB 2: FULL MATRIX LEAVE SUMMARY TABLE ================= -->
+        <!-- ================= TAB 2: FULL MATRIX LEAVE SUMMARY TABLE (EDITABLE) ================= -->
         <section id="tab-summary" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center space-x-2">
                             <h2 class="font-bold text-slate-900 text-lg" id="summary-table-header-title">สรุปตารางลาของพนักงาน</h2>
-                            <span class="bg-blue-100 text-blue-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full">3 ประเภทการลา: พักร้อน / ป่วย / ลาอื่นๆ</span>
+                            <span class="bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center">
+                                <i class="fa-solid fa-pen-to-square mr-1"></i> สามารถแก้ไขตัวเลขในตารางได้โดยตรง
+                            </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">กติกาวันลา: เพิ่มวันลาพักร้อน +1 วัน/เดือน (ทบสะสมจากเดือนก่อน และยกยอดไปใช้ปีถัดๆ ไปได้)</p>
+                        <p class="text-xs text-slate-500 mt-0.5">ระบบจะคำนวณยอดรวมและบันทึกข้อมูลอัตโนมัติเมื่อพิมพ์แก้ไขในช่องตาราง</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -225,9 +228,9 @@
                     </div>
                 </div>
 
-                <!-- Matrix Table -->
+                <!-- Matrix Table (Fully Editable Numeric Cells) -->
                 <div class="overflow-x-auto border border-slate-300 rounded-xl shadow-inner relative max-h-[650px]">
-                    <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1500px]">
+                    <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1550px]">
                         <thead>
                             <tr class="bg-slate-800 text-white text-center font-bold divide-x divide-slate-700 border-b border-slate-700 sticky top-0 z-20">
                                 <th rowspan="3" class="p-2 w-10 sticky left-0 z-30 bg-slate-900 shadow-r">ลำดับ</th>
@@ -243,8 +246,8 @@
                                 <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">
                                     ลาป่วย <span class="text-[10px] font-normal">(ปีละไม่เกิน 30 วันทำการ)</span>
                                 </th>
-                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[65px]">ลาอื่นๆ<br>(รวมทั้งปี)</th>
-                                <th rowspan="3" class="p-2 min-w-[110px]">หมายเหตุ / สถานะ</th>
+                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[70px]">ลาอื่นๆ<br>(รวมทั้งปี)</th>
+                                <th rowspan="3" class="p-2 min-w-[130px]">หมายเหตุ / สถานะ</th>
                             </tr>
                             <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[33px] z-10">
                                 <th colspan="24" class="p-1.5 bg-amber-50 text-amber-900">เพิ่มวันลา (+1/ด.) & ใช้ลาประจำเดือน (ม.ค. - ธ.ค.)</th>
@@ -292,7 +295,7 @@
             </div>
         </section>
 
-        <!-- ================= TAB 3: LEAVE REQUEST FORM WITH AI ================= -->
+        <!-- ================= TAB 3: LEAVE REQUEST FORM ================= -->
         <section id="tab-request-form" class="tab-content hidden max-w-xl mx-auto">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5">
                 <div class="border-b border-slate-100 pb-3">
@@ -401,14 +404,7 @@
                     </div>
 
                     <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="font-semibold text-slate-700">เหตุผลการลา / ช่องทางติดต่อ *</label>
-                            <!-- Gemini API Feature 1: AI Reason & Contact Polisher -->
-                            <button type="button" onclick="aiPolishLeaveReason()" id="btn-ai-polish" class="text-[11px] bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium px-2 py-0.5 rounded-lg border border-purple-200 transition flex items-center space-x-1">
-                                <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i>
-                                <span>✨ AI ปรับภาษาให้สุภาพ/ทางการ</span>
-                            </button>
-                        </div>
+                        <label class="block font-semibold text-slate-700 mb-1">เหตุผลการลา / ช่องทางติดต่อ *</label>
                         <textarea id="form-reason" rows="2" required placeholder="เช่น ธุระติดต่อราชการ / โทร 081-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
                     </div>
 
@@ -431,7 +427,7 @@
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div class="border-b border-slate-100 pb-3">
                     <h2 class="font-bold text-slate-900 text-lg">ศูนย์การพิจารณาอนุมัติวันลา</h2>
-                    <p class="text-xs text-slate-500">จำลองมุมมองผู้บริหาร/HR ในการกดอนุมัติหรือปฏิเสธคำขอ เพื่อตัดยอดวันลาลงตารางทันที</p>
+                    <p class="text-xs text-slate-500">กดอนุมัติเพื่อตัดยอดวันลาลงในตาราง Matrix ประจำเดือนทันที</p>
                 </div>
 
                 <div id="approval-list" class="space-y-3">
@@ -440,81 +436,9 @@
             </div>
         </section>
 
-        <!-- ================= TAB 5: HR AI ADVISOR & ANALYTICS ================= -->
-        <section id="tab-ai-assistant" class="tab-content hidden space-y-6">
-            <div class="bg-gradient-to-r from-purple-800 via-indigo-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
-                <div class="relative z-10 space-y-2">
-                    <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
-                        <i class="fa-solid fa-brain text-purple-300"></i>
-                        <span>ขับเคลื่อนด้วย Gemini 3 Flash LLM</span>
-                    </div>
-                    <h2 class="text-xl sm:text-2xl font-bold">HR Leave AI Co-Pilot & Insights</h2>
-                    <p class="text-purple-200 text-xs sm:text-sm">ผู้ช่วยอัจฉริยะวิเคราะห์อัตรากำลังคน แจ้งเตือนโควตาวันลา และร่างหนังสือประกาศ HR</p>
-                </div>
-            </div>
-
-            <!-- Predefined AI Prompts Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button onclick="runAiInsight('ANALYZE_EXHAUSTION')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition text-left space-y-1.5">
-                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                    </div>
-                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm">วิเคราะห์ผู้เสี่ยงโควตาหมด</h4>
-                    <p class="text-[11px] text-slate-500">สแกนพนักงานที่ใช้วันพักร้อนหรือลาป่วยใกล้เกินเกณฑ์</p>
-                </button>
-
-                <button onclick="runAiInsight('EXECUTIVE_SUMMARY')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition text-left space-y-1.5">
-                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm">สรุปภาพรวมกำลังคนให้ผู้บริหาร</h4>
-                    <p class="text-[11px] text-slate-500">สรุปดัชนีการลาเฉลี่ย สัดส่วนประเภทการลา และแนวโน้ม</p>
-                </button>
-
-                <button onclick="runAiInsight('DRAFT_HOLIDAY_MEMO')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition text-left space-y-1.5">
-                    <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
-                        <i class="fa-solid fa-bullhorn"></i>
-                    </div>
-                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm">ร่างประกาศแผนวันลาพักร้อน</h4>
-                    <p class="text-[11px] text-slate-500">สร้างข้อความประชาสัมพันธ์การทบวันลา (+1/ด.) สำหรับส่ง LINE</p>
-                </button>
-            </div>
-
-            <!-- Custom AI Prompt Box -->
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-comments text-purple-600"></i>
-                    <h3 class="font-bold text-slate-900 text-sm">ถาม-ตอบ สถิติและวิเคราะห์ข้อมูลวันลากับ AI</h3>
-                </div>
-                
-                <div class="flex gap-2">
-                    <input type="text" id="custom-ai-query" placeholder="เช่น สรุปสถานะวันลาของคุณณัฐากานต์ หรือ ตรวจสอบฝ่ายวิศวกร..." class="flex-grow bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" onkeydown="if(event.key==='Enter') runCustomAiQuery()">
-                    <button onclick="runCustomAiQuery()" id="btn-run-ai" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl transition shadow-sm flex items-center space-x-1">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <span>วิเคราะห์</span>
-                    </button>
-                </div>
-
-                <!-- AI Output Display Box -->
-                <div id="ai-response-container" class="hidden bg-purple-50/50 border border-purple-200 rounded-xl p-4 sm:p-5 space-y-3">
-                    <div class="flex items-center justify-between border-b border-purple-100 pb-2">
-                        <span class="text-xs font-bold text-purple-900 flex items-center">
-                            <i class="fa-solid fa-sparkles text-purple-600 mr-1.5"></i> คำตอบจาก Gemini AI Advisor
-                        </span>
-                        <button onclick="copyAiResponse()" class="text-xs text-purple-700 hover:text-purple-900 font-medium">
-                            <i class="fa-regular fa-copy mr-1"></i> คัดลอก
-                        </button>
-                    </div>
-                    <div id="ai-response-content" class="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
-                        <!-- AI text rendered here -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <!-- Modal: Simulated Email Modal with Gemini AI Impact Checker -->
+    <!-- Modal: Simulated Email Modal -->
     <div id="email-modal" class="fixed inset-0 bg-slate-900/60 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -539,15 +463,6 @@
                     <li><strong>ช่วงวันลา:</strong> <span id="email-detail-dates">-</span></li>
                     <li><strong>ช่องทางติดต่อ / เหตุผล:</strong> <span id="email-detail-reason">-</span></li>
                 </ul>
-
-                <!-- Gemini API Feature 2: AI Quick Risk Check inside Modal -->
-                <div id="modal-ai-risk-box" class="bg-purple-50 border border-purple-200 rounded-lg p-2.5 text-xs text-purple-900 mt-2 space-y-1">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-purple-600"></i> AI การวิเคราะห์ผลกระทบทีม:</span>
-                        <button onclick="aiEvaluateApprovalRisk()" id="btn-eval-risk" class="text-[11px] text-purple-700 underline hover:text-purple-900">วิเคราะห์ความเสี่ยง</button>
-                    </div>
-                    <div id="modal-ai-risk-text" class="text-[11px] text-slate-600">กดปุ่มเพื่อดูการวิเคราะห์กำลังคนและสิทธิ์คงเหลือจาก Gemini</div>
-                </div>
             </div>
 
             <div class="flex items-center justify-end space-x-2 pt-2">
@@ -612,7 +527,7 @@
         }
 
         function switchTab(tabId) {
-            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'ai-assistant'];
+            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
                 const content = document.getElementById(`tab-${id}`);
@@ -639,8 +554,8 @@
 
         function saveData() {
             try {
-                localStorage.setItem('hr_leave_employees_official_v3', JSON.stringify(employees));
-                localStorage.setItem('hr_leave_requests_official_v3', JSON.stringify(requests));
+                localStorage.setItem('hr_leave_employees_official_v4', JSON.stringify(employees));
+                localStorage.setItem('hr_leave_requests_official_v4', JSON.stringify(requests));
             } catch(e) {
                 console.error("Could not save to localStorage", e);
             }
@@ -648,8 +563,8 @@
 
         function loadSavedData() {
             try {
-                const localEmp = localStorage.getItem('hr_leave_employees_official_v3');
-                const localReq = localStorage.getItem('hr_leave_requests_official_v3');
+                const localEmp = localStorage.getItem('hr_leave_employees_official_v4');
+                const localReq = localStorage.getItem('hr_leave_requests_official_v4');
 
                 if (localEmp) employees = JSON.parse(localEmp);
                 else initOfficialDataset();
@@ -667,67 +582,67 @@
             employees = [
                 {
                     seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
-                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
-                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
-                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President (รองประธานกรรมการบริหาร)", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20,
-                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
-                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
-                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 3, id: "1102033", name: "นางสาวภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
-                    vacationAccrued: [1,0.25, 1,0, 1,0, 1,2, 1,0, 1,1, 1,2, 1,0.25, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                     vacationUsedMonths: [0.25, 0, 0, 2, 0, 1, 2, 0.25, 0, 0, 0, 0],
                     sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 4, id: "1104008", name: "นางสาวกนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
-                    vacationAccrued: [1,1.5, 1,0, 1,3, 1,1, 1,0.5, 1,2, 1,1, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                     vacationUsedMonths: [1.5, 0, 3, 1, 0.5, 2, 1, 1, 0, 0, 0, 0],
                     sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: ""
                 },
                 {
                     seq: 5, id: "1103020", name: "นายชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
-                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
-                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
-                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 6, id: "1103059", name: "นายปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
-                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
-                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
-                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 7, id: "1102049", name: "นางสาวณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
-                    vacationAccrued: [1,3, 1,0.25, 1,1, 1,3.75, 1,0, 1,1, 1,3, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                     vacationUsedMonths: [3, 0.25, 1, 3.75, 0, 1, 3, 1, 0, 0, 0, 0],
                     sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 8, id: "1102050", name: "นางสาวภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
-                    vacationAccrued: [1,3, 1,0, 1,1, 1,2, 1,3, 1,1, 1,1, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                     vacationUsedMonths: [3, 0, 1, 2, 3, 1, 1, 1, 0, 0, 0, 0],
                     sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 9, id: "1102051", name: "นางสาวอาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
-                    vacationAccrued: [1,1, 1,1, 1,2, 1,6, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                     vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
                     sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED"
                 },
                 {
                     seq: 10, id: "1102055", name: "นายรัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
-                    vacationAccrued: [1,0, 1,0.25, 1,1.75, 1,2.25, 1,0.25, 1,0, 1,1.25, 1,0.5, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                     vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
                     sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 },
                 {
                     seq: 11, id: "1103063", name: "นายกฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
-                    vacationAccrued: [1,1, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                     vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                     sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 }
@@ -736,11 +651,13 @@
         }
 
         function resetToOfficialData() {
-            initOfficialDataset();
-            requests = [];
-            saveData();
-            renderAllViews();
-            showToast('รีเซ็ตข้อมูลเป็นค่ามาตรฐานตามไฟล์เรียบร้อย');
+            if (confirm('คุณต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นใช่หรือไม่?')) {
+                initOfficialDataset();
+                requests = [];
+                saveData();
+                renderAllViews();
+                showToast('รีเซ็ตข้อมูลเป็นค่ามาตรฐานตามไฟล์เรียบร้อย');
+            }
         }
 
         function renderAllViews() {
@@ -824,23 +741,18 @@
             employees.forEach(e => {
                 let totalAccrued = 0;
                 if (e.vacationAccrued) {
-                    for (let m = 0; m < 12; m++) totalAccrued += parseFloat(e.vacationAccrued[m * 2]) || 0;
-                } else totalAccrued = 8;
+                    for (let m = 0; m < 12; m++) totalAccrued += parseFloat(e.vacationAccrued[m]) || 0;
+                }
 
                 let usedVac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const onlineVac = requests.filter(r => r.empId === e.id && r.status === 'อนุมัติแล้ว' && r.type === 'ลาพักร้อน').reduce((s, r) => s + r.days, 0);
-                const finalUsedVac = usedVac + onlineVac;
-
                 const carry = parseFloat(e.carryVacation) || 0;
-                const remVac = Math.max(0, carry + totalAccrued - finalUsedVac);
+                const remVac = Math.max(0, carry + totalAccrued - usedVac);
 
                 let usedSick = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const onlineSick = requests.filter(r => r.empId === e.id && r.status === 'อนุมัติแล้ว' && r.type === 'ลาป่วย').reduce((s, r) => s + r.days, 0);
-                const finalUsedSick = usedSick + onlineSick;
 
-                grandVacationUsed += finalUsedVac;
+                grandVacationUsed += usedVac;
                 grandVacationRemaining += remVac;
-                grandSickUsed += finalUsedSick;
+                grandSickUsed += usedSick;
             });
 
             document.getElementById('kpi-total-vacation-used').innerText = `${grandVacationUsed} วัน`;
@@ -849,6 +761,7 @@
             document.getElementById('kpi-avg-vacation').innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
+        // ================= FULL MATRIX RENDERING WITH INLINE EDITING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -861,90 +774,141 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
-            filtered.forEach((e, index) => {
+            filtered.forEach((e) => {
+                const empIndex = employees.findIndex(emp => emp.id === e.id);
+                
+                // Normalizing Vacation Accrued Array (12 items)
+                if (!e.vacationAccrued || e.vacationAccrued.length !== 12) {
+                    e.vacationAccrued = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0];
+                }
+                if (!e.vacationUsedMonths || e.vacationUsedMonths.length !== 12) {
+                    e.vacationUsedMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                }
+                if (!e.sickMonths || e.sickMonths.length !== 12) {
+                    e.sickMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                }
+
                 let totalAccrued = 0;
-                if (e.vacationAccrued) {
-                    for (let m = 0; m < 12; m++) totalAccrued += parseFloat(e.vacationAccrued[m * 2]) || 0;
-                } else totalAccrued = 8;
-
-                // Precompute online approved leaves per month for this employee
-                const approvedVacByMonth = Array(12).fill(0);
-                const approvedSickByMonth = Array(12).fill(0);
-                let onlineOtherDays = 0;
-
-                requests.filter(r => r.empId === e.id && r.status === 'อนุมัติแล้ว').forEach(r => {
-                    const startM = new Date(r.startDate).getMonth();
-                    if (r.type === 'ลาพักร้อน') {
-                        approvedVacByMonth[startM] += r.days;
-                    } else if (r.type === 'ลาป่วย') {
-                        approvedSickByMonth[startM] += r.days;
-                    } else {
-                        onlineOtherDays += r.days;
-                    }
-                });
-
                 let totalVacationUsed = 0;
                 let totalSickUsed = 0;
 
+                for (let m = 0; m < 12; m++) {
+                    totalAccrued += parseFloat(e.vacationAccrued[m]) || 0;
+                    totalVacationUsed += parseFloat(e.vacationUsedMonths[m]) || 0;
+                    totalSickUsed += parseFloat(e.sickMonths[m]) || 0;
+                }
+
+                const carryVal = parseFloat(e.carryVacation) || 0;
+                const remainingVacation = Math.max(0, carryVal + totalAccrued - totalVacationUsed);
+                const finalOtherUsed = parseFloat(e.otherLeaveDays) || 0;
+
                 let rowHtml = `
                     <tr class="hover:bg-slate-100/80 transition text-slate-800 divide-x divide-slate-200">
-                        <td class="p-2 text-center font-bold text-slate-500 bg-white sticky left-0 z-10">${e.seq || (index + 1)}</td>
+                        <td class="p-2 text-center font-bold text-slate-500 bg-white sticky left-0 z-10">${e.seq}</td>
                         <td class="p-2 text-center font-mono text-slate-600">${e.id}</td>
                         <td class="p-2 font-bold text-slate-900 bg-white sticky left-10 z-10 shadow-r">${e.name}</td>
                         <td class="p-2 text-slate-600 text-[11px]">${e.position}</td>
                         <td class="p-2 text-center text-slate-500">${e.dob || '-'}</td>
                         <td class="p-2 text-center text-slate-500">${e.startDate || '-'}</td>
-                        <td class="p-2 text-center font-bold bg-purple-50 text-purple-900">${e.carryVacation || 0}</td>
+                        <td class="p-1 text-center font-bold bg-purple-50 text-purple-900">
+                            <input type="number" step="0.25" min="0" value="${e.carryVacation !== undefined ? e.carryVacation : 0}" 
+                                onchange="updateEmpField(${empIndex}, 'carryVacation', this.value)"
+                                class="w-12 text-center bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-purple-500 rounded p-0.5 font-bold text-purple-950">
+                        </td>
                 `;
 
-                // 12 Months Vacation Breakdown (Combining base spreadsheet + approved requests)
+                // 12 Months Vacation: [Accrued (+), Used (-)]
                 for (let m = 0; m < 12; m++) {
-                    const addIdx = m * 2;
-                    const usedIdx = m * 2 + 1;
-                    const addVal = e.vacationAccrued ? (e.vacationAccrued[addIdx] !== undefined ? e.vacationAccrued[addIdx] : 1) : 1;
-                    
-                    const baseUsedVal = e.vacationUsedMonths ? (parseFloat(e.vacationUsedMonths[m]) || 0) : (e.vacationAccrued ? (parseFloat(e.vacationAccrued[usedIdx]) || 0) : 0);
-                    const finalMonthVacUsed = baseUsedVal + approvedVacByMonth[m];
-                    totalVacationUsed += finalMonthVacUsed;
+                    const addVal = e.vacationAccrued[m] !== undefined ? e.vacationAccrued[m] : 1;
+                    const usedVal = e.vacationUsedMonths[m] !== undefined ? e.vacationUsedMonths[m] : 0;
 
                     rowHtml += `
-                        <td class="p-1 text-center text-[10px] text-slate-400 bg-amber-50/30">${addVal !== 0 ? addVal : ''}</td>
-                        <td class="p-1 text-center font-medium ${finalMonthVacUsed > 0 ? 'text-amber-900 font-bold bg-amber-100/60' : 'text-slate-300'}">${finalMonthVacUsed > 0 ? finalMonthVacUsed : ''}</td>
+                        <td class="p-0 text-center bg-amber-50/40">
+                            <input type="number" step="0.25" min="0" value="${addVal > 0 ? addVal : ''}" placeholder="0"
+                                onchange="updateVacAccruedMonth(${empIndex}, ${m}, this.value)"
+                                class="w-8 text-center text-[10px] text-slate-500 bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-amber-500 rounded p-0.5">
+                        </td>
+                        <td class="p-0 text-center ${usedVal > 0 ? 'bg-amber-100/60' : ''}">
+                            <input type="number" step="0.25" min="0" value="${usedVal > 0 ? usedVal : ''}" placeholder="-"
+                                onchange="updateVacUsedMonth(${empIndex}, ${m}, this.value)"
+                                class="w-9 text-center text-[11px] font-semibold ${usedVal > 0 ? 'text-amber-950 font-bold' : 'text-slate-400'} bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-amber-500 rounded p-0.5">
+                        </td>
                     `;
                 }
-
-                const carryVal = parseFloat(e.carryVacation) || 0;
-                const remainingVacation = Math.max(0, carryVal + totalAccrued - totalVacationUsed);
 
                 // Vacation Totals
                 rowHtml += `
-                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950">${totalAccrued}</td>
-                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800">${totalVacationUsed}</td>
-                    <td class="p-2 text-center font-extrabold text-xs bg-yellow-300 text-slate-900 shadow-sm">${remainingVacation}</td>
+                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950" id="tot-accrued-${e.id}">${totalAccrued}</td>
+                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800" id="tot-vac-used-${e.id}">${totalVacationUsed}</td>
+                    <td class="p-2 text-center font-extrabold text-xs bg-yellow-300 text-slate-900 shadow-sm" id="tot-vac-rem-${e.id}">${remainingVacation}</td>
                 `;
 
-                // 12 Months Sick Leave Breakdown (Combining base spreadsheet + approved requests)
+                // 12 Months Sick Leave
                 for (let m = 0; m < 12; m++) {
-                    const baseSickVal = e.sickMonths ? (parseFloat(e.sickMonths[m]) || 0) : 0;
-                    const finalMonthSick = baseSickVal + approvedSickByMonth[m];
-                    totalSickUsed += finalMonthSick;
-
+                    const sickVal = e.sickMonths[m] !== undefined ? e.sickMonths[m] : 0;
                     rowHtml += `
-                        <td class="p-1 text-center ${finalMonthSick > 0 ? 'text-emerald-800 font-bold bg-emerald-100/60' : 'text-slate-300'}">${finalMonthSick > 0 ? finalMonthSick : ''}</td>
+                        <td class="p-0 text-center ${sickVal > 0 ? 'bg-emerald-100/60' : 'bg-emerald-50/20'}">
+                            <input type="number" step="0.25" min="0" value="${sickVal > 0 ? sickVal : ''}" placeholder="-"
+                                onchange="updateSickMonth(${empIndex}, ${m}, this.value)"
+                                class="w-9 text-center text-[11px] font-semibold ${sickVal > 0 ? 'text-emerald-900 font-bold' : 'text-slate-400'} bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded p-0.5">
+                        </td>
                     `;
                 }
 
-                const finalOtherUsed = (parseFloat(e.otherLeaveDays) || 0) + onlineOtherDays;
-
                 // Sick Total, Other, Note
                 rowHtml += `
-                    <td class="p-2 text-center font-bold bg-emerald-100 text-rose-600 text-sm">${totalSickUsed}</td>
-                    <td class="p-2 text-center font-bold bg-purple-100 text-purple-950">${finalOtherUsed > 0 ? finalOtherUsed : 0}</td>
-                    <td class="p-2 text-xs font-semibold ${e.note && e.note.includes('RESIGNED') ? 'text-rose-600 bg-rose-50' : 'text-slate-500'}">${e.note || '-'}</td>
+                    <td class="p-2 text-center font-bold bg-emerald-100 text-emerald-900 text-sm" id="tot-sick-${e.id}">${totalSickUsed}</td>
+                    <td class="p-1 text-center font-bold bg-purple-100 text-purple-950">
+                        <input type="number" step="0.25" min="0" value="${finalOtherUsed > 0 ? finalOtherUsed : ''}" placeholder="0"
+                            onchange="updateEmpField(${empIndex}, 'otherLeaveDays', this.value)"
+                            class="w-10 text-center text-[11px] font-bold bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-purple-500 rounded p-0.5">
+                    </td>
+                    <td class="p-1 text-xs">
+                        <input type="text" value="${e.note || ''}" placeholder="หมายเหตุ"
+                            onchange="updateEmpField(${empIndex}, 'note', this.value)"
+                            class="w-full text-xs text-slate-600 bg-transparent hover:bg-white focus:bg-white border-0 hover:border rounded p-1">
+                    </td>
                 </tr>`;
 
                 tbody.innerHTML += rowHtml;
             });
+        }
+
+        // Inline Field Update Handlers
+        function updateEmpField(empIndex, field, val) {
+            if (field === 'carryVacation' || field === 'otherLeaveDays') {
+                employees[empIndex][field] = parseFloat(val) || 0;
+            } else {
+                employees[empIndex][field] = val;
+            }
+            saveData();
+            renderSummaryTable();
+            renderTodayDashboard();
+            showToast('บันทึกการแก้ไขข้อมูลเรียบร้อย');
+        }
+
+        function updateVacAccruedMonth(empIndex, monthIdx, val) {
+            employees[empIndex].vacationAccrued[monthIdx] = parseFloat(val) || 0;
+            saveData();
+            renderSummaryTable();
+            renderTodayDashboard();
+            showToast('บันทึกยอดเพิ่มพักร้อนเรียบร้อย');
+        }
+
+        function updateVacUsedMonth(empIndex, monthIdx, val) {
+            employees[empIndex].vacationUsedMonths[monthIdx] = parseFloat(val) || 0;
+            saveData();
+            renderSummaryTable();
+            renderTodayDashboard();
+            showToast('บันทึกยอดใช้พักร้อนเรียบร้อย');
+        }
+
+        function updateSickMonth(empIndex, monthIdx, val) {
+            employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
+            saveData();
+            renderSummaryTable();
+            renderTodayDashboard();
+            showToast('บันทึกยอดลาป่วยเรียบร้อย');
         }
 
         function renderEmpSelectOptions(selectId) {
@@ -1127,9 +1091,6 @@
             document.getElementById('email-detail-dates').innerText = `${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
             document.getElementById('email-detail-reason').innerText = req.reason;
 
-            const riskText = document.getElementById('modal-ai-risk-text');
-            if (riskText) riskText.innerText = 'กดปุ่มเพื่อดูการวิเคราะห์กำลังคนและสิทธิ์คงเหลือจาก Gemini';
-
             const btnApprove = document.getElementById('email-btn-approve');
             const btnReject = document.getElementById('email-btn-reject');
 
@@ -1144,13 +1105,32 @@
             activeModalReqId = null;
         }
 
+        // ================= APPROVAL HANDLER THAT DOCKS DIRECTLY INTO THE MONTH MATRIX =================
         function approveLeaveRequest(reqId) {
             const req = requests.find(r => r.id === reqId);
-            if (req) {
+            if (req && req.status !== 'อนุมัติแล้ว') {
                 req.status = 'อนุมัติแล้ว';
+
+                const emp = employees.find(e => e.id === req.empId);
+                if (emp) {
+                    // Extract month from startDate (0 = ม.ค., 11 = ธ.ค.)
+                    const leaveDate = new Date(req.startDate);
+                    const monthIdx = !isNaN(leaveDate.getMonth()) ? leaveDate.getMonth() : 0;
+
+                    if (req.type === 'ลาพักร้อน') {
+                        if (!emp.vacationUsedMonths) emp.vacationUsedMonths = Array(12).fill(0);
+                        emp.vacationUsedMonths[monthIdx] = (parseFloat(emp.vacationUsedMonths[monthIdx]) || 0) + parseFloat(req.days);
+                    } else if (req.type === 'ลาป่วย') {
+                        if (!emp.sickMonths) emp.sickMonths = Array(12).fill(0);
+                        emp.sickMonths[monthIdx] = (parseFloat(emp.sickMonths[monthIdx]) || 0) + parseFloat(req.days);
+                    } else {
+                        emp.otherLeaveDays = (parseFloat(emp.otherLeaveDays) || 0) + parseFloat(req.days);
+                    }
+                }
+
                 saveData();
                 renderAllViews();
-                showToast(`อนุมัติคำขอของ ${req.empName} แล้ว และอัปเดตลงตารางทันที`);
+                showToast(`อนุมัติคำขอของ ${req.empName} แล้ว และตัดยอดลงตารางประจำเดือนทันที`);
             }
         }
 
@@ -1162,177 +1142,6 @@
                 renderAllViews();
                 showToast(`ปฏิเสธคำขอของ ${req.empName} แล้ว`);
             }
-        }
-
-        // Gemini API Text Generation with Exponential Backoff
-        async function callGeminiApi(systemPrompt, userPrompt) {
-            const apiKey = ""; // Provided in runtime by Canvas
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-
-            let delay = 1000;
-            for (let i = 0; i < 3; i++) {
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const result = await response.json();
-                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "ไม่มีข้อความตอบกลับจากระบบ";
-                } catch (err) {
-                    if (i === 2) throw err;
-                    await new Promise(res => setTimeout(res, delay));
-                    delay *= 2;
-                }
-            }
-        }
-
-        // Feature 1: AI Leave Reason & Courtesy Polisher
-        async function aiPolishLeaveReason() {
-            const reasonInput = document.getElementById('form-reason');
-            const empId = document.getElementById('form-emp-id')?.value;
-            const emp = employees.find(e => e.id === empId);
-            const rawText = reasonInput ? reasonInput.value.trim() : '';
-
-            if (!rawText) {
-                showToast('กรุณากรอกเหตุผลหรือเบอร์ติดต่อสั้นๆ ก่อนให้ AI ปรับภาษา');
-                return;
-            }
-
-            const btn = document.getElementById('btn-ai-polish');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังปรับภาษา...`;
-            btn.disabled = true;
-
-            const systemPrompt = "คุณคือผู้เชี่ยวชาญด้านงานบุคคล (HR Professional) ในองค์กรไทย ปรับข้อความเหตุผลการลาหรือช่องทางติดต่อให้สุภาพ ทางการ กะทัดรัด และชัดเจนตามวัฒนธรรมองค์กรไทย ตอบเฉพาะข้อความที่ปรับแล้วเท่านั้น ไม่ต้องมีคำนำหรือเครื่องหมายคำพูด";
-            const userPrompt = `พนักงาน: ${emp ? emp.name : 'พนักงาน'}\nตำแหน่ง: ${emp ? emp.position : '-'}\nข้อความเดิม: "${rawText}"\nโปรดปรับให้เป็นข้อความบันทึกการลาอย่างเป็นทางการ:`;
-
-            try {
-                const polished = await callGeminiApi(systemPrompt, userPrompt);
-                reasonInput.value = polished.trim();
-                showToast('AI ปรับภาษาให้สุภาพเรียบร้อยแล้ว');
-            } catch (err) {
-                showToast('ไม่สามารถเชื่อมต่อ AI ได้ในขณะนี้');
-            } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-            }
-        }
-
-        // Feature 2: AI Approval Risk & Coverage Evaluator in Modal
-        async function aiEvaluateApprovalRisk() {
-            if (!activeModalReqId) return;
-            const req = requests.find(r => r.id === activeModalReqId);
-            if (!req) return;
-
-            const emp = employees.find(e => e.id === req.empId);
-            const riskTextEl = document.getElementById('modal-ai-risk-text');
-            const btn = document.getElementById('btn-eval-risk');
-
-            if (riskTextEl) riskTextEl.innerHTML = `<span class="text-purple-600 animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Gemini กำลังประเมินผลกระทบกำลังคนและสิทธิ์คงเหลือ...</span>`;
-            if (btn) btn.style.display = 'none';
-
-            // Gather context
-            const samePosCount = employees.filter(e => e.position === emp?.position).length;
-            const systemPrompt = "คุณคือ HR Advisor ผู้ช่วยผู้บริหาร วิเคราะห์ผลกระทบการอนุมัติการลางาน ตอบสั้นๆ กระชับ 2-3 ประโยคเป็นภาษาไทย ให้คำแนะนำว่าอนุมัติได้หรือไม่ และมีผลกระทบต่อตำแหน่งงานอย่างไร";
-            const userPrompt = `ข้อมูลคำขอลา:
-- พนักงาน: ${req.empName} (${emp ? emp.position : '-'})
-- จำนวนพนักงานในตำแหน่งเดียวกัน: ${samePosCount} คน
-- ประเภทการลา: ${req.type}
-- จำนวนวันที่ขอลา: ${req.days} วัน (${req.startDate} ถึง ${req.endDate})
-- สิทธิ์พักร้อนสะสมเดิม: ${emp ? emp.carryVacation : 0} วัน
-- เหตุผล: ${req.reason}
-
-โปรดประเมินความเสี่ยงด้านกำลังคนและให้คำแนะนำสั้นๆ แก่ผู้อนุมัติ:`;
-
-            try {
-                const response = await callGeminiApi(systemPrompt, userPrompt);
-                if (riskTextEl) riskTextEl.innerHTML = `<span class="text-slate-800">${response}</span>`;
-            } catch (err) {
-                if (riskTextEl) riskTextEl.innerHTML = `<span class="text-rose-600">ไม่สามารถวิเคราะห์ได้ในขณะนี้</span>`;
-            } finally {
-                if (btn) btn.style.display = 'inline';
-            }
-        }
-
-        // Feature 3: HR AI Co-Pilot Queries
-        async function runAiInsight(type) {
-            const queryInput = document.getElementById('custom-ai-query');
-            if (type === 'ANALYZE_EXHAUSTION') {
-                queryInput.value = "ตรวจสอบและแจ้งเตือนพนักงานที่ใช้วันลาพักร้อนหรือลาป่วยสะสมเยอะ และผู้ที่มีสิทธิ์คงเหลือน้อยที่สุด";
-            } else if (type === 'EXECUTIVE_SUMMARY') {
-                queryInput.value = "สรุปภาพรวมการบริหารกำลังคน สัดส่วนการใช้วันลาพักร้อน/ลาป่วยทั้งบริษัท และข้อเสนอแนะเชิงกลยุทธ์ HR";
-            } else if (type === 'DRAFT_HOLIDAY_MEMO') {
-                queryInput.value = "ร่างข้อความประกาศนโยบายการลาพักร้อน (+1 วัน/เดือน ทบสะสมปีถัดไปได้) ส่งเข้า LINE พนักงานอย่างเป็นกันเองและชัดเจน";
-            }
-            runCustomAiQuery();
-        }
-
-        async function runCustomAiQuery() {
-            const queryInput = document.getElementById('custom-ai-query');
-            const userQuery = queryInput ? queryInput.value.trim() : '';
-            if (!userQuery) {
-                showToast('กรุณากรอกคำถามหรือเลือกหัวข้อการวิเคราะห์');
-                return;
-            }
-
-            const resContainer = document.getElementById('ai-response-container');
-            const resContent = document.getElementById('ai-response-content');
-            const runBtn = document.getElementById('btn-run-ai');
-
-            resContainer.classList.remove('hidden');
-            resContent.innerHTML = `<div class="flex items-center space-x-2 text-purple-700 py-3"><i class="fa-solid fa-spinner fa-spin text-lg"></i> <span>Gemini 3 Flash กำลังวิเคราะห์ฐานข้อมูลวันลา...</span></div>`;
-            runBtn.disabled = true;
-
-            // Generate condensed summary context of employees
-            const empContext = employees.map(e => ({
-                id: e.id,
-                name: e.name,
-                position: e.position,
-                carryVacation: e.carryVacation,
-                vacationUsed: e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a,b)=>a+b,0) : 0,
-                sickUsed: e.sickMonths ? e.sickMonths.reduce((a,b)=>a+b,0) : 0,
-                note: e.note || ''
-            }));
-
-            const systemPrompt = `คุณคือ "HR AI Co-Pilot" ผู้ช่วยงานบุคคลระดับสูงของระบบ HR Leave Connect ในองค์กร
-ข้อมูลกฎการลาของบริษัท:
-1. วันลาพักร้อน เพิ่มให้ +1 วัน/เดือน สามารถทบสะสมจากเดือนก่อน และยกยอดไปใช้ปีถัดๆ ไปได้
-2. ลาป่วย โควตาปีละไม่เกิน 30 วันทำการ
-3. มี 3 ประเภทการลา: ลาพักร้อน, ลาป่วย, ลาอื่นๆ
-
-ฐานข้อมูลพนักงานปัจจุบัน (${currentYearBE}):
-${JSON.stringify(empContext)}
-
-จงตอบคำถามผู้ใช้งานอย่างมืออาชีพ ถูกต้องตามตัวเลขจริง จัดรูปแบบให้อ่านง่าย มีหัวข้อและ emoji ประกอบอย่างสวยงาม`;
-
-            try {
-                const aiResult = await callGeminiApi(systemPrompt, userQuery);
-                resContent.innerText = aiResult;
-            } catch (err) {
-                resContent.innerHTML = `<span class="text-rose-600">เกิดข้อผิดพลาดในการเชื่อมต่อ Gemini API โปรดลองใหม่อีกครั้ง</span>`;
-            } finally {
-                runBtn.disabled = false;
-            }
-        }
-
-        function copyAiResponse() {
-            const content = document.getElementById('ai-response-content')?.innerText;
-            if (!content) return;
-            const temp = document.createElement('textarea');
-            temp.value = content;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            showToast('คัดลอกข้อความ AI สำเร็จ');
         }
 
         // Excel Import / Export Handlers
@@ -1358,16 +1167,29 @@ ${JSON.stringify(empContext)}
         }
 
         function exportSummaryToExcel() {
-            const dataToExport = employees.map(e => ({
-                "รหัสพนักงาน": e.id,
-                "ชื่อ-นามสกุล": e.name,
-                "ตำแหน่ง": e.position,
-                "วันเริ่มงาน": e.startDate,
-                "ทบวันลาพักร้อน": e.carryVacation || 0,
-                "รวมเพิ่มลาพักร้อน": 8,
-                "รวมใช้ลาพักร้อน": e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s,v)=>s+(parseFloat(v)||0),0) : 0,
-                "เหลือลาพักร้อน": e.carryVacation || 0
-            }));
+            const dataToExport = employees.map(e => {
+                const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const carry = parseFloat(e.carryVacation) || 0;
+                const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
+
+                return {
+                    "ลำดับ": e.seq,
+                    "รหัสพนักงาน": e.id,
+                    "ชื่อ-นามสกุล": e.name,
+                    "ตำแหน่ง": e.position,
+                    "วันเดือนปีเกิด": e.dob,
+                    "วันเริ่มงาน": e.startDate,
+                    "ทบวันพักร้อนสะสมปีก่อน": carry,
+                    "รวมเพิ่มพักร้อน": totalAccrued,
+                    "รวมใช้พักร้อน": totalVacUsed,
+                    "เหลือพักร้อน": remVac,
+                    "รวมใช้ลาป่วย": totalSickUsed,
+                    "ลาอื่นๆ": e.otherLeaveDays || 0,
+                    "หมายเหตุ": e.note || ""
+                };
+            });
             const ws = XLSX.utils.json_to_sheet(dataToExport);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, `สรุปปี_${currentYearBE}`);
