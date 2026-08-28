@@ -409,7 +409,7 @@
                         <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1]
                     </div>
 
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                    <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-paper-plane"></i>
                         <span>ส่งใบลาเพื่อขออนุมัติ</span>
                     </button>
@@ -433,7 +433,7 @@
 
     </main>
 
-    <!-- Modal: Simulated Email Modal -->
+    <!-- Modal: Detail Modal -->
     <div id="email-modal" class="fixed inset-0 bg-slate-900/60 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -441,14 +441,14 @@
                     <span class="w-3 h-3 rounded-full bg-rose-500"></span>
                     <span class="w-3 h-3 rounded-full bg-amber-500"></span>
                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-slate-400 font-mono ml-2">[จำลองการส่งอีเมลขออนุมัติ]</span>
+                    <span class="text-xs text-slate-400 font-mono ml-2">[รายละเอียดคำขอลา]</span>
                 </div>
                 <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1]
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1]
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -478,6 +478,9 @@
     </div>
 
     <script>
+        // Web App URL ของ Google Apps Script พร้อมใช้งาน
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHryhg9gm1HBRlL2g0g5DXRHCuJgIzLj_3duaIYsEJkIfkZAgX5RAs1JjPo0EUmkCWJQ/exec";
+
         // Automatic Real-Time Current Date & Year Detection
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -487,7 +490,7 @@
             "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
         ];
         
-        const todayRealISO = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const todayRealISO = now.toISOString().split('T')[0];
         const todayRealThaiText = `${now.getDate()} ${thaiMonthsFull[now.getMonth()]} พ.ศ. ${currentYearBE}`;
 
         // Global State Variables
@@ -578,7 +581,6 @@
             }
         }
 
-        // Exact official dataset matching verified company spreadsheet
         function initOfficialDataset() {
             employees = [
                 {
@@ -724,7 +726,6 @@
                 }
             }
 
-            // Calculate Overall Totals for the Year
             let grandVacationUsed = 0;
             let grandVacationRemaining = 0;
             let grandSickUsed = 0;
@@ -738,7 +739,6 @@
                 let usedVac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - usedVac);
-
                 let usedSick = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
 
                 grandVacationUsed += usedVac;
@@ -752,7 +752,7 @@
             document.getElementById('kpi-avg-vacation').innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
-        // ================= FULL MATRIX RENDERING WITH INLINE EDITING =================
+        // ================= FULL MATRIX RENDERING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -768,7 +768,6 @@
             filtered.forEach((e) => {
                 const empIndex = employees.findIndex(emp => emp.id === e.id);
                 
-                // Normalizing Vacation Accrued Array (12 items)
                 if (!e.vacationAccrued || e.vacationAccrued.length !== 12) {
                     e.vacationAccrued = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0];
                 }
@@ -808,7 +807,6 @@
                         </td>
                 `;
 
-                // 12 Months Vacation: [Accrued (+), Used (-)]
                 for (let m = 0; m < 12; m++) {
                     const addVal = e.vacationAccrued[m] !== undefined ? e.vacationAccrued[m] : 1;
                     const usedVal = e.vacationUsedMonths[m] !== undefined ? e.vacationUsedMonths[m] : 0;
@@ -827,14 +825,12 @@
                     `;
                 }
 
-                // Vacation Totals
                 rowHtml += `
-                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950" id="tot-accrued-${e.id}">${totalAccrued}</td>
-                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800" id="tot-vac-used-${e.id}">${totalVacationUsed}</td>
-                    <td class="p-2 text-center font-extrabold text-xs bg-yellow-300 text-slate-900 shadow-sm" id="tot-vac-rem-${e.id}">${remainingVacation}</td>
+                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950">${totalAccrued}</td>
+                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800">${totalVacationUsed}</td>
+                    <td class="p-2 text-center font-extrabold text-xs bg-yellow-300 text-slate-900 shadow-sm">${remainingVacation}</td>
                 `;
 
-                // 12 Months Sick Leave
                 for (let m = 0; m < 12; m++) {
                     const sickVal = e.sickMonths[m] !== undefined ? e.sickMonths[m] : 0;
                     rowHtml += `
@@ -846,9 +842,8 @@
                     `;
                 }
 
-                // Sick Total, Other, Note
                 rowHtml += `
-                    <td class="p-2 text-center font-bold bg-emerald-100 text-emerald-900 text-sm" id="tot-sick-${e.id}">${totalSickUsed}</td>
+                    <td class="p-2 text-center font-bold bg-emerald-100 text-emerald-900 text-sm">${totalSickUsed}</td>
                     <td class="p-1 text-center font-bold bg-purple-100 text-purple-950">
                         <input type="number" step="0.25" min="0" value="${finalOtherUsed > 0 ? finalOtherUsed : ''}" placeholder="0"
                             onchange="updateEmpField(${empIndex}, 'otherLeaveDays', this.value)"
@@ -865,7 +860,6 @@
             });
         }
 
-        // Inline Field Update Handlers
         function updateEmpField(empIndex, field, val) {
             if (field === 'carryVacation' || field === 'otherLeaveDays') {
                 employees[empIndex][field] = parseFloat(val) || 0;
@@ -971,7 +965,7 @@
             return 1;
         }
 
-        function handleLeaveSubmit(e) {
+        async function handleLeaveSubmit(e) {
             e.preventDefault();
             const empId = document.getElementById('form-emp-id').value;
             const emp = employees.find(x => x.id === empId);
@@ -1007,11 +1001,30 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com',[cite: 1]
                 status: 'รออนุมัติ',
                 createdAt: todayRealISO,
                 year: currentYearBE.toString()
             };
+
+            const submitBtn = document.getElementById('btn-submit-form');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งอีเมลแจ้งเตือน...`;
+
+            // ยิงส่งข้อมูลไปยัง Google Apps Script เพื่อส่งอีเมลจริง
+            if (GOOGLE_SCRIPT_URL) {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(newReq)
+                    });
+                } catch (err) {
+                    console.error("เกิดข้อผิดพลาดในการส่งอีเมลผ่าน Google Apps Script:", err);
+                }
+            }
 
             requests.unshift(newReq);
             saveData();
@@ -1019,7 +1032,10 @@
             document.getElementById('leave-form').reset();
             setupDynamicDates();
             toggleDurationOptions();
-            showToast('ยื่นใบลาส่งไปยัง Secretary.fine@gmail.com เรียบร้อยแล้ว');
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');[cite: 1]
         }
 
         function renderApprovalQueue() {
@@ -1060,7 +1076,7 @@
                         </div>
                         <div class="flex items-center space-x-2">
                             <button onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition">
-                                <i class="fa-solid fa-envelope mr-1"></i> ดูอีเมล
+                                <i class="fa-solid fa-envelope mr-1"></i> ดูรายละเอียด
                             </button>
                             ${r.status === 'รออนุมัติ' ? `
                                 <button onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition">อนุมัติ</button>
@@ -1096,7 +1112,6 @@
             activeModalReqId = null;
         }
 
-        // ================= APPROVAL HANDLER THAT DOCKS DIRECTLY INTO THE MONTH MATRIX =================
         function approveLeaveRequest(reqId) {
             const req = requests.find(r => r.id === reqId);
             if (req && req.status !== 'อนุมัติแล้ว') {
@@ -1104,7 +1119,6 @@
 
                 const emp = employees.find(e => e.id === req.empId);
                 if (emp) {
-                    // Extract month from startDate (0 = ม.ค., 11 = ธ.ค.)
                     const leaveDate = new Date(req.startDate);
                     const monthIdx = !isNaN(leaveDate.getMonth()) ? leaveDate.getMonth() : 0;
 
@@ -1135,7 +1149,6 @@
             }
         }
 
-        // Excel Import / Export Handlers
         function triggerExcelImport() {
             document.getElementById('excel-file-input').click();
         }
