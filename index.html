@@ -118,7 +118,7 @@
                         <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ข้อมูล ณ ปัจจุบัน</p>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังคำนวณข้อมูล...</p>
                 </div>
             </div>
 
@@ -611,8 +611,8 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v7');
-                const localReq = localStorage.getItem('pcbk_req_v7');
+                const localEmp = localStorage.getItem('pcbk_emp_v8');
+                const localReq = localStorage.getItem('pcbk_req_v8');
 
                 if (localEmp && JSON.parse(localEmp).length > 0) {
                     employees = JSON.parse(localEmp);
@@ -634,11 +634,12 @@
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v7', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v7', JSON.stringify(requests));
+                localStorage.setItem('pcbk_emp_v8', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v8', JSON.stringify(requests));
             } catch (e) {}
         }
 
+        // ================= BACKGROUND CLOUD SYNC =================
         async function syncFromCloud() {
             const syncIndicator = document.getElementById('sync-indicator');
             const syncText = document.getElementById('sync-text');
@@ -780,14 +781,22 @@
 
             employees.forEach(e => {
                 let totalAccrued = 0;
-                if (e.vacationAccrued) {
-                    for (let m = 0; m < 12; m++) totalAccrued += parseFloat(e.vacationAccrued[m]) || 0;
+                if (e.vacationAccrued && Array.isArray(e.vacationAccrued)) {
+                    for (let m = 0; m < 12; m++) totalAccrued += (parseFloat(e.vacationAccrued[m]) || 0);
                 }
 
-                let usedVac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                let usedVac = 0;
+                if (e.vacationUsedMonths && Array.isArray(e.vacationUsedMonths)) {
+                    usedVac = e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                }
+
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - usedVac);
-                let usedSick = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                
+                let usedSick = 0;
+                if (e.sickMonths && Array.isArray(e.sickMonths)) {
+                    usedSick = e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                }
 
                 grandVacationUsed += usedVac;
                 grandVacationRemaining += remVac;
@@ -805,6 +814,7 @@
             if (avgVacEl) avgVacEl.innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
+        // ================= FULL MATRIX RENDERING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -1053,7 +1063,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',[cite: 1, 2]
+                approverEmail: 'Secretary.fine@gmail.com',
                 status: 'รออนุมัติ',
                 createdAt: todayRealISO,
                 year: currentYearBE.toString()
@@ -1083,7 +1093,7 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');[cite: 1, 2]
+            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');
         }
 
         function renderApprovalQueue() {
