@@ -69,17 +69,12 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Real-Time Date & Reset Action -->
+                <!-- Dynamic Real-Time Date -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
                         <i class="fa-regular fa-calendar-check text-blue-600"></i>
                         <span id="header-realtime-date" class="font-bold">วันนี้: กำลังโหลด...</span>
                     </div>
-
-                    <button onclick="resetToOfficialData()" title="รีเซ็ตเป็นข้อมูลตั้งต้นตามไฟล์ Excel ล่าสุด" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 border border-slate-200">
-                        <i class="fa-solid fa-rotate-right"></i>
-                        <span class="hidden md:inline">รีเซ็ตข้อมูล</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -302,7 +297,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1]</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -411,7 +406,7 @@
                     <!-- Destination Notice -->
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1]
                     </div>
 
                     <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
@@ -566,11 +561,17 @@
                 const localEmp = localStorage.getItem('hr_leave_employees_official_v4');
                 const localReq = localStorage.getItem('hr_leave_requests_official_v4');
 
-                if (localEmp) employees = JSON.parse(localEmp);
-                else initOfficialDataset();
+                if (localEmp) {
+                    employees = JSON.parse(localEmp);
+                } else {
+                    initOfficialDataset();
+                }
 
-                if (localReq) requests = JSON.parse(localReq);
-                else requests = []; 
+                if (localReq) {
+                    requests = JSON.parse(localReq);
+                } else {
+                    requests = []; 
+                }
             } catch(e) {
                 initOfficialDataset();
                 requests = [];
@@ -648,16 +649,6 @@
                 }
             ];
             saveData();
-        }
-
-        function resetToOfficialData() {
-            if (confirm('คุณต้องการรีเซ็ตข้อมูลทั้งหมดกลับเป็นค่าเริ่มต้นใช่หรือไม่?')) {
-                initOfficialDataset();
-                requests = [];
-                saveData();
-                renderAllViews();
-                showToast('รีเซ็ตข้อมูลเป็นค่ามาตรฐานตามไฟล์เรียบร้อย');
-            }
         }
 
         function renderAllViews() {
