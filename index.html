@@ -69,9 +69,9 @@
 
                 <!-- Dynamic Real-Time Date & Sync Status -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
-                    <div id="sync-status" class="hidden sm:flex items-center space-x-1.5 text-[11px] text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span>ซิงก์ Cloud แล้ว</span>
+                    <div id="sync-status" class="flex items-center space-x-1.5 text-[11px] bg-slate-100 px-2.5 py-1 rounded-lg">
+                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span id="sync-text" class="text-slate-600">กำลังเชื่อม Cloud...</span>
                     </div>
                     <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
                         <i class="fa-regular fa-calendar-check text-blue-600"></i>
@@ -171,7 +171,7 @@
                 </div>
             </div>
 
-            <!-- Today's Attendance List -->
+            <!-- Attendance List -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
@@ -294,7 +294,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1, 2]</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -398,7 +398,7 @@
 
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1, 2]
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
@@ -439,8 +439,8 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1, 2]
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1, 2]
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -470,7 +470,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHryhg9gm1HBRlL2g0g5DXRHCuJgIzLj_3duaIYsEJkIfkZAgX5RAs1JjPo0EUmkCWJQ/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJ5MbVVrlxSZT4ziXaU0An4HeGMTn1muCkjsJQV-qAYD6xQpjrYR0X5OOcL97xcWyD/exec";
 
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -490,10 +490,10 @@
         window.onload = async function() {
             try {
                 setupDynamicDates();
-                initOfficialDataset(); // โหลดชุดข้อมูลตั้งต้นทันที
+                initOfficialDataset();
                 renderAllViews();
                 switchTab('dashboard');
-                await loadCloudData(); // ดึงข้อมูลสดจาก Google Cloud มาซิงก์
+                await loadCloudData();
             } catch (err) {
                 console.error("Initialization Error:", err);
             }
@@ -546,23 +546,35 @@
 
         // ================= CLOUD DATA SYNC HANDLERS =================
         async function loadCloudData() {
+            const syncIndicator = document.getElementById('sync-indicator');
+            const syncText = document.getElementById('sync-text');
+
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
+                
                 if (data && data.status === "success") {
-                    if (data.employees && data.employees.length > 0) {
+                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
                         employees = data.employees;
                     } else {
-                        // ถ้าชีตยังว่างเปล่า ให้ส่งค่าตั้งต้นขึ้นไปเก็บ
-                        saveEmployeesToCloud();
+                        await saveEmployeesToCloud();
                     }
-                    if (data.requests) {
+                    if (data.requests && Array.isArray(data.requests)) {
                         requests = data.requests;
+                    }
+                    
+                    if (syncIndicator && syncText) {
+                        syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
+                        syncText.innerText = "ซิงก์ Cloud แล้ว";
                     }
                     renderAllViews();
                 }
             } catch (err) {
-                console.log("Cloud sync fallback to local cache", err);
+                console.log("Cloud sync fallback to default dataset:", err);
+                if (syncIndicator && syncText) {
+                    syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
+                    syncText.innerText = "ใช้งานระบบออฟไลน์";
+                }
             }
         }
 
@@ -570,8 +582,7 @@
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
                         action: "SAVE_EMPLOYEES",
                         employees: employees
@@ -586,8 +597,7 @@
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     body: JSON.stringify({
                         action: "SAVE_ALL",
                         employees: employees,
@@ -882,39 +892,39 @@
             });
         }
 
-        function updateEmpField(empIndex, field, val) {
+        async function updateEmpField(empIndex, field, val) {
             if (field === 'carryVacation' || field === 'otherLeaveDays') {
                 employees[empIndex][field] = parseFloat(val) || 0;
             } else {
                 employees[empIndex][field] = val;
             }
-            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
+            await saveEmployeesToCloud();
             showToast('บันทึกการแก้ไขขึ้น Cloud เรียบร้อย');
         }
 
-        function updateVacAccruedMonth(empIndex, monthIdx, val) {
+        async function updateVacAccruedMonth(empIndex, monthIdx, val) {
             employees[empIndex].vacationAccrued[monthIdx] = parseFloat(val) || 0;
-            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
+            await saveEmployeesToCloud();
             showToast('บันทึกยอดเพิ่มพักร้อนขึ้น Cloud เรียบร้อย');
         }
 
-        function updateVacUsedMonth(empIndex, monthIdx, val) {
+        async function updateVacUsedMonth(empIndex, monthIdx, val) {
             employees[empIndex].vacationUsedMonths[monthIdx] = parseFloat(val) || 0;
-            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
+            await saveEmployeesToCloud();
             showToast('บันทึกยอดใช้พักร้อนขึ้น Cloud เรียบร้อย');
         }
 
-        function updateSickMonth(empIndex, monthIdx, val) {
+        async function updateSickMonth(empIndex, monthIdx, val) {
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
-            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
+            await saveEmployeesToCloud();
             showToast('บันทึกยอดลาป่วยขึ้น Cloud เรียบร้อย');
         }
 
@@ -1023,7 +1033,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com',[cite: 1, 2]
                 status: 'รออนุมัติ',
                 createdAt: todayRealISO,
                 year: currentYearBE.toString()
@@ -1034,20 +1044,17 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลและอีเมล...`;
 
-            if (GOOGLE_SCRIPT_URL) {
-                try {
-                    await fetch(GOOGLE_SCRIPT_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            action: "SUBMIT_LEAVE",
-                            request: newReq
-                        })
-                    });
-                } catch (err) {
-                    console.error("Cloud submit error:", err);
-                }
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "SUBMIT_LEAVE",
+                        request: newReq
+                    })
+                });
+            } catch (err) {
+                console.error("Cloud submit error:", err);
             }
 
             requests.unshift(newReq);
@@ -1058,7 +1065,7 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');
+            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');[cite: 1, 2]
         }
 
         function renderApprovalQueue() {
@@ -1135,7 +1142,7 @@
             activeModalReqId = null;
         }
 
-        function approveLeaveRequest(reqId) {
+        async function approveLeaveRequest(reqId) {
             const req = requests.find(r => r.id === reqId);
             if (req && req.status !== 'อนุมัติแล้ว') {
                 req.status = 'อนุมัติแล้ว';
@@ -1156,18 +1163,18 @@
                     }
                 }
 
-                saveAllToCloud();
                 renderAllViews();
+                await saveAllToCloud();
                 showToast(`อนุมัติคำขอของ ${req.empName} แล้ว และตัดยอดลงตารางประจำเดือนทันที`);
             }
         }
 
-        function rejectLeaveRequest(reqId) {
+        async function rejectLeaveRequest(reqId) {
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
-                saveAllToCloud();
                 renderAllViews();
+                await saveAllToCloud();
                 showToast(`ปฏิเสธคำขอของ ${req.empName} แล้ว`);
             }
         }
