@@ -84,20 +84,20 @@
         <!-- Navigation Tabs -->
         <div class="bg-slate-50 border-t border-slate-200 overflow-x-auto">
             <div class="max-w-7xl mx-auto px-4 flex space-x-2 sm:space-x-4 min-w-max">
-                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition cursor-pointer">
+                <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition cursor-pointer">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>ภาพรวมวันนี้</span>
                     <span id="badge-today-count" class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </button>
-                <button onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
+                <button type="button" onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-table-list"></i>
                     <span id="tab-summary-title">ตารางสรุปวันลา</span>
                 </button>
-                <button onclick="switchTab('request-form')" id="tab-btn-request-form" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
+                <button type="button" onclick="switchTab('request-form')" id="tab-btn-request-form" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span>ยื่นขอลางาน</span>
                 </button>
-                <button onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
+                <button type="button" onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-envelope-circle-check"></i>
                     <span>รายการอนุมัติ</span>
                     <span id="badge-pending-count" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
@@ -118,7 +118,7 @@
                         <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ข้อมูล ณ ปัจจุบัน</p>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ข้อมูล ณ วันที่กำลังโหลด...</p>
                 </div>
             </div>
 
@@ -181,12 +181,12 @@
                         <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานเพื่อบริหารจัดการทีม</p>
                     </div>
                     <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="today-status-chip">
-                        สถานะ: ปกติ
+                        สถานะ: กำลังโหลด...
                     </span>
                 </div>
 
                 <div id="today-leave-list-container" class="py-6 text-center space-y-2">
-                    <!-- Rendered by JS -->
+                    <!-- Dynamic -->
                 </div>
             </div>
         </section>
@@ -210,11 +210,11 @@
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                             <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ หรือตำแหน่ง..." class="w-full sm:w-48 pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
-                        <button onclick="triggerExcelImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
+                        <button type="button" onclick="triggerExcelImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
                         </button>
                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
-                        <button onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
+                        <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-download mr-1"></i> ส่งออก Excel
                         </button>
                     </div>
@@ -280,7 +280,7 @@
                             </tr>
                         </thead>
                         <tbody id="summary-table-body" class="divide-y divide-slate-200">
-                            <!-- Rows generated by JS -->
+                            <!-- Dynamic -->
                         </tbody>
                     </table>
                 </div>
@@ -294,7 +294,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1, 2]</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -398,7 +398,7 @@
 
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1, 2]
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -418,7 +418,7 @@
                 </div>
 
                 <div id="approval-list" class="space-y-3">
-                    <!-- Dynamic Requests -->
+                    <!-- Dynamic -->
                 </div>
             </div>
         </section>
@@ -435,12 +435,12 @@
                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                     <span class="text-xs text-slate-400 font-mono ml-2">[รายละเอียดคำขอลา]</span>
                 </div>
-                <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button type="button" onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1, 2]
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1, 2]
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -453,10 +453,10 @@
             </div>
 
             <div class="flex items-center justify-end space-x-2 pt-2">
-                <button id="email-btn-reject" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition cursor-pointer">
+                <button type="button" id="email-btn-reject" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition cursor-pointer">
                     <i class="fa-solid fa-xmark mr-1"></i> ไม่อนุมัติ
                 </button>
-                <button id="email-btn-approve" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition cursor-pointer">
+                <button type="button" id="email-btn-approve" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition cursor-pointer">
                     <i class="fa-solid fa-check mr-1"></i> อนุมัติคำขอนี้
                 </button>
             </div>
@@ -487,89 +487,84 @@
         let requests = []; 
         let activeModalReqId = null;
 
-        // ฟังก์ชันตั้งต้นชุดข้อมูลทางการ
-        function getOfficialEmployees() {
-            return [
-                {
-                    seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President (รองประธานกรรมการบริหาร)", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 3, id: "1102033", name: "นางสาวภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [0.25, 0, 0, 2, 0, 1, 2, 0.25, 0, 0, 0, 0],
-                    sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 4, id: "1104008", name: "นางสาวกนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [1.5, 0, 3, 1, 0.5, 2, 1, 1, 0, 0, 0, 0],
-                    sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: ""
-                },
-                {
-                    seq: 5, id: "1103020", name: "นายชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 6, id: "1103059", name: "นายปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 7, id: "1102049", name: "นางสาวณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [3, 0.25, 1, 3.75, 0, 1, 3, 1, 0, 0, 0, 0],
-                    sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 8, id: "1102050", name: "นางสาวภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [3, 0, 1, 2, 3, 1, 1, 1, 0, 0, 0, 0],
-                    sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 9, id: "1102051", name: "นางสาวอาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
-                    vacationAccrued: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-                    vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED"
-                },
-                {
-                    seq: 10, id: "1102055", name: "นายรัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                },
-                {
-                    seq: 11, id: "1103063", name: "นายกฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
-                    vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                    vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
-                }
-            ];
-        }
-
-        window.onload = function() {
-            try {
-                setupDynamicDates();
-                loadInitialData();
-                renderAllViews();
-                switchTab('dashboard');
-                syncFromCloud();
-            } catch (err) {
-                console.error("Window Load Error:", err);
+        // รายชื่อพนักงานและสถิติเริ่มต้นตาม Spreadsheet จริง
+        const defaultDataset = [
+            {
+                seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President (รองประธานกรรมการบริหาร)", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 3, id: "1102033", name: "นางสาวภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0.25, 0, 0, 2, 0, 1, 2, 0.25, 0, 0, 0, 0],
+                sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 4, id: "1104008", name: "นางสาวกนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [1.5, 0, 3, 1, 0.5, 2, 1, 1, 0, 0, 0, 0],
+                sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: ""
+            },
+            {
+                seq: 5, id: "1103020", name: "นายชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 6, id: "1103059", name: "นายปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 7, id: "1102049", name: "นางสาวณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [3, 0.25, 1, 3.75, 0, 1, 3, 1, 0, 0, 0, 0],
+                sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 8, id: "1102050", name: "นางสาวภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [3, 0, 1, 2, 3, 1, 1, 1, 0, 0, 0, 0],
+                sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 9, id: "1102051", name: "นางสาวอาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
+                vacationAccrued: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED"
+            },
+            {
+                seq: 10, id: "1102055", name: "นายรัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+            },
+            {
+                seq: 11, id: "1103063", name: "นายกฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             }
-        };
+        ];
+
+        // เรียกทำงานทันทีที่เปิดหน้าเว็บ
+        window.addEventListener('DOMContentLoaded', () => {
+            setupDynamicDates();
+            loadInitialData();
+            renderAllViews();
+            switchTab('dashboard');
+            syncFromCloud();
+        });
 
         function setupDynamicDates() {
             const headerDateEl = document.getElementById('header-realtime-date');
@@ -618,13 +613,13 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v5');
-                const localReq = localStorage.getItem('pcbk_req_v5');
+                const localEmp = localStorage.getItem('pcbk_emp_v6');
+                const localReq = localStorage.getItem('pcbk_req_v6');
 
                 if (localEmp && JSON.parse(localEmp).length > 0) {
                     employees = JSON.parse(localEmp);
                 } else {
-                    employees = getOfficialEmployees();
+                    employees = JSON.parse(JSON.stringify(defaultDataset));
                     saveLocalData();
                 }
 
@@ -634,15 +629,15 @@
                     requests = [];
                 }
             } catch (e) {
-                employees = getOfficialEmployees();
+                employees = JSON.parse(JSON.stringify(defaultDataset));
                 requests = [];
             }
         }
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v5', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v5', JSON.stringify(requests));
+                localStorage.setItem('pcbk_emp_v6', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v6', JSON.stringify(requests));
             } catch (e) {}
         }
 
@@ -1062,7 +1057,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',[cite: 1, 2]
+                approverEmail: 'Secretary.fine@gmail.com',
                 status: 'รออนุมัติ',
                 createdAt: todayRealISO,
                 year: currentYearBE.toString()
@@ -1092,7 +1087,7 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');[cite: 1, 2]
+            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');
         }
 
         function renderApprovalQueue() {
@@ -1132,12 +1127,12 @@
                             <p class="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg"><strong>ช่องทางติดต่อ:</strong> ${r.reason}</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition cursor-pointer">
+                            <button type="button" onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition cursor-pointer">
                                 <i class="fa-solid fa-envelope mr-1"></i> ดูรายละเอียด
                             </button>
                             ${r.status === 'รออนุมัติ' ? `
-                                <button onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">อนุมัติ</button>
-                                <button onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">ปฏิเสธ</button>
+                                <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">อนุมัติ</button>
+                                <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">ปฏิเสธ</button>
                             ` : ''}
                         </div>
                     </div>`;
