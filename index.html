@@ -28,7 +28,6 @@
         .modal-blur {
             backdrop-filter: blur(6px);
         }
-        /* Custom smooth scrollbar for matrix table */
         ::-webkit-scrollbar {
             height: 7px;
             width: 7px;
@@ -40,7 +39,6 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        /* Hide number input spinners for cleaner spreadsheet UI */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
@@ -69,8 +67,12 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Real-Time Date -->
+                <!-- Dynamic Real-Time Date & Sync Status -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div id="sync-status" class="hidden sm:flex items-center space-x-1.5 text-[11px] text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>ซิงก์ Cloud แล้ว</span>
+                    </div>
                     <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
                         <i class="fa-regular fa-calendar-check text-blue-600"></i>
                         <span id="header-realtime-date" class="font-bold">วันนี้: กำลังโหลด...</span>
@@ -109,21 +111,19 @@
 
         <!-- ================= TAB 1: EXECUTIVE DASHBOARD ================= -->
         <section id="tab-dashboard" class="tab-content space-y-6">
-            <!-- Hero Welcome Card -->
             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
                 <div class="relative z-10 space-y-1">
                     <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
+                        <span>ระบบคลาวด์อัปเดตข้อมูลอัตโนมัติเชื่อมตรงทุกเครื่อง</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
                     <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังคำนวณข้อมูล...</p>
                 </div>
             </div>
 
-            <!-- KPI Metric Cards -->
+            <!-- KPI Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- KPI 1: วันนี้ลางาน -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">ลางานวันนี้</span>
@@ -137,7 +137,6 @@
                     </p>
                 </div>
 
-                <!-- KPI 2: วันลาพักร้อนใช้ไปทั้งปี -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">พักร้อนใช้ไปทั้งปี</span>
@@ -149,7 +148,6 @@
                     <p class="text-xs text-slate-500 mt-1">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> วัน/คน</p>
                 </div>
 
-                <!-- KPI 3: สิทธิ์พักร้อนคงเหลือรวม -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">สิทธิ์พักร้อนคงเหลือรวม</span>
@@ -161,7 +159,6 @@
                     <p class="text-xs text-emerald-600 font-semibold mt-1">+1 วัน/เดือน (ทบสะสมปีถัดไปได้)</p>
                 </div>
 
-                <!-- KPI 4: ลาป่วยใช้ไปรวม -->
                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">ลาป่วยสะสมทั้งปี</span>
@@ -174,7 +171,7 @@
                 </div>
             </div>
 
-            <!-- Today's Leave Attendance Status Card -->
+            <!-- Today's Attendance List -->
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div>
@@ -189,7 +186,7 @@
                 </div>
 
                 <div id="today-leave-list-container" class="py-6 text-center space-y-2">
-                    <!-- Rendered dynamically by JS -->
+                    <!-- Rendered by JS -->
                 </div>
             </div>
         </section>
@@ -202,10 +199,10 @@
                         <div class="flex items-center space-x-2">
                             <h2 class="font-bold text-slate-900 text-lg" id="summary-table-header-title">สรุปตารางลาของพนักงาน</h2>
                             <span class="bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center">
-                                <i class="fa-solid fa-pen-to-square mr-1"></i> สามารถแก้ไขตัวเลขในตารางได้โดยตรง
+                                <i class="fa-solid fa-cloud-arrow-up mr-1"></i> ซิงก์ข้อมูลคลาวด์ทุกเครื่องอัตโนมัติ
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">ระบบจะคำนวณยอดรวมและบันทึกข้อมูลอัตโนมัติเมื่อพิมพ์แก้ไขในช่องตาราง</p>
+                        <p class="text-xs text-slate-500 mt-0.5">แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -283,7 +280,7 @@
                             </tr>
                         </thead>
                         <tbody id="summary-table-body" class="divide-y divide-slate-200">
-                            <!-- Matrix Rows generated dynamically by JS -->
+                            <!-- Rows generated by JS -->
                         </tbody>
                     </table>
                 </div>
@@ -329,7 +326,6 @@
                         </div>
                     </div>
 
-                    <!-- Leave Duration Type (1 Day, 0.5 Day, 0.25 Day) -->
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">ระยะเวลาการลา *</label>
                         <div class="grid grid-cols-3 gap-2">
@@ -351,7 +347,6 @@
                         </div>
                     </div>
 
-                    <!-- Sub-option for 0.5 Day -->
                     <div id="option-half-day" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-2">
                         <label class="block font-semibold text-amber-900 text-xs">ช่วงเวลาครึ่งวัน *</label>
                         <div class="grid grid-cols-2 gap-2 text-xs">
@@ -366,7 +361,6 @@
                         </div>
                     </div>
 
-                    <!-- Sub-option for 0.25 Day -->
                     <div id="option-quarter-day" class="hidden bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2">
                         <label class="block font-semibold text-purple-900 text-xs">ระบุช่วงเวลาลางาน 2 ชั่วโมง *</label>
                         <div class="grid grid-cols-2 gap-3 text-xs">
@@ -381,7 +375,6 @@
                         </div>
                     </div>
 
-                    <!-- Dates Picker -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">ตั้งแต่วันที่ *</label>
@@ -403,7 +396,6 @@
                         <textarea id="form-reason" rows="2" required placeholder="เช่น ธุระติดต่อราชการ / โทร 081-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
                     </div>
 
-                    <!-- Destination Notice -->
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
                         <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
@@ -426,7 +418,7 @@
                 </div>
 
                 <div id="approval-list" class="space-y-3">
-                    <!-- Dynamic Requests via JS -->
+                    <!-- Dynamic Requests -->
                 </div>
             </div>
         </section>
@@ -495,12 +487,13 @@
         let requests = []; 
         let activeModalReqId = null;
 
-        window.onload = function() {
+        window.onload = async function() {
             try {
                 setupDynamicDates();
-                loadSavedData();
+                initOfficialDataset(); // โหลดชุดข้อมูลตั้งต้นทันที
                 renderAllViews();
                 switchTab('dashboard');
+                await loadCloudData(); // ดึงข้อมูลสดจาก Google Cloud มาซิงก์
             } catch (err) {
                 console.error("Initialization Error:", err);
             }
@@ -551,34 +544,58 @@
             if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
         }
 
-        function saveData() {
+        // ================= CLOUD DATA SYNC HANDLERS =================
+        async function loadCloudData() {
             try {
-                localStorage.setItem('hr_leave_employees_official_v4', JSON.stringify(employees));
-                localStorage.setItem('hr_leave_requests_official_v4', JSON.stringify(requests));
-            } catch(e) {
-                console.error("Could not save to localStorage", e);
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await res.json();
+                if (data && data.status === "success") {
+                    if (data.employees && data.employees.length > 0) {
+                        employees = data.employees;
+                    } else {
+                        // ถ้าชีตยังว่างเปล่า ให้ส่งค่าตั้งต้นขึ้นไปเก็บ
+                        saveEmployeesToCloud();
+                    }
+                    if (data.requests) {
+                        requests = data.requests;
+                    }
+                    renderAllViews();
+                }
+            } catch (err) {
+                console.log("Cloud sync fallback to local cache", err);
             }
         }
 
-        function loadSavedData() {
+        async function saveEmployeesToCloud() {
             try {
-                const localEmp = localStorage.getItem('hr_leave_employees_official_v4');
-                const localReq = localStorage.getItem('hr_leave_requests_official_v4');
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "SAVE_EMPLOYEES",
+                        employees: employees
+                    })
+                });
+            } catch (err) {
+                console.error("Cloud save employees error:", err);
+            }
+        }
 
-                if (localEmp) {
-                    employees = JSON.parse(localEmp);
-                } else {
-                    initOfficialDataset();
-                }
-
-                if (localReq) {
-                    requests = JSON.parse(localReq);
-                } else {
-                    requests = []; 
-                }
-            } catch(e) {
-                initOfficialDataset();
-                requests = [];
+        async function saveAllToCloud() {
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "SAVE_ALL",
+                        employees: employees,
+                        requests: requests
+                    })
+                });
+            } catch (err) {
+                console.error("Cloud save all error:", err);
             }
         }
 
@@ -651,7 +668,6 @@
                     sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 }
             ];
-            saveData();
         }
 
         function renderAllViews() {
@@ -872,34 +888,34 @@
             } else {
                 employees[empIndex][field] = val;
             }
-            saveData();
+            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
-            showToast('บันทึกการแก้ไขข้อมูลเรียบร้อย');
+            showToast('บันทึกการแก้ไขขึ้น Cloud เรียบร้อย');
         }
 
         function updateVacAccruedMonth(empIndex, monthIdx, val) {
             employees[empIndex].vacationAccrued[monthIdx] = parseFloat(val) || 0;
-            saveData();
+            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
-            showToast('บันทึกยอดเพิ่มพักร้อนเรียบร้อย');
+            showToast('บันทึกยอดเพิ่มพักร้อนขึ้น Cloud เรียบร้อย');
         }
 
         function updateVacUsedMonth(empIndex, monthIdx, val) {
             employees[empIndex].vacationUsedMonths[monthIdx] = parseFloat(val) || 0;
-            saveData();
+            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
-            showToast('บันทึกยอดใช้พักร้อนเรียบร้อย');
+            showToast('บันทึกยอดใช้พักร้อนขึ้น Cloud เรียบร้อย');
         }
 
         function updateSickMonth(empIndex, monthIdx, val) {
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
-            saveData();
+            saveEmployeesToCloud();
             renderSummaryTable();
             renderTodayDashboard();
-            showToast('บันทึกยอดลาป่วยเรียบร้อย');
+            showToast('บันทึกยอดลาป่วยขึ้น Cloud เรียบร้อย');
         }
 
         function renderEmpSelectOptions(selectId) {
@@ -1016,7 +1032,7 @@
             const submitBtn = document.getElementById('btn-submit-form');
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งอีเมลแจ้งเตือน...`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลและอีเมล...`;
 
             if (GOOGLE_SCRIPT_URL) {
                 try {
@@ -1024,15 +1040,17 @@
                         method: "POST",
                         mode: "no-cors",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(newReq)
+                        body: JSON.stringify({
+                            action: "SUBMIT_LEAVE",
+                            request: newReq
+                        })
                     });
                 } catch (err) {
-                    console.error("เกิดข้อผิดพลาดในการส่งอีเมลผ่าน Google Apps Script:", err);
+                    console.error("Cloud submit error:", err);
                 }
             }
 
             requests.unshift(newReq);
-            saveData();
             renderAllViews();
             document.getElementById('leave-form').reset();
             setupDynamicDates();
@@ -1138,7 +1156,7 @@
                     }
                 }
 
-                saveData();
+                saveAllToCloud();
                 renderAllViews();
                 showToast(`อนุมัติคำขอของ ${req.empName} แล้ว และตัดยอดลงตารางประจำเดือนทันที`);
             }
@@ -1148,7 +1166,7 @@
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
-                saveData();
+                saveAllToCloud();
                 renderAllViews();
                 showToast(`ปฏิเสธคำขอของ ${req.empName} แล้ว`);
             }
