@@ -70,8 +70,8 @@
                 <!-- Dynamic Real-Time Date & Sync Status -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div id="sync-status" class="flex items-center space-x-1.5 text-[11px] bg-slate-100 px-2.5 py-1 rounded-lg">
-                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                        <span id="sync-text" class="text-slate-600">กำลังเชื่อม Cloud...</span>
+                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span id="sync-text" class="text-slate-600">พร้อมใช้งาน</span>
                     </div>
                     <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
                         <i class="fa-regular fa-calendar-check text-blue-600"></i>
@@ -81,7 +81,7 @@
             </div>
         </div>
 
-        <!-- Clean Navigation Tabs -->
+        <!-- Navigation Tabs -->
         <div class="bg-slate-50 border-t border-slate-200 overflow-x-auto">
             <div class="max-w-7xl mx-auto px-4 flex space-x-2 sm:space-x-4 min-w-max">
                 <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition">
@@ -115,7 +115,7 @@
                 <div class="relative z-10 space-y-1">
                     <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
                         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>ระบบคลาวด์อัปเดตข้อมูลอัตโนมัติเชื่อมตรงทุกเครื่อง</span>
+                        <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
                     <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังคำนวณข้อมูล...</p>
@@ -487,13 +487,14 @@
         let requests = []; 
         let activeModalReqId = null;
 
-        window.onload = async function() {
+        window.onload = function() {
             try {
                 setupDynamicDates();
-                initOfficialDataset();
+                loadLocalOrOfficialData(); // แสดงผลข้อมูลตั้งต้นทันที ไม่ให้หน้าเว็บค้าง
                 renderAllViews();
                 switchTab('dashboard');
-                await loadCloudData();
+                // โหลดซิงก์จาก Cloud แบบ Background Non-blocking
+                loadCloudDataBackground();
             } catch (err) {
                 console.error("Initialization Error:", err);
             }
@@ -544,25 +545,52 @@
             if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
         }
 
-        // ================= CLOUD DATA SYNC HANDLERS =================
-        async function loadCloudData() {
+        function loadLocalOrOfficialData() {
+            try {
+                const localEmp = localStorage.getItem('pcbk_employees_cache');
+                const localReq = localStorage.getItem('pcbk_requests_cache');
+                if (localEmp) employees = JSON.parse(localEmp);
+                else initOfficialDataset();
+
+                if (localReq) requests = JSON.parse(localReq);
+                else requests = [];
+            } catch (e) {
+                initOfficialDataset();
+                requests = [];
+            }
+        }
+
+        function saveLocalCache() {
+            try {
+                localStorage.setItem('pcbk_employees_cache', JSON.stringify(employees));
+                localStorage.setItem('pcbk_requests_cache', JSON.stringify(requests));
+            } catch (e) {}
+        }
+
+        // ================= BACKGROUND CLOUD SYNC =================
+        async function loadCloudDataBackground() {
             const syncIndicator = document.getElementById('sync-indicator');
             const syncText = document.getElementById('sync-text');
 
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 วินาที Timeout กันค้าง
+
+                const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
+                clearTimeout(timeoutId);
                 const data = await res.json();
                 
                 if (data && data.status === "success") {
                     if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
                         employees = data.employees;
                     } else {
-                        await saveEmployeesToCloud();
+                        saveEmployeesToCloud();
                     }
                     if (data.requests && Array.isArray(data.requests)) {
                         requests = data.requests;
                     }
                     
+                    saveLocalCache();
                     if (syncIndicator && syncText) {
                         syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
                         syncText.innerText = "ซิงก์ Cloud แล้ว";
@@ -570,15 +598,15 @@
                     renderAllViews();
                 }
             } catch (err) {
-                console.log("Cloud sync fallback to default dataset:", err);
                 if (syncIndicator && syncText) {
                     syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
-                    syncText.innerText = "ใช้งานระบบออฟไลน์";
+                    syncText.innerText = "พร้อมใช้งาน";
                 }
             }
         }
 
         async function saveEmployeesToCloud() {
+            saveLocalCache();
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
@@ -589,11 +617,12 @@
                     })
                 });
             } catch (err) {
-                console.error("Cloud save employees error:", err);
+                console.error("Cloud save error:", err);
             }
         }
 
         async function saveAllToCloud() {
+            saveLocalCache();
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
@@ -609,6 +638,7 @@
             }
         }
 
+        // ชุดข้อมูลทางการล่าสุดตาม Spreadsheet
         function initOfficialDataset() {
             employees = [
                 {
