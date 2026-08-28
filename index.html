@@ -118,7 +118,7 @@
                         <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ข้อมูล ณ วันที่กำลังโหลด...</p>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ข้อมูล ณ ปัจจุบัน</p>
                 </div>
             </div>
 
@@ -181,7 +181,7 @@
                         <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานเพื่อบริหารจัดการทีม</p>
                     </div>
                     <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="today-status-chip">
-                        สถานะ: กำลังโหลด...
+                        สถานะ: ปกติ
                     </span>
                 </div>
 
@@ -294,7 +294,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1, 2]</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -398,7 +398,7 @@
 
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1, 2]
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -439,8 +439,8 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1, 2]
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1, 2]
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -470,7 +470,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJ5MbVVrlxSZT4ziXaU0An4HeGMTn1muCkjsJQV-qAYD6xQpjrYR0X5OOcL97xcWyD/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbxyHjnm0_nbQxzqt_ebT4CDDkP20cjdKpOmGLFXJNprllJEO2-e5Ozw1VHxKsvVOL4g/exec";
 
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -487,7 +487,6 @@
         let requests = []; 
         let activeModalReqId = null;
 
-        // รายชื่อพนักงานและสถิติเริ่มต้นตาม Spreadsheet จริง
         const defaultDataset = [
             {
                 seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
@@ -557,7 +556,6 @@
             }
         ];
 
-        // เรียกทำงานทันทีที่เปิดหน้าเว็บ
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
@@ -613,8 +611,8 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v6');
-                const localReq = localStorage.getItem('pcbk_req_v6');
+                const localEmp = localStorage.getItem('pcbk_emp_v7');
+                const localReq = localStorage.getItem('pcbk_req_v7');
 
                 if (localEmp && JSON.parse(localEmp).length > 0) {
                     employees = JSON.parse(localEmp);
@@ -636,12 +634,11 @@
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v6', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v6', JSON.stringify(requests));
+                localStorage.setItem('pcbk_emp_v7', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v7', JSON.stringify(requests));
             } catch (e) {}
         }
 
-        // ================= BACKGROUND CLOUD SYNC =================
         async function syncFromCloud() {
             const syncIndicator = document.getElementById('sync-indicator');
             const syncText = document.getElementById('sync-text');
@@ -808,7 +805,6 @@
             if (avgVacEl) avgVacEl.innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
-        // ================= FULL MATRIX RENDERING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -1057,7 +1053,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com',[cite: 1, 2]
                 status: 'รออนุมัติ',
                 createdAt: todayRealISO,
                 year: currentYearBE.toString()
@@ -1087,7 +1083,7 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');
+            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');[cite: 1, 2]
         }
 
         function renderApprovalQueue() {
