@@ -223,7 +223,7 @@
                     </div>
                 </div>
 
-                <!-- Matrix Table (Fully Editable Numeric Cells) -->
+                <!-- Matrix Table -->
                 <div class="overflow-x-auto border border-slate-300 rounded-xl shadow-inner relative max-h-[650px]">
                     <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1550px]">
                         <thead>
@@ -297,7 +297,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1]</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -406,7 +406,7 @@
                     <!-- Destination Notice -->
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1]
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
@@ -447,8 +447,8 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1]
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1]
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -478,10 +478,8 @@
     </div>
 
     <script>
-        // Web App URL ของ Google Apps Script พร้อมใช้งาน
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzHryhg9gm1HBRlL2g0g5DXRHCuJgIzLj_3duaIYsEJkIfkZAgX5RAs1JjPo0EUmkCWJQ/exec";
 
-        // Automatic Real-Time Current Date & Year Detection
         const now = new Date();
         const currentYearAD = now.getFullYear();
         const currentYearBE = currentYearAD + 543;
@@ -493,16 +491,19 @@
         const todayRealISO = now.toISOString().split('T')[0];
         const todayRealThaiText = `${now.getDate()} ${thaiMonthsFull[now.getMonth()]} พ.ศ. ${currentYearBE}`;
 
-        // Global State Variables
         let employees = [];
         let requests = []; 
         let activeModalReqId = null;
 
         window.onload = function() {
-            setupDynamicDates();
-            loadSavedData();
-            renderAllViews();
-            switchTab('dashboard');
+            try {
+                setupDynamicDates();
+                loadSavedData();
+                renderAllViews();
+                switchTab('dashboard');
+            } catch (err) {
+                console.error("Initialization Error:", err);
+            }
         };
 
         function setupDynamicDates() {
@@ -746,10 +747,15 @@
                 grandSickUsed += usedSick;
             });
 
-            document.getElementById('kpi-total-vacation-used').innerText = `${grandVacationUsed} วัน`;
-            document.getElementById('kpi-total-vacation-rem').innerText = `${grandVacationRemaining} วัน`;
-            document.getElementById('kpi-total-sick-used').innerText = `${grandSickUsed} วัน`;
-            document.getElementById('kpi-avg-vacation').innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
+            const vacUsedEl = document.getElementById('kpi-total-vacation-used');
+            const vacRemEl = document.getElementById('kpi-total-vacation-rem');
+            const sickUsedEl = document.getElementById('kpi-total-sick-used');
+            const avgVacEl = document.getElementById('kpi-avg-vacation');
+
+            if (vacUsedEl) vacUsedEl.innerText = `${grandVacationUsed} วัน`;
+            if (vacRemEl) vacRemEl.innerText = `${grandVacationRemaining} วัน`;
+            if (sickUsedEl) sickUsedEl.innerText = `${grandSickUsed} วัน`;
+            if (avgVacEl) avgVacEl.innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
         // ================= FULL MATRIX RENDERING =================
@@ -1001,7 +1007,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',[cite: 1]
+                approverEmail: 'Secretary.fine@gmail.com',
                 status: 'รออนุมัติ',
                 createdAt: todayRealISO,
                 year: currentYearBE.toString()
@@ -1012,7 +1018,6 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งอีเมลแจ้งเตือน...`;
 
-            // ยิงส่งข้อมูลไปยัง Google Apps Script เพื่อส่งอีเมลจริง
             if (GOOGLE_SCRIPT_URL) {
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
@@ -1035,7 +1040,7 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');[cite: 1]
+            showToast('ยื่นใบลาและส่งอีเมลแจ้งเตือนเข้า Secretary.fine@gmail.com สำเร็จ');
         }
 
         function renderApprovalQueue() {
