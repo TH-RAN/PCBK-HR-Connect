@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Leave Connect AI - ระบบบริหารจัดการวันลาและสถิติกำลังคน</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS for Excel Upload/Download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc;
+        }
+        .tab-active {
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+            font-weight: 600;
+            background-color: #eff6ff;
+        }
+        .modal-blur {
+            backdrop-filter: blur(6px);
+        }
+        /* Custom smooth scrollbar for matrix table */
+        ::-webkit-scrollbar {
+            height: 7px;
+            width: 7px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- System Brand -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-200">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">HR Leave Connect</h1>
+                            <span class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold flex items-center shadow-xs">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Gemini AI
+                            </span>
+                        </div>
+                        <p class="text-[11px] sm:text-xs text-slate-500">ระบบจัดการวันลา สถิติกำลังคน และผู้ช่วยวิเคราะห์ AI</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Real-Time Date & Reset Action -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
+                        <i class="fa-regular fa-calendar-check text-blue-600"></i>
+                        <span id="header-realtime-date" class="font-bold">วันนี้: กำลังโหลด...</span>
+                    </div>
+
+                    <button onclick="resetToOfficialData()" title="รีเซ็ตเป็นข้อมูลตั้งต้นตามไฟล์ Excel ล่าสุด" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 border border-slate-200">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span class="hidden md:inline">รีเซ็ตข้อมูล</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clean Navigation Tabs -->
+        <div class="bg-slate-50 border-t border-slate-200 overflow-x-auto">
+            <div class="max-w-7xl mx-auto px-4 flex space-x-2 sm:space-x-4 min-w-max">
+                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>ภาพรวมวันนี้</span>
+                    <span id="badge-today-count" class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600">
+                    <i class="fa-solid fa-table-list"></i>
+                    <span id="tab-summary-title">ตารางสรุปวันลา</span>
+                </button>
+                <button onclick="switchTab('request-form')" id="tab-btn-request-form" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>ยื่นขอลางาน</span>
+                </button>
+                <button onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
+                    <span>รายการอนุมัติ</span>
+                    <span id="badge-pending-count" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button onclick="switchTab('ai-assistant')" id="tab-btn-ai-assistant" class="tab-btn text-purple-700 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:bg-purple-50 font-medium">
+                    <i class="fa-solid fa-robot text-purple-600"></i>
+                    <span>HR AI Advisor</span>
+                    <span class="bg-purple-100 text-purple-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold">AI</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= TAB 1: EXECUTIVE DASHBOARD ================= -->
+        <section id="tab-dashboard" class="tab-content space-y-6">
+            <!-- Hero Welcome Card -->
+            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 rounded-2xl p-6 text-white shadow-md relative overflow-hidden">
+                <div class="relative z-10 space-y-1">
+                    <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>ระบบอัปเดตข้อมูลอัตโนมัติและวิเคราะห์สถานะสด</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังคำนวณข้อมูล...</p>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- KPI 1: วันนี้ลางาน -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">ลางานวันนี้</span>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-emerald-600 mt-2" id="kpi-today-leave-count">0 คน</div>
+                    <p class="text-xs text-slate-500 mt-1 flex items-center" id="kpi-today-desc">
+                        <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> พนักงานมาปฏิบัติงานครบ 100%
+                    </p>
+                </div>
+
+                <!-- KPI 2: วันลาพักร้อนใช้ไปทั้งปี -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">พักร้อนใช้ไปทั้งปี</span>
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base">
+                            <i class="fa-solid fa-umbrella-beach"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-rose-600 mt-2" id="kpi-total-vacation-used">54.75 วัน</div>
+                    <p class="text-xs text-slate-500 mt-1">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">5.0</strong> วัน/คน</p>
+                </div>
+
+                <!-- KPI 3: สิทธิ์พักร้อนคงเหลือรวม -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">สิทธิ์พักร้อนคงเหลือรวม</span>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-amber-600 mt-2" id="kpi-total-vacation-rem">116.75 วัน</div>
+                    <p class="text-xs text-emerald-600 font-semibold mt-1">+1 วัน/เดือน (ทบสะสมปีถัดไปได้)</p>
+                </div>
+
+                <!-- KPI 4: ลาป่วยใช้ไปรวม -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">ลาป่วยสะสมทั้งปี</span>
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+                            <i class="fa-solid fa-bed-pulse"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-extrabold text-slate-800 mt-2" id="kpi-total-sick-used">16.5 วัน</div>
+                    <p class="text-xs text-slate-500 mt-1">โควตาไม่เกิน 30 วันทำการ/ปี</p>
+                </div>
+            </div>
+
+            <!-- Today's Leave Attendance Status Card -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base flex items-center">
+                            <i class="fa-solid fa-user-clock text-blue-600 mr-2"></i> รายชื่อผู้ที่ลางานในวันนี้
+                        </h3>
+                        <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานเพื่อบริหารจัดการทีม</p>
+                    </div>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="today-status-chip">
+                        สถานะ: กำลังโหลด...
+                    </span>
+                </div>
+
+                <div id="today-leave-list-container" class="py-6 text-center space-y-2">
+                    <!-- Rendered dynamically by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: FULL MATRIX LEAVE SUMMARY TABLE ================= -->
+        <section id="tab-summary" class="tab-content hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="font-bold text-slate-900 text-lg" id="summary-table-header-title">สรุปตารางลาของพนักงาน</h2>
+                            <span class="bg-blue-100 text-blue-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full">3 ประเภทการลา: พักร้อน / ป่วย / ลาอื่นๆ</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-0.5">กติกาวันลา: เพิ่มวันลาพักร้อน +1 วัน/เดือน (ทบสะสมจากเดือนก่อน และยกยอดไปใช้ปีถัดๆ ไปได้)</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="relative flex-grow sm:flex-grow-0">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ หรือตำแหน่ง..." class="w-full sm:w-48 pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button onclick="triggerExcelImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm">
+                            <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
+                        </button>
+                        <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
+                        <button onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm">
+                            <i class="fa-solid fa-download mr-1"></i> ส่งออก Excel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Matrix Table -->
+                <div class="overflow-x-auto border border-slate-300 rounded-xl shadow-inner relative max-h-[650px]">
+                    <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1500px]">
+                        <thead>
+                            <tr class="bg-slate-800 text-white text-center font-bold divide-x divide-slate-700 border-b border-slate-700 sticky top-0 z-20">
+                                <th rowspan="3" class="p-2 w-10 sticky left-0 z-30 bg-slate-900 shadow-r">ลำดับ</th>
+                                <th rowspan="3" class="p-2 w-20">รหัสพนักงาน</th>
+                                <th rowspan="3" class="p-2 min-w-[180px] sticky left-10 z-30 bg-slate-900 shadow-r">ชื่อ - นามสกุล</th>
+                                <th rowspan="3" class="p-2 min-w-[180px]">ตำแหน่ง</th>
+                                <th rowspan="3" class="p-2">ว/ด/ป.เกิด</th>
+                                <th rowspan="3" class="p-2">วันเริ่มงาน</th>
+                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[80px]">
+                                    ทบวันพักร้อน<br><span class="text-[10px] font-normal">สะสมปีก่อน</span>
+                                </th>
+                                <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน (เพิ่มเดือนละ 1 วันทบได้)</th>
+                                <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">
+                                    ลาป่วย <span class="text-[10px] font-normal">(ปีละไม่เกิน 30 วันทำการ)</span>
+                                </th>
+                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[65px]">ลาอื่นๆ<br>(รวมทั้งปี)</th>
+                                <th rowspan="3" class="p-2 min-w-[110px]">หมายเหตุ / สถานะ</th>
+                            </tr>
+                            <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[33px] z-10">
+                                <th colspan="24" class="p-1.5 bg-amber-50 text-amber-900">เพิ่มวันลา (+1/ด.) & ใช้ลาประจำเดือน (ม.ค. - ธ.ค.)</th>
+                                <th rowspan="2" class="p-2 bg-amber-200 text-amber-950 font-bold min-w-[70px]">รวมเพิ่ม<br>พักร้อน</th>
+                                <th rowspan="2" class="p-2 bg-rose-200 text-rose-950 font-bold min-w-[70px]">รวมใช้<br>พักร้อน</th>
+                                <th rowspan="2" class="p-2 bg-yellow-300 text-yellow-950 font-bold min-w-[70px]">เหลือ<br>พักร้อน</th>
+
+                                <th colspan="12" class="p-1.5 bg-emerald-50 text-emerald-900">รายเดือน (ม.ค. - ธ.ค.)</th>
+                                <th rowspan="2" class="p-2 bg-emerald-200 text-emerald-950 font-bold min-w-[70px]">รวมใช้<br>ลาป่วย</th>
+                            </tr>
+
+                            <tr class="bg-slate-50 text-slate-600 text-[10px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[65px] z-10">
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ม.ค.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ก.พ.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">มี.ค.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">เม.ย.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">พ.ค.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">มิ.ย.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ก.ค.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ส.ค.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ก.ย.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ต.ค.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">พ.ย.</th>
+                                <th class="p-1 bg-amber-50/50">เพิ่ม</th><th class="p-1 bg-amber-100/40">ธ.ค.</th>
+
+                                <th class="p-1 bg-emerald-50">ม.ค.</th>
+                                <th class="p-1 bg-emerald-50">ก.พ.</th>
+                                <th class="p-1 bg-emerald-50">มี.ค.</th>
+                                <th class="p-1 bg-emerald-50">เม.ย.</th>
+                                <th class="p-1 bg-emerald-50">พ.ค.</th>
+                                <th class="p-1 bg-emerald-50">มิ.ย.</th>
+                                <th class="p-1 bg-emerald-50">ก.ค.</th>
+                                <th class="p-1 bg-emerald-50">ส.ค.</th>
+                                <th class="p-1 bg-emerald-50">ก.ย.</th>
+                                <th class="p-1 bg-emerald-50">ต.ค.</th>
+                                <th class="p-1 bg-emerald-50">พ.ย.</th>
+                                <th class="p-1 bg-emerald-50">ธ.ค.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-table-body" class="divide-y divide-slate-200">
+                            <!-- Matrix Rows generated dynamically by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: LEAVE REQUEST FORM WITH AI ================= -->
+        <section id="tab-request-form" class="tab-content hidden max-w-xl mx-auto">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-slate-900 text-lg flex items-center">
+                        <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
+                </div>
+
+                <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">เลือกชื่อพนักงาน *</label>
+                        <select id="form-emp-id" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 text-slate-800">
+                            <option value="">-- เลือกชื่อพนักงาน --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">ประเภทการลางาน (3 ประเภท) *</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="leave_type" value="ลาพักร้อน" required checked class="hidden">
+                                <i class="fa-solid fa-umbrella-beach text-amber-600 text-base mb-1"></i>
+                                <span class="font-medium text-xs">1. ลาพักร้อน</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="leave_type" value="ลาป่วย" required class="hidden">
+                                <i class="fa-solid fa-bed-pulse text-rose-600 text-base mb-1"></i>
+                                <span class="font-medium text-xs">2. ลาป่วย</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="leave_type" value="ลาอื่นๆ" required class="hidden">
+                                <i class="fa-solid fa-folder-open text-purple-600 text-base mb-1"></i>
+                                <span class="font-medium text-xs">3. ลาอื่นๆ</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Leave Duration Type (1 Day, 0.5 Day, 0.25 Day) -->
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">ระยะเวลาการลา *</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions()" class="hidden">
+                                <span class="font-bold text-xs text-slate-800">1.0 วัน</span>
+                                <span class="text-[10px] text-slate-500">เต็มวัน (8 ชม.)</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions()" class="hidden">
+                                <span class="font-bold text-xs text-slate-800">0.5 วัน</span>
+                                <span class="text-[10px] text-slate-500">ครึ่งวัน (4 ชม.)</span>
+                            </label>
+                            <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions()" class="hidden">
+                                <span class="font-bold text-xs text-slate-800">0.25 วัน</span>
+                                <span class="text-[10px] text-slate-500">ออกธุระ (2 ชม.)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sub-option for 0.5 Day -->
+                    <div id="option-half-day" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-2">
+                        <label class="block font-semibold text-amber-900 text-xs">ช่วงเวลาครึ่งวัน *</label>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="bg-white border border-amber-300 rounded-lg p-2 flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="half_day_period" value="ครึ่งวันเช้า (08:30 - 12:30 น.)" checked class="text-blue-600">
+                                <span>🌅 ครึ่งวันเช้า (08:30 - 12:30 น.)</span>
+                            </label>
+                            <label class="bg-white border border-amber-300 rounded-lg p-2 flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="half_day_period" value="ครึ่งวันบ่าย (13:30 - 17:30 น.)" class="text-blue-600">
+                                <span>🌤️ ครึ่งวันบ่าย (13:30 - 17:30 น.)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Sub-option for 0.25 Day -->
+                    <div id="option-quarter-day" class="hidden bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2">
+                        <label class="block font-semibold text-purple-900 text-xs">ระบุช่วงเวลาลางาน 2 ชั่วโมง *</label>
+                        <div class="grid grid-cols-2 gap-3 text-xs">
+                            <div>
+                                <label class="block text-slate-600 text-[11px] mb-1">ตั้งแต่เวลา</label>
+                                <input type="time" id="quarter-start-time" value="10:00" class="w-full bg-white border border-purple-300 rounded-lg p-2">
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 text-[11px] mb-1">ถึงเวลา</label>
+                                <input type="time" id="quarter-end-time" value="12:00" class="w-full bg-white border border-purple-300 rounded-lg p-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dates Picker -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">ตั้งแต่วันที่ *</label>
+                            <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div id="wrapper-end-date">
+                            <label class="block font-semibold text-slate-700 mb-1">ถึงวันที่ *</label>
+                            <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex justify-between items-center">
+                        <span>จำนวนวันลาที่คำนวณได้:</span>
+                        <span id="form-day-count" class="font-bold text-sm text-blue-700">1 วัน</span>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="font-semibold text-slate-700">เหตุผลการลา / ช่องทางติดต่อ *</label>
+                            <!-- Gemini API Feature 1: AI Reason & Contact Polisher -->
+                            <button type="button" onclick="aiPolishLeaveReason()" id="btn-ai-polish" class="text-[11px] bg-purple-50 hover:bg-purple-100 text-purple-700 font-medium px-2 py-0.5 rounded-lg border border-purple-200 transition flex items-center space-x-1">
+                                <i class="fa-solid fa-wand-magic-sparkles text-purple-600"></i>
+                                <span>✨ AI ปรับภาษาให้สุภาพ/ทางการ</span>
+                            </button>
+                        </div>
+                        <textarea id="form-reason" rows="2" required placeholder="เช่น ธุระติดต่อราชการ / โทร 081-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
+                    </div>
+
+                    <!-- Destination Notice -->
+                    <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
+                        <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>ส่งใบลาเพื่อขออนุมัติ</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= TAB 4: APPROVAL CENTER ================= -->
+        <section id="tab-approval-center" class="tab-content hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-slate-900 text-lg">ศูนย์การพิจารณาอนุมัติวันลา</h2>
+                    <p class="text-xs text-slate-500">จำลองมุมมองผู้บริหาร/HR ในการกดอนุมัติหรือปฏิเสธคำขอ เพื่อตัดยอดวันลาลงตารางทันที</p>
+                </div>
+
+                <div id="approval-list" class="space-y-3">
+                    <!-- Dynamic Requests via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 5: HR AI ADVISOR & ANALYTICS ================= -->
+        <section id="tab-ai-assistant" class="tab-content hidden space-y-6">
+            <div class="bg-gradient-to-r from-purple-800 via-indigo-800 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                <div class="relative z-10 space-y-2">
+                    <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
+                        <i class="fa-solid fa-brain text-purple-300"></i>
+                        <span>ขับเคลื่อนด้วย Gemini 3 Flash LLM</span>
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-bold">HR Leave AI Co-Pilot & Insights</h2>
+                    <p class="text-purple-200 text-xs sm:text-sm">ผู้ช่วยอัจฉริยะวิเคราะห์อัตรากำลังคน แจ้งเตือนโควตาวันลา และร่างหนังสือประกาศ HR</p>
+                </div>
+            </div>
+
+            <!-- Predefined AI Prompts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <button onclick="runAiInsight('ANALYZE_EXHAUSTION')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition text-left space-y-1.5">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm">วิเคราะห์ผู้เสี่ยงโควตาหมด</h4>
+                    <p class="text-[11px] text-slate-500">สแกนพนักงานที่ใช้วันพักร้อนหรือลาป่วยใกล้เกินเกณฑ์</p>
+                </button>
+
+                <button onclick="runAiInsight('EXECUTIVE_SUMMARY')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition text-left space-y-1.5">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm">สรุปภาพรวมกำลังคนให้ผู้บริหาร</h4>
+                    <p class="text-[11px] text-slate-500">สรุปดัชนีการลาเฉลี่ย สัดส่วนประเภทการลา และแนวโน้ม</p>
+                </button>
+
+                <button onclick="runAiInsight('DRAFT_HOLIDAY_MEMO')" class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition text-left space-y-1.5">
+                    <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-900 text-xs sm:text-sm">ร่างประกาศแผนวันลาพักร้อน</h4>
+                    <p class="text-[11px] text-slate-500">สร้างข้อความประชาสัมพันธ์การทบวันลา (+1/ด.) สำหรับส่ง LINE</p>
+                </button>
+            </div>
+
+            <!-- Custom AI Prompt Box -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-comments text-purple-600"></i>
+                    <h3 class="font-bold text-slate-900 text-sm">ถาม-ตอบ สถิติและวิเคราะห์ข้อมูลวันลากับ AI</h3>
+                </div>
+                
+                <div class="flex gap-2">
+                    <input type="text" id="custom-ai-query" placeholder="เช่น สรุปสถานะวันลาของคุณณัฐากานต์ หรือ ตรวจสอบฝ่ายวิศวกร..." class="flex-grow bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" onkeydown="if(event.key==='Enter') runCustomAiQuery()">
+                    <button onclick="runCustomAiQuery()" id="btn-run-ai" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs sm:text-sm px-4 py-2 rounded-xl transition shadow-sm flex items-center space-x-1">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>วิเคราะห์</span>
+                    </button>
+                </div>
+
+                <!-- AI Output Display Box -->
+                <div id="ai-response-container" class="hidden bg-purple-50/50 border border-purple-200 rounded-xl p-4 sm:p-5 space-y-3">
+                    <div class="flex items-center justify-between border-b border-purple-100 pb-2">
+                        <span class="text-xs font-bold text-purple-900 flex items-center">
+                            <i class="fa-solid fa-sparkles text-purple-600 mr-1.5"></i> คำตอบจาก Gemini AI Advisor
+                        </span>
+                        <button onclick="copyAiResponse()" class="text-xs text-purple-700 hover:text-purple-900 font-medium">
+                            <i class="fa-regular fa-copy mr-1"></i> คัดลอก
+                        </button>
+                    </div>
+                    <div id="ai-response-content" class="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                        <!-- AI text rendered here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Simulated Email Modal with Gemini AI Impact Checker -->
+    <div id="email-modal" class="fixed inset-0 bg-slate-900/60 modal-blur z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-1.5">
+                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                    <span class="text-xs text-slate-400 font-mono ml-2">[จำลองการส่งอีเมลขออนุมัติ]</span>
+                </div>
+                <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
+            </div>
+
+            <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
+                <p>เรียน ผู้บังคับบัญชา / HR,</p>
+                <p>พนักงานมีความประสงค์ขอยื่นเรื่อง <strong id="email-detail-type" class="text-slate-900">ลาพักร้อน</strong> โดยมีรายละเอียดดังนี้:</p>
+                <ul class="list-disc list-inside space-y-1 bg-slate-50 p-2.5 rounded-lg">
+                    <li><strong>ช่วงวันลา:</strong> <span id="email-detail-dates">-</span></li>
+                    <li><strong>ช่องทางติดต่อ / เหตุผล:</strong> <span id="email-detail-reason">-</span></li>
+                </ul>
+
+                <!-- Gemini API Feature 2: AI Quick Risk Check inside Modal -->
+                <div id="modal-ai-risk-box" class="bg-purple-50 border border-purple-200 rounded-lg p-2.5 text-xs text-purple-900 mt-2 space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-purple-600"></i> AI การวิเคราะห์ผลกระทบทีม:</span>
+                        <button onclick="aiEvaluateApprovalRisk()" id="btn-eval-risk" class="text-[11px] text-purple-700 underline hover:text-purple-900">วิเคราะห์ความเสี่ยง</button>
+                    </div>
+                    <div id="modal-ai-risk-text" class="text-[11px] text-slate-600">กดปุ่มเพื่อดูการวิเคราะห์กำลังคนและสิทธิ์คงเหลือจาก Gemini</div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2 pt-2">
+                <button id="email-btn-reject" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition">
+                    <i class="fa-solid fa-xmark mr-1"></i> ไม่อนุมัติ
+                </button>
+                <button id="email-btn-approve" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition">
+                    <i class="fa-solid fa-check mr-1"></i> อนุมัติคำขอนี้
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message">ทำรายการสำเร็จ</span>
+    </div>
+
+    <script>
+        // Automatic Real-Time Current Date & Year Detection
+        const now = new Date();
+        const currentYearAD = now.getFullYear();
+        const currentYearBE = currentYearAD + 543;
+        const thaiMonthsFull = [
+            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+        ];
+        
+        const todayRealISO = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const todayRealThaiText = `${now.getDate()} ${thaiMonthsFull[now.getMonth()]} พ.ศ. ${currentYearBE}`;
+
+        // Global State Variables
+        let employees = [];
+        let requests = []; 
+        let activeModalReqId = null;
+
+        window.onload = function() {
+            setupDynamicDates();
+            loadSavedData();
+            renderAllViews();
+            switchTab('dashboard');
+        };
+
+        function setupDynamicDates() {
+            const headerDateEl = document.getElementById('header-realtime-date');
+            if (headerDateEl) headerDateEl.innerText = `วันนี้: ${todayRealThaiText}`;
+
+            const dashDateEl = document.getElementById('dashboard-full-date');
+            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${todayRealThaiText} (ปีงบประมาณ ${currentYearBE})`;
+
+            const tableTitleEl = document.getElementById('summary-table-header-title');
+            if (tableTitleEl) tableTitleEl.innerText = `สรุปตารางลาของพนักงาน ปี ${currentYearBE}`;
+
+            const tabTitleEl = document.getElementById('tab-summary-title');
+            if (tabTitleEl) tabTitleEl.innerText = `ตารางสรุปวันลา (ปี ${currentYearBE})`;
+
+            const formStart = document.getElementById('form-start-date');
+            const formEnd = document.getElementById('form-end-date');
+            if (formStart) formStart.value = todayRealISO;
+            if (formEnd) formEnd.value = todayRealISO;
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'ai-assistant'];
+            tabs.forEach(id => {
+                const btn = document.getElementById(`tab-btn-${id}`);
+                const content = document.getElementById(`tab-${id}`);
+                if (btn) {
+                    if (id === tabId) {
+                        btn.classList.add('tab-active');
+                        btn.classList.remove('text-slate-600');
+                    } else {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('text-slate-600');
+                    }
+                }
+                if (content) {
+                    if (id === tabId) content.classList.remove('hidden');
+                    else content.classList.add('hidden');
+                }
+            });
+
+            if (tabId === 'dashboard') renderTodayDashboard();
+            if (tabId === 'summary') renderSummaryTable();
+            if (tabId === 'approval-center') renderApprovalQueue();
+            if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem('hr_leave_employees_official_v3', JSON.stringify(employees));
+                localStorage.setItem('hr_leave_requests_official_v3', JSON.stringify(requests));
+            } catch(e) {
+                console.error("Could not save to localStorage", e);
+            }
+        }
+
+        function loadSavedData() {
+            try {
+                const localEmp = localStorage.getItem('hr_leave_employees_official_v3');
+                const localReq = localStorage.getItem('hr_leave_requests_official_v3');
+
+                if (localEmp) employees = JSON.parse(localEmp);
+                else initOfficialDataset();
+
+                if (localReq) requests = JSON.parse(localReq);
+                else requests = []; 
+            } catch(e) {
+                initOfficialDataset();
+                requests = [];
+            }
+        }
+
+        // Exact official dataset matching verified company spreadsheet
+        function initOfficialDataset() {
+            employees = [
+                {
+                    seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
+                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
+                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President (รองประธานกรรมการบริหาร)", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20,
+                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
+                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 3, id: "1102033", name: "นางสาวภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
+                    vacationAccrued: [1,0.25, 1,0, 1,0, 1,2, 1,0, 1,1, 1,2, 1,0.25, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [0.25, 0, 0, 2, 0, 1, 2, 0.25, 0, 0, 0, 0],
+                    sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 4, id: "1104008", name: "นางสาวกนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
+                    vacationAccrued: [1,1.5, 1,0, 1,3, 1,1, 1,0.5, 1,2, 1,1, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [1.5, 0, 3, 1, 0.5, 2, 1, 1, 0, 0, 0, 0],
+                    sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: ""
+                },
+                {
+                    seq: 5, id: "1103020", name: "นายชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
+                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
+                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 6, id: "1103059", name: "นายปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
+                    vacationAccrued: [1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [0,0,0,0,0,0,0,0,0,0,0,0],
+                    sickMonths: [0,0,0,0,0,0,0,0,0,0,0,0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 7, id: "1102049", name: "นางสาวณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
+                    vacationAccrued: [1,3, 1,0.25, 1,1, 1,3.75, 1,0, 1,1, 1,3, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [3, 0.25, 1, 3.75, 0, 1, 3, 1, 0, 0, 0, 0],
+                    sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 8, id: "1102050", name: "นางสาวภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
+                    vacationAccrued: [1,3, 1,0, 1,1, 1,2, 1,3, 1,1, 1,1, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [3, 0, 1, 2, 3, 1, 1, 1, 0, 0, 0, 0],
+                    sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 9, id: "1102051", name: "นางสาวอาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
+                    vacationAccrued: [1,1, 1,1, 1,2, 1,6, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED"
+                },
+                {
+                    seq: 10, id: "1102055", name: "นายรัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
+                    vacationAccrued: [1,0, 1,0.25, 1,1.75, 1,2.25, 1,0.25, 1,0, 1,1.25, 1,0.5, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                },
+                {
+                    seq: 11, id: "1103063", name: "นายกฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
+                    vacationAccrued: [1,1, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 1,0, 0,0, 0,0, 0,0, 0,0],
+                    vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                }
+            ];
+            saveData();
+        }
+
+        function resetToOfficialData() {
+            initOfficialDataset();
+            requests = [];
+            saveData();
+            renderAllViews();
+            showToast('รีเซ็ตข้อมูลเป็นค่ามาตรฐานตามไฟล์เรียบร้อย');
+        }
+
+        function renderAllViews() {
+            renderTodayDashboard();
+            renderSummaryTable();
+            renderApprovalQueue();
+            updateBadges();
+        }
+
+        function updateBadges() {
+            const todayApprovedLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && r.status === 'อนุมัติแล้ว');
+            const todayBadge = document.getElementById('badge-today-count');
+            if (todayBadge) todayBadge.innerText = todayApprovedLeaves.length;
+
+            const pendingReqs = requests.filter(r => r.status === 'รออนุมัติ');
+            const pendingBadge = document.getElementById('badge-pending-count');
+            if (pendingBadge) {
+                pendingBadge.innerText = pendingReqs.length;
+                if (pendingReqs.length > 0) {
+                    pendingBadge.className = 'bg-amber-100 text-amber-800 text-[11px] px-2 py-0.5 rounded-full font-bold animate-pulse';
+                } else {
+                    pendingBadge.className = 'bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold';
+                }
+            }
+        }
+
+        function renderTodayDashboard() {
+            const todayLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && r.status === 'อนุมัติแล้ว');
+            const countEl = document.getElementById('kpi-today-leave-count');
+            const listContainer = document.getElementById('today-leave-list-container');
+            const statusChip = document.getElementById('today-status-chip');
+            const kpiTodayDesc = document.getElementById('kpi-today-desc');
+
+            if (countEl) countEl.innerText = `${todayLeaves.length} คน`;
+
+            if (todayLeaves.length === 0) {
+                if (statusChip) statusChip.innerHTML = `<span class="text-emerald-700 font-bold">🟢 กำลังคน 100%</span>`;
+                if (kpiTodayDesc) kpiTodayDesc.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> พนักงานมาปฏิบัติงานครบ 100%`;
+                if (listContainer) {
+                    listContainer.innerHTML = `
+                        <div class="py-6 text-center space-y-2">
+                            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center text-xl shadow-inner">
+                                <i class="fa-solid fa-check-double"></i>
+                            </div>
+                            <h4 class="font-semibold text-slate-800 text-sm">วันนี้ยังไม่มีพนักงานลางาน</h4>
+                            <p class="text-xs text-slate-500 max-w-md mx-auto">ทุกคนมาปฏิบัติงานครบถ้วน หากมีพนักงานยื่นลาและได้รับการอนุมัติ รายชื่อจะปรากฏที่นี่โดยอัตโนมัติ</p>
+                        </div>
+                    `;
+                }
+            } else {
+                if (statusChip) statusChip.innerHTML = `<span class="text-amber-700 font-bold">⚠️ มีผู้ลางาน ${todayLeaves.length} คน</span>`;
+                if (kpiTodayDesc) kpiTodayDesc.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1 text-amber-600"></i> ลางานวันนี้ ${todayLeaves.length} ท่าน`;
+                if (listContainer) {
+                    let cardsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-left">`;
+                    todayLeaves.forEach(r => {
+                        const emp = employees.find(e => e.id === r.empId);
+                        const pos = emp ? emp.position : 'พนักงาน';
+                        cardsHtml += `
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-slate-900 text-xs">${r.empName}</span>
+                                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">${r.type} (${r.days} วัน)</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500">${pos}</p>
+                                <div class="text-[11px] text-slate-600 border-t border-slate-200 pt-1.5">
+                                    <strong>ติดต่อ/เหตุผล:</strong> ${r.reason || '-'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    cardsHtml += `</div>`;
+                    listContainer.innerHTML = cardsHtml;
+                }
+            }
+
+            // Calculate Overall Totals for the Year
+            let grandVacationUsed = 0;
+            let grandVacationRemaining = 0;
+            let grandSickUsed = 0;
+
+            employees.forEach(e => {
+                let totalAccrued = 0;
+                if (e.vacationAccrued) {
+                    for (let m = 0; m < 12; m++) totalAccrued += parseFloat(e.vacationAccrued[m * 2]) || 0;
+                } else totalAccrued = 8;
+
+                let usedVac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const onlineVac = requests.filter(r => r.empId === e.id && r.status === 'อนุมัติแล้ว' && r.type === 'ลาพักร้อน').reduce((s, r) => s + r.days, 0);
+                const finalUsedVac = usedVac + onlineVac;
+
+                const carry = parseFloat(e.carryVacation) || 0;
+                const remVac = Math.max(0, carry + totalAccrued - finalUsedVac);
+
+                let usedSick = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const onlineSick = requests.filter(r => r.empId === e.id && r.status === 'อนุมัติแล้ว' && r.type === 'ลาป่วย').reduce((s, r) => s + r.days, 0);
+                const finalUsedSick = usedSick + onlineSick;
+
+                grandVacationUsed += finalUsedVac;
+                grandVacationRemaining += remVac;
+                grandSickUsed += finalUsedSick;
+            });
+
+            document.getElementById('kpi-total-vacation-used').innerText = `${grandVacationUsed} วัน`;
+            document.getElementById('kpi-total-vacation-rem').innerText = `${grandVacationRemaining} วัน`;
+            document.getElementById('kpi-total-sick-used').innerText = `${grandSickUsed} วัน`;
+            document.getElementById('kpi-avg-vacation').innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
+        }
+
+        function renderSummaryTable() {
+            const tbody = document.getElementById('summary-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const search = document.getElementById('search-emp')?.value.toLowerCase() || '';
+            const filtered = employees.filter(e => {
+                return (e.name && e.name.toLowerCase().includes(search)) || 
+                       (e.id && e.id.toLowerCase().includes(search)) || 
+                       (e.position && e.position.toLowerCase().includes(search));
+            });
+
+            filtered.forEach((e, index) => {
+                let totalAccrued = 0;
+                if (e.vacationAccrued) {
+                    for (let m = 0; m < 12; m++) totalAccrued += parseFloat(e.vacationAccrued[m * 2]) || 0;
+                } else totalAccrued = 8;
+
+                // Precompute online approved leaves per month for this employee
+                const approvedVacByMonth = Array(12).fill(0);
+                const approvedSickByMonth = Array(12).fill(0);
+                let onlineOtherDays = 0;
+
+                requests.filter(r => r.empId === e.id && r.status === 'อนุมัติแล้ว').forEach(r => {
+                    const startM = new Date(r.startDate).getMonth();
+                    if (r.type === 'ลาพักร้อน') {
+                        approvedVacByMonth[startM] += r.days;
+                    } else if (r.type === 'ลาป่วย') {
+                        approvedSickByMonth[startM] += r.days;
+                    } else {
+                        onlineOtherDays += r.days;
+                    }
+                });
+
+                let totalVacationUsed = 0;
+                let totalSickUsed = 0;
+
+                let rowHtml = `
+                    <tr class="hover:bg-slate-100/80 transition text-slate-800 divide-x divide-slate-200">
+                        <td class="p-2 text-center font-bold text-slate-500 bg-white sticky left-0 z-10">${e.seq || (index + 1)}</td>
+                        <td class="p-2 text-center font-mono text-slate-600">${e.id}</td>
+                        <td class="p-2 font-bold text-slate-900 bg-white sticky left-10 z-10 shadow-r">${e.name}</td>
+                        <td class="p-2 text-slate-600 text-[11px]">${e.position}</td>
+                        <td class="p-2 text-center text-slate-500">${e.dob || '-'}</td>
+                        <td class="p-2 text-center text-slate-500">${e.startDate || '-'}</td>
+                        <td class="p-2 text-center font-bold bg-purple-50 text-purple-900">${e.carryVacation || 0}</td>
+                `;
+
+                // 12 Months Vacation Breakdown (Combining base spreadsheet + approved requests)
+                for (let m = 0; m < 12; m++) {
+                    const addIdx = m * 2;
+                    const usedIdx = m * 2 + 1;
+                    const addVal = e.vacationAccrued ? (e.vacationAccrued[addIdx] !== undefined ? e.vacationAccrued[addIdx] : 1) : 1;
+                    
+                    const baseUsedVal = e.vacationUsedMonths ? (parseFloat(e.vacationUsedMonths[m]) || 0) : (e.vacationAccrued ? (parseFloat(e.vacationAccrued[usedIdx]) || 0) : 0);
+                    const finalMonthVacUsed = baseUsedVal + approvedVacByMonth[m];
+                    totalVacationUsed += finalMonthVacUsed;
+
+                    rowHtml += `
+                        <td class="p-1 text-center text-[10px] text-slate-400 bg-amber-50/30">${addVal !== 0 ? addVal : ''}</td>
+                        <td class="p-1 text-center font-medium ${finalMonthVacUsed > 0 ? 'text-amber-900 font-bold bg-amber-100/60' : 'text-slate-300'}">${finalMonthVacUsed > 0 ? finalMonthVacUsed : ''}</td>
+                    `;
+                }
+
+                const carryVal = parseFloat(e.carryVacation) || 0;
+                const remainingVacation = Math.max(0, carryVal + totalAccrued - totalVacationUsed);
+
+                // Vacation Totals
+                rowHtml += `
+                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950">${totalAccrued}</td>
+                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800">${totalVacationUsed}</td>
+                    <td class="p-2 text-center font-extrabold text-xs bg-yellow-300 text-slate-900 shadow-sm">${remainingVacation}</td>
+                `;
+
+                // 12 Months Sick Leave Breakdown (Combining base spreadsheet + approved requests)
+                for (let m = 0; m < 12; m++) {
+                    const baseSickVal = e.sickMonths ? (parseFloat(e.sickMonths[m]) || 0) : 0;
+                    const finalMonthSick = baseSickVal + approvedSickByMonth[m];
+                    totalSickUsed += finalMonthSick;
+
+                    rowHtml += `
+                        <td class="p-1 text-center ${finalMonthSick > 0 ? 'text-emerald-800 font-bold bg-emerald-100/60' : 'text-slate-300'}">${finalMonthSick > 0 ? finalMonthSick : ''}</td>
+                    `;
+                }
+
+                const finalOtherUsed = (parseFloat(e.otherLeaveDays) || 0) + onlineOtherDays;
+
+                // Sick Total, Other, Note
+                rowHtml += `
+                    <td class="p-2 text-center font-bold bg-emerald-100 text-rose-600 text-sm">${totalSickUsed}</td>
+                    <td class="p-2 text-center font-bold bg-purple-100 text-purple-950">${finalOtherUsed > 0 ? finalOtherUsed : 0}</td>
+                    <td class="p-2 text-xs font-semibold ${e.note && e.note.includes('RESIGNED') ? 'text-rose-600 bg-rose-50' : 'text-slate-500'}">${e.note || '-'}</td>
+                </tr>`;
+
+                tbody.innerHTML += rowHtml;
+            });
+        }
+
+        function renderEmpSelectOptions(selectId) {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            sel.innerHTML = '<option value="">-- เลือกชื่อพนักงาน --</option>';
+            employees.forEach(e => {
+                sel.innerHTML += `<option value="${e.id}">${e.name} (${e.position})</option>`;
+            });
+        }
+
+        function toggleDurationOptions() {
+            const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
+            const halfDiv = document.getElementById('option-half-day');
+            const quarterDiv = document.getElementById('option-quarter-day');
+            const endDateWrapper = document.getElementById('wrapper-end-date');
+            const startDateInput = document.getElementById('form-start-date');
+            const endDateInput = document.getElementById('form-end-date');
+
+            if (durType === 'HALF') {
+                if (halfDiv) halfDiv.classList.remove('hidden');
+                if (quarterDiv) quarterDiv.classList.add('hidden');
+                if (endDateWrapper) endDateWrapper.classList.add('opacity-50', 'pointer-events-none');
+                if (startDateInput && endDateInput) endDateInput.value = startDateInput.value;
+            } else if (durType === 'QUARTER') {
+                if (halfDiv) halfDiv.classList.add('hidden');
+                if (quarterDiv) quarterDiv.classList.remove('hidden');
+                if (endDateWrapper) endDateWrapper.classList.add('opacity-50', 'pointer-events-none');
+                if (startDateInput && endDateInput) endDateInput.value = startDateInput.value;
+            } else {
+                if (halfDiv) halfDiv.classList.add('hidden');
+                if (quarterDiv) quarterDiv.classList.add('hidden');
+                if (endDateWrapper) endDateWrapper.classList.remove('opacity-50', 'pointer-events-none');
+            }
+            calculateDays();
+        }
+
+        function calculateDays() {
+            const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
+            const countEl = document.getElementById('form-day-count');
+            if (!countEl) return 1;
+
+            if (durType === 'HALF') {
+                countEl.innerText = '0.5 วัน (4 ชั่วโมง)';
+                return 0.5;
+            }
+
+            if (durType === 'QUARTER') {
+                const startTime = document.getElementById('quarter-start-time')?.value || '10:00';
+                const endTime = document.getElementById('quarter-end-time')?.value || '12:00';
+                countEl.innerText = `0.25 วัน (2 ชั่วโมง : ${startTime} - ${endTime} น.)`;
+                return 0.25;
+            }
+
+            const startStr = document.getElementById('form-start-date')?.value;
+            const endStr = document.getElementById('form-end-date')?.value;
+
+            if (startStr && endStr) {
+                const start = new Date(startStr);
+                const end = new Date(endStr);
+                if (end >= start) {
+                    const diffTime = Math.abs(end - start);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    countEl.innerText = `${diffDays} วัน`;
+                    return diffDays;
+                }
+            }
+            countEl.innerText = '1 วัน';
+            return 1;
+        }
+
+        function handleLeaveSubmit(e) {
+            e.preventDefault();
+            const empId = document.getElementById('form-emp-id').value;
+            const emp = employees.find(x => x.id === empId);
+            if (!emp) {
+                showToast('กรุณาเลือกชื่อพนักงาน');
+                return;
+            }
+
+            const type = document.querySelector('input[name="leave_type"]:checked')?.value || 'ลาพักร้อน';
+            const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
+            const startDate = document.getElementById('form-start-date').value;
+            let endDate = document.getElementById('form-end-date').value;
+            if (durType === 'HALF' || durType === 'QUARTER') endDate = startDate;
+
+            const days = calculateDays();
+            let reason = document.getElementById('form-reason').value;
+
+            if (durType === 'HALF') {
+                const halfPeriod = document.querySelector('input[name="half_day_period"]:checked')?.value || 'ครึ่งวัน';
+                reason = `[${halfPeriod}] ${reason}`;
+            } else if (durType === 'QUARTER') {
+                const startTime = document.getElementById('quarter-start-time')?.value || '10:00';
+                const endTime = document.getElementById('quarter-end-time')?.value || '12:00';
+                reason = `[ลาออกจากออฟฟิศ 2 ชม. (${startTime} - ${endTime} น.)] ${reason}`;
+            }
+
+            const newReq = {
+                id: `REQ-${Date.now().toString().slice(-4)}`,
+                empId: emp.id,
+                empName: emp.name,
+                type: type,
+                startDate: startDate,
+                endDate: endDate,
+                days: days,
+                reason: reason,
+                approverEmail: 'Secretary.fine@gmail.com',
+                status: 'รออนุมัติ',
+                createdAt: todayRealISO,
+                year: currentYearBE.toString()
+            };
+
+            requests.unshift(newReq);
+            saveData();
+            renderAllViews();
+            document.getElementById('leave-form').reset();
+            setupDynamicDates();
+            toggleDurationOptions();
+            showToast('ยื่นใบลาส่งไปยัง Secretary.fine@gmail.com เรียบร้อยแล้ว');
+        }
+
+        function renderApprovalQueue() {
+            const container = document.getElementById('approval-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (requests.length === 0) {
+                container.innerHTML = `
+                    <div class="p-10 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                        <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300"></i>
+                        <p class="font-medium text-slate-600 text-sm">ยังไม่มีคำขอลางานในระบบ</p>
+                        <p class="text-xs text-slate-400 mt-1">เมื่อพนักงานส่งใบลาจริงเข้ามา รายการจะปรากฏที่นี่ทันที</p>
+                    </div>
+                `;
+                return;
+            }
+
+            requests.forEach(r => {
+                const statusBadge = r.status === 'อนุมัติแล้ว' 
+                    ? '<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold">อนุมัติแล้ว</span>'
+                    : r.status === 'ไม่อนุมัติ'
+                    ? '<span class="bg-rose-100 text-rose-700 text-xs px-2.5 py-1 rounded-full font-bold">ไม่อนุมัติ</span>'
+                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
+
+                container.innerHTML += `
+                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-slate-900">${r.empName}</span>
+                                <span class="text-xs text-slate-400">(${r.empId})</span>
+                                ${statusBadge}
+                            </div>
+                            <div class="text-xs text-slate-600">
+                                <strong class="text-blue-600">${r.type}</strong> (${r.days} วัน) | ${r.startDate} ถึง ${r.endDate}
+                            </div>
+                            <p class="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg"><strong>ช่องทางติดต่อ:</strong> ${r.reason}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition">
+                                <i class="fa-solid fa-envelope mr-1"></i> ดูอีเมล
+                            </button>
+                            ${r.status === 'รออนุมัติ' ? `
+                                <button onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition">อนุมัติ</button>
+                                <button onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition">ปฏิเสธ</button>
+                            ` : ''}
+                        </div>
+                    </div>`;
+            });
+        }
+
+        function openEmailModal(reqId) {
+            const req = requests.find(r => r.id === reqId);
+            if (!req) return;
+            activeModalReqId = reqId;
+
+            document.getElementById('email-emp-name').innerText = req.empName;
+            document.getElementById('email-leave-type').innerText = `${req.type} (${req.days} วัน)`;
+            document.getElementById('email-detail-type').innerText = `${req.type} (${req.days} วัน)`;
+            document.getElementById('email-detail-dates').innerText = `${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
+            document.getElementById('email-detail-reason').innerText = req.reason;
+
+            const riskText = document.getElementById('modal-ai-risk-text');
+            if (riskText) riskText.innerText = 'กดปุ่มเพื่อดูการวิเคราะห์กำลังคนและสิทธิ์คงเหลือจาก Gemini';
+
+            const btnApprove = document.getElementById('email-btn-approve');
+            const btnReject = document.getElementById('email-btn-reject');
+
+            btnApprove.onclick = function() { approveLeaveRequest(req.id); closeEmailModal(); };
+            btnReject.onclick = function() { rejectLeaveRequest(req.id); closeEmailModal(); };
+
+            document.getElementById('email-modal').classList.remove('hidden');
+        }
+
+        function closeEmailModal() {
+            document.getElementById('email-modal').classList.add('hidden');
+            activeModalReqId = null;
+        }
+
+        function approveLeaveRequest(reqId) {
+            const req = requests.find(r => r.id === reqId);
+            if (req) {
+                req.status = 'อนุมัติแล้ว';
+                saveData();
+                renderAllViews();
+                showToast(`อนุมัติคำขอของ ${req.empName} แล้ว และอัปเดตลงตารางทันที`);
+            }
+        }
+
+        function rejectLeaveRequest(reqId) {
+            const req = requests.find(r => r.id === reqId);
+            if (req) {
+                req.status = 'ไม่อนุมัติ';
+                saveData();
+                renderAllViews();
+                showToast(`ปฏิเสธคำขอของ ${req.empName} แล้ว`);
+            }
+        }
+
+        // Gemini API Text Generation with Exponential Backoff
+        async function callGeminiApi(systemPrompt, userPrompt) {
+            const apiKey = ""; // Provided in runtime by Canvas
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            let delay = 1000;
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text || "ไม่มีข้อความตอบกลับจากระบบ";
+                } catch (err) {
+                    if (i === 2) throw err;
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // Feature 1: AI Leave Reason & Courtesy Polisher
+        async function aiPolishLeaveReason() {
+            const reasonInput = document.getElementById('form-reason');
+            const empId = document.getElementById('form-emp-id')?.value;
+            const emp = employees.find(e => e.id === empId);
+            const rawText = reasonInput ? reasonInput.value.trim() : '';
+
+            if (!rawText) {
+                showToast('กรุณากรอกเหตุผลหรือเบอร์ติดต่อสั้นๆ ก่อนให้ AI ปรับภาษา');
+                return;
+            }
+
+            const btn = document.getElementById('btn-ai-polish');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังปรับภาษา...`;
+            btn.disabled = true;
+
+            const systemPrompt = "คุณคือผู้เชี่ยวชาญด้านงานบุคคล (HR Professional) ในองค์กรไทย ปรับข้อความเหตุผลการลาหรือช่องทางติดต่อให้สุภาพ ทางการ กะทัดรัด และชัดเจนตามวัฒนธรรมองค์กรไทย ตอบเฉพาะข้อความที่ปรับแล้วเท่านั้น ไม่ต้องมีคำนำหรือเครื่องหมายคำพูด";
+            const userPrompt = `พนักงาน: ${emp ? emp.name : 'พนักงาน'}\nตำแหน่ง: ${emp ? emp.position : '-'}\nข้อความเดิม: "${rawText}"\nโปรดปรับให้เป็นข้อความบันทึกการลาอย่างเป็นทางการ:`;
+
+            try {
+                const polished = await callGeminiApi(systemPrompt, userPrompt);
+                reasonInput.value = polished.trim();
+                showToast('AI ปรับภาษาให้สุภาพเรียบร้อยแล้ว');
+            } catch (err) {
+                showToast('ไม่สามารถเชื่อมต่อ AI ได้ในขณะนี้');
+            } finally {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        }
+
+        // Feature 2: AI Approval Risk & Coverage Evaluator in Modal
+        async function aiEvaluateApprovalRisk() {
+            if (!activeModalReqId) return;
+            const req = requests.find(r => r.id === activeModalReqId);
+            if (!req) return;
+
+            const emp = employees.find(e => e.id === req.empId);
+            const riskTextEl = document.getElementById('modal-ai-risk-text');
+            const btn = document.getElementById('btn-eval-risk');
+
+            if (riskTextEl) riskTextEl.innerHTML = `<span class="text-purple-600 animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Gemini กำลังประเมินผลกระทบกำลังคนและสิทธิ์คงเหลือ...</span>`;
+            if (btn) btn.style.display = 'none';
+
+            // Gather context
+            const samePosCount = employees.filter(e => e.position === emp?.position).length;
+            const systemPrompt = "คุณคือ HR Advisor ผู้ช่วยผู้บริหาร วิเคราะห์ผลกระทบการอนุมัติการลางาน ตอบสั้นๆ กระชับ 2-3 ประโยคเป็นภาษาไทย ให้คำแนะนำว่าอนุมัติได้หรือไม่ และมีผลกระทบต่อตำแหน่งงานอย่างไร";
+            const userPrompt = `ข้อมูลคำขอลา:
+- พนักงาน: ${req.empName} (${emp ? emp.position : '-'})
+- จำนวนพนักงานในตำแหน่งเดียวกัน: ${samePosCount} คน
+- ประเภทการลา: ${req.type}
+- จำนวนวันที่ขอลา: ${req.days} วัน (${req.startDate} ถึง ${req.endDate})
+- สิทธิ์พักร้อนสะสมเดิม: ${emp ? emp.carryVacation : 0} วัน
+- เหตุผล: ${req.reason}
+
+โปรดประเมินความเสี่ยงด้านกำลังคนและให้คำแนะนำสั้นๆ แก่ผู้อนุมัติ:`;
+
+            try {
+                const response = await callGeminiApi(systemPrompt, userPrompt);
+                if (riskTextEl) riskTextEl.innerHTML = `<span class="text-slate-800">${response}</span>`;
+            } catch (err) {
+                if (riskTextEl) riskTextEl.innerHTML = `<span class="text-rose-600">ไม่สามารถวิเคราะห์ได้ในขณะนี้</span>`;
+            } finally {
+                if (btn) btn.style.display = 'inline';
+            }
+        }
+
+        // Feature 3: HR AI Co-Pilot Queries
+        async function runAiInsight(type) {
+            const queryInput = document.getElementById('custom-ai-query');
+            if (type === 'ANALYZE_EXHAUSTION') {
+                queryInput.value = "ตรวจสอบและแจ้งเตือนพนักงานที่ใช้วันลาพักร้อนหรือลาป่วยสะสมเยอะ และผู้ที่มีสิทธิ์คงเหลือน้อยที่สุด";
+            } else if (type === 'EXECUTIVE_SUMMARY') {
+                queryInput.value = "สรุปภาพรวมการบริหารกำลังคน สัดส่วนการใช้วันลาพักร้อน/ลาป่วยทั้งบริษัท และข้อเสนอแนะเชิงกลยุทธ์ HR";
+            } else if (type === 'DRAFT_HOLIDAY_MEMO') {
+                queryInput.value = "ร่างข้อความประกาศนโยบายการลาพักร้อน (+1 วัน/เดือน ทบสะสมปีถัดไปได้) ส่งเข้า LINE พนักงานอย่างเป็นกันเองและชัดเจน";
+            }
+            runCustomAiQuery();
+        }
+
+        async function runCustomAiQuery() {
+            const queryInput = document.getElementById('custom-ai-query');
+            const userQuery = queryInput ? queryInput.value.trim() : '';
+            if (!userQuery) {
+                showToast('กรุณากรอกคำถามหรือเลือกหัวข้อการวิเคราะห์');
+                return;
+            }
+
+            const resContainer = document.getElementById('ai-response-container');
+            const resContent = document.getElementById('ai-response-content');
+            const runBtn = document.getElementById('btn-run-ai');
+
+            resContainer.classList.remove('hidden');
+            resContent.innerHTML = `<div class="flex items-center space-x-2 text-purple-700 py-3"><i class="fa-solid fa-spinner fa-spin text-lg"></i> <span>Gemini 3 Flash กำลังวิเคราะห์ฐานข้อมูลวันลา...</span></div>`;
+            runBtn.disabled = true;
+
+            // Generate condensed summary context of employees
+            const empContext = employees.map(e => ({
+                id: e.id,
+                name: e.name,
+                position: e.position,
+                carryVacation: e.carryVacation,
+                vacationUsed: e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a,b)=>a+b,0) : 0,
+                sickUsed: e.sickMonths ? e.sickMonths.reduce((a,b)=>a+b,0) : 0,
+                note: e.note || ''
+            }));
+
+            const systemPrompt = `คุณคือ "HR AI Co-Pilot" ผู้ช่วยงานบุคคลระดับสูงของระบบ HR Leave Connect ในองค์กร
+ข้อมูลกฎการลาของบริษัท:
+1. วันลาพักร้อน เพิ่มให้ +1 วัน/เดือน สามารถทบสะสมจากเดือนก่อน และยกยอดไปใช้ปีถัดๆ ไปได้
+2. ลาป่วย โควตาปีละไม่เกิน 30 วันทำการ
+3. มี 3 ประเภทการลา: ลาพักร้อน, ลาป่วย, ลาอื่นๆ
+
+ฐานข้อมูลพนักงานปัจจุบัน (${currentYearBE}):
+${JSON.stringify(empContext)}
+
+จงตอบคำถามผู้ใช้งานอย่างมืออาชีพ ถูกต้องตามตัวเลขจริง จัดรูปแบบให้อ่านง่าย มีหัวข้อและ emoji ประกอบอย่างสวยงาม`;
+
+            try {
+                const aiResult = await callGeminiApi(systemPrompt, userQuery);
+                resContent.innerText = aiResult;
+            } catch (err) {
+                resContent.innerHTML = `<span class="text-rose-600">เกิดข้อผิดพลาดในการเชื่อมต่อ Gemini API โปรดลองใหม่อีกครั้ง</span>`;
+            } finally {
+                runBtn.disabled = false;
+            }
+        }
+
+        function copyAiResponse() {
+            const content = document.getElementById('ai-response-content')?.innerText;
+            if (!content) return;
+            const temp = document.createElement('textarea');
+            temp.value = content;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            document.body.removeChild(temp);
+            showToast('คัดลอกข้อความ AI สำเร็จ');
+        }
+
+        // Excel Import / Export Handlers
+        function triggerExcelImport() {
+            document.getElementById('excel-file-input').click();
+        }
+
+        function handleExcelFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    showToast("นำเข้าข้อมูลจาก Excel เรียบร้อยแล้ว");
+                } catch (err) {
+                    showToast("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportSummaryToExcel() {
+            const dataToExport = employees.map(e => ({
+                "รหัสพนักงาน": e.id,
+                "ชื่อ-นามสกุล": e.name,
+                "ตำแหน่ง": e.position,
+                "วันเริ่มงาน": e.startDate,
+                "ทบวันลาพักร้อน": e.carryVacation || 0,
+                "รวมเพิ่มลาพักร้อน": 8,
+                "รวมใช้ลาพักร้อน": e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s,v)=>s+(parseFloat(v)||0),0) : 0,
+                "เหลือลาพักร้อน": e.carryVacation || 0
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, `สรุปปี_${currentYearBE}`);
+            XLSX.writeFile(wb, `รายงานสรุปวันลา_ปี_${currentYearBE}.xlsx`);
+            showToast("ส่งออกไฟล์ Excel สำเร็จ");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            if (!toast || !msgEl) return;
+            msgEl.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
