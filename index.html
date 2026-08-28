@@ -84,20 +84,20 @@
         <!-- Navigation Tabs -->
         <div class="bg-slate-50 border-t border-slate-200 overflow-x-auto">
             <div class="max-w-7xl mx-auto px-4 flex space-x-2 sm:space-x-4 min-w-max">
-                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition">
+                <button onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition cursor-pointer">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>ภาพรวมวันนี้</span>
                     <span id="badge-today-count" class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
                 </button>
-                <button onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600">
+                <button onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-table-list"></i>
                     <span id="tab-summary-title">ตารางสรุปวันลา</span>
                 </button>
-                <button onclick="switchTab('request-form')" id="tab-btn-request-form" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600">
+                <button onclick="switchTab('request-form')" id="tab-btn-request-form" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span>ยื่นขอลางาน</span>
                 </button>
-                <button onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600">
+                <button onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-envelope-circle-check"></i>
                     <span>รายการอนุมัติ</span>
                     <span id="badge-pending-count" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
@@ -118,7 +118,7 @@
                         <span>ระบบอัปเดตข้อมูลอัตโนมัติและแสดงผลแบบเรียลไทม์</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold pt-1">สถานะกำลังคนและการลางานประจำวัน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังคำนวณข้อมูล...</p>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ข้อมูล ณ ปัจจุบัน</p>
                 </div>
             </div>
 
@@ -181,7 +181,7 @@
                         <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานเพื่อบริหารจัดการทีม</p>
                     </div>
                     <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium" id="today-status-chip">
-                        สถานะ: กำลังโหลด...
+                        สถานะ: ปกติ
                     </span>
                 </div>
 
@@ -210,11 +210,11 @@
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                             <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ หรือตำแหน่ง..." class="w-full sm:w-48 pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
-                        <button onclick="triggerExcelImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm">
+                        <button onclick="triggerExcelImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
                         </button>
                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
-                        <button onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm">
+                        <button onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-download mr-1"></i> ส่งออก Excel
                         </button>
                     </div>
@@ -401,7 +401,7 @@
                         <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1, 2]
                     </div>
 
-                    <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+                    <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
                         <i class="fa-solid fa-paper-plane"></i>
                         <span>ส่งใบลาเพื่อขออนุมัติ</span>
                     </button>
@@ -435,7 +435,7 @@
                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                     <span class="text-xs text-slate-400 font-mono ml-2">[รายละเอียดคำขอลา]</span>
                 </div>
-                <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
@@ -453,10 +453,10 @@
             </div>
 
             <div class="flex items-center justify-end space-x-2 pt-2">
-                <button id="email-btn-reject" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition">
+                <button id="email-btn-reject" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition cursor-pointer">
                     <i class="fa-solid fa-xmark mr-1"></i> ไม่อนุมัติ
                 </button>
-                <button id="email-btn-approve" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition">
+                <button id="email-btn-approve" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition cursor-pointer">
                     <i class="fa-solid fa-check mr-1"></i> อนุมัติคำขอนี้
                 </button>
             </div>
@@ -487,157 +487,9 @@
         let requests = []; 
         let activeModalReqId = null;
 
-        window.onload = function() {
-            try {
-                setupDynamicDates();
-                loadLocalOrOfficialData();
-                renderAllViews();
-                switchTab('dashboard');
-                loadCloudDataBackground();
-            } catch (err) {
-                console.error("Initialization Error:", err);
-            }
-        };
-
-        function setupDynamicDates() {
-            const headerDateEl = document.getElementById('header-realtime-date');
-            if (headerDateEl) headerDateEl.innerText = `วันนี้: ${todayRealThaiText}`;
-
-            const dashDateEl = document.getElementById('dashboard-full-date');
-            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${todayRealThaiText} (ปีงบประมาณ ${currentYearBE})`;
-
-            const tableTitleEl = document.getElementById('summary-table-header-title');
-            if (tableTitleEl) tableTitleEl.innerText = `สรุปตารางลาของพนักงาน ปี ${currentYearBE}`;
-
-            const tabTitleEl = document.getElementById('tab-summary-title');
-            if (tabTitleEl) tabTitleEl.innerText = `ตารางสรุปวันลา (ปี ${currentYearBE})`;
-
-            const formStart = document.getElementById('form-start-date');
-            const formEnd = document.getElementById('form-end-date');
-            if (formStart) formStart.value = todayRealISO;
-            if (formEnd) formEnd.value = todayRealISO;
-        }
-
-        function switchTab(tabId) {
-            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center'];
-            tabs.forEach(id => {
-                const btn = document.getElementById(`tab-btn-${id}`);
-                const content = document.getElementById(`tab-${id}`);
-                if (btn) {
-                    if (id === tabId) {
-                        btn.classList.add('tab-active');
-                        btn.classList.remove('text-slate-600');
-                    } else {
-                        btn.classList.remove('tab-active');
-                        btn.classList.add('text-slate-600');
-                    }
-                }
-                if (content) {
-                    if (id === tabId) content.classList.remove('hidden');
-                    else content.classList.add('hidden');
-                }
-            });
-
-            if (tabId === 'dashboard') renderTodayDashboard();
-            if (tabId === 'summary') renderSummaryTable();
-            if (tabId === 'approval-center') renderApprovalQueue();
-            if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
-        }
-
-        function loadLocalOrOfficialData() {
-            try {
-                const localEmp = localStorage.getItem('pcbk_employees_cache');
-                const localReq = localStorage.getItem('pcbk_requests_cache');
-                if (localEmp) employees = JSON.parse(localEmp);
-                else initOfficialDataset();
-
-                if (localReq) requests = JSON.parse(localReq);
-                else requests = [];
-            } catch (e) {
-                initOfficialDataset();
-                requests = [];
-            }
-        }
-
-        function saveLocalCache() {
-            try {
-                localStorage.setItem('pcbk_employees_cache', JSON.stringify(employees));
-                localStorage.setItem('pcbk_requests_cache', JSON.stringify(requests));
-            } catch (e) {}
-        }
-
-        async function loadCloudDataBackground() {
-            const syncIndicator = document.getElementById('sync-indicator');
-            const syncText = document.getElementById('sync-text');
-
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000);
-
-                const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                const data = await res.json();
-                
-                if (data && data.status === "success") {
-                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        employees = data.employees;
-                    } else {
-                        saveEmployeesToCloud();
-                    }
-                    if (data.requests && Array.isArray(data.requests)) {
-                        requests = data.requests;
-                    }
-                    
-                    saveLocalCache();
-                    if (syncIndicator && syncText) {
-                        syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
-                        syncText.innerText = "ซิงก์ Cloud แล้ว";
-                    }
-                    renderAllViews();
-                }
-            } catch (err) {
-                if (syncIndicator && syncText) {
-                    syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
-                    syncText.innerText = "พร้อมใช้งาน";
-                }
-            }
-        }
-
-        async function saveEmployeesToCloud() {
-            saveLocalCache();
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        action: "SAVE_EMPLOYEES",
-                        employees: employees
-                    })
-                });
-            } catch (err) {
-                console.error("Cloud save error:", err);
-            }
-        }
-
-        async function saveAllToCloud() {
-            saveLocalCache();
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({
-                        action: "SAVE_ALL",
-                        employees: employees,
-                        requests: requests
-                    })
-                });
-            } catch (err) {
-                console.error("Cloud save all error:", err);
-            }
-        }
-
-        function initOfficialDataset() {
-            employees = [
+        // ฟังก์ชันตั้งต้นชุดข้อมูลทางการ
+        function getOfficialEmployees() {
+            return [
                 {
                     seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
                     vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -705,6 +557,156 @@
                     sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
                 }
             ];
+        }
+
+        window.onload = function() {
+            try {
+                setupDynamicDates();
+                loadInitialData();
+                renderAllViews();
+                switchTab('dashboard');
+                syncFromCloud();
+            } catch (err) {
+                console.error("Window Load Error:", err);
+            }
+        };
+
+        function setupDynamicDates() {
+            const headerDateEl = document.getElementById('header-realtime-date');
+            if (headerDateEl) headerDateEl.innerText = `วันนี้: ${todayRealThaiText}`;
+
+            const dashDateEl = document.getElementById('dashboard-full-date');
+            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${todayRealThaiText} (ปีงบประมาณ ${currentYearBE})`;
+
+            const tableTitleEl = document.getElementById('summary-table-header-title');
+            if (tableTitleEl) tableTitleEl.innerText = `สรุปตารางลาของพนักงาน ปี ${currentYearBE}`;
+
+            const tabTitleEl = document.getElementById('tab-summary-title');
+            if (tabTitleEl) tabTitleEl.innerText = `ตารางสรุปวันลา (ปี ${currentYearBE})`;
+
+            const formStart = document.getElementById('form-start-date');
+            const formEnd = document.getElementById('form-end-date');
+            if (formStart) formStart.value = todayRealISO;
+            if (formEnd) formEnd.value = todayRealISO;
+        }
+
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center'];
+            tabs.forEach(id => {
+                const btn = document.getElementById(`tab-btn-${id}`);
+                const content = document.getElementById(`tab-${id}`);
+                if (btn) {
+                    if (id === tabId) {
+                        btn.classList.add('tab-active');
+                        btn.classList.remove('text-slate-600');
+                    } else {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('text-slate-600');
+                    }
+                }
+                if (content) {
+                    if (id === tabId) content.classList.remove('hidden');
+                    else content.classList.add('hidden');
+                }
+            });
+
+            if (tabId === 'dashboard') renderTodayDashboard();
+            if (tabId === 'summary') renderSummaryTable();
+            if (tabId === 'approval-center') renderApprovalQueue();
+            if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
+        }
+
+        function loadInitialData() {
+            try {
+                const localEmp = localStorage.getItem('pcbk_emp_v5');
+                const localReq = localStorage.getItem('pcbk_req_v5');
+
+                if (localEmp && JSON.parse(localEmp).length > 0) {
+                    employees = JSON.parse(localEmp);
+                } else {
+                    employees = getOfficialEmployees();
+                    saveLocalData();
+                }
+
+                if (localReq) {
+                    requests = JSON.parse(localReq);
+                } else {
+                    requests = [];
+                }
+            } catch (e) {
+                employees = getOfficialEmployees();
+                requests = [];
+            }
+        }
+
+        function saveLocalData() {
+            try {
+                localStorage.setItem('pcbk_emp_v5', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v5', JSON.stringify(requests));
+            } catch (e) {}
+        }
+
+        // ================= BACKGROUND CLOUD SYNC =================
+        async function syncFromCloud() {
+            const syncIndicator = document.getElementById('sync-indicator');
+            const syncText = document.getElementById('sync-text');
+
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await res.json();
+                
+                if (data && data.status === "success") {
+                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
+                        employees = data.employees;
+                    } else {
+                        saveEmployeesToCloud();
+                    }
+                    if (data.requests && Array.isArray(data.requests)) {
+                        requests = data.requests;
+                    }
+                    
+                    saveLocalData();
+                    if (syncIndicator && syncText) {
+                        syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
+                        syncText.innerText = "ซิงก์ Cloud แล้ว";
+                    }
+                    renderAllViews();
+                }
+            } catch (err) {
+                if (syncIndicator && syncText) {
+                    syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
+                    syncText.innerText = "พร้อมใช้งาน";
+                }
+            }
+        }
+
+        async function saveEmployeesToCloud() {
+            saveLocalData();
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "SAVE_EMPLOYEES",
+                        employees: employees
+                    })
+                });
+            } catch (err) {}
+        }
+
+        async function saveAllToCloud() {
+            saveLocalData();
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                        action: "SAVE_ALL",
+                        employees: employees,
+                        requests: requests
+                    })
+                });
+            } catch (err) {}
         }
 
         function renderAllViews() {
@@ -1080,9 +1082,7 @@
                         request: newReq
                     })
                 });
-            } catch (err) {
-                console.error("Cloud submit error:", err);
-            }
+            } catch (err) {}
 
             requests.unshift(newReq);
             renderAllViews();
@@ -1132,12 +1132,12 @@
                             <p class="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg"><strong>ช่องทางติดต่อ:</strong> ${r.reason}</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition">
+                            <button onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition cursor-pointer">
                                 <i class="fa-solid fa-envelope mr-1"></i> ดูรายละเอียด
                             </button>
                             ${r.status === 'รออนุมัติ' ? `
-                                <button onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition">อนุมัติ</button>
-                                <button onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition">ปฏิเสธ</button>
+                                <button onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">อนุมัติ</button>
+                                <button onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">ปฏิเสธ</button>
                             ` : ''}
                         </div>
                     </div>`;
