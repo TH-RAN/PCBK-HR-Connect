@@ -470,7 +470,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbxyHjnm0_nbQxzqt_ebT4CDDkP20cjdKpOmGLFXJNprllJEO2-e5Ozw1VHxKsvVOL4g/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
 
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -611,8 +611,8 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v8');
-                const localReq = localStorage.getItem('pcbk_req_v8');
+                const localEmp = localStorage.getItem('pcbk_emp_v10');
+                const localReq = localStorage.getItem('pcbk_req_v10');
 
                 if (localEmp && JSON.parse(localEmp).length > 0) {
                     employees = JSON.parse(localEmp);
@@ -634,12 +634,12 @@
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v8', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v8', JSON.stringify(requests));
+                localStorage.setItem('pcbk_emp_v10', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v10', JSON.stringify(requests));
             } catch (e) {}
         }
 
-        // ================= BACKGROUND CLOUD SYNC =================
+        // ================= CLOUD SYNC =================
         async function syncFromCloud() {
             const syncIndicator = document.getElementById('sync-indicator');
             const syncText = document.getElementById('sync-text');
@@ -678,7 +678,8 @@
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify({
                         action: "SAVE_EMPLOYEES",
                         employees: employees
@@ -692,7 +693,8 @@
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify({
                         action: "SAVE_ALL",
                         employees: employees,
@@ -779,29 +781,31 @@
             let grandVacationRemaining = 0;
             let grandSickUsed = 0;
 
-            employees.forEach(e => {
-                let totalAccrued = 0;
-                if (e.vacationAccrued && Array.isArray(e.vacationAccrued)) {
-                    for (let m = 0; m < 12; m++) totalAccrued += (parseFloat(e.vacationAccrued[m]) || 0);
-                }
+            if (Array.isArray(employees)) {
+                employees.forEach(e => {
+                    let totalAccrued = 0;
+                    if (e.vacationAccrued && Array.isArray(e.vacationAccrued)) {
+                        for (let m = 0; m < 12; m++) totalAccrued += (parseFloat(e.vacationAccrued[m]) || 0);
+                    }
 
-                let usedVac = 0;
-                if (e.vacationUsedMonths && Array.isArray(e.vacationUsedMonths)) {
-                    usedVac = e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
-                }
+                    let usedVac = 0;
+                    if (e.vacationUsedMonths && Array.isArray(e.vacationUsedMonths)) {
+                        usedVac = e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                    }
 
-                const carry = parseFloat(e.carryVacation) || 0;
-                const remVac = Math.max(0, carry + totalAccrued - usedVac);
-                
-                let usedSick = 0;
-                if (e.sickMonths && Array.isArray(e.sickMonths)) {
-                    usedSick = e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
-                }
+                    const carry = parseFloat(e.carryVacation) || 0;
+                    const remVac = Math.max(0, carry + totalAccrued - usedVac);
+                    
+                    let usedSick = 0;
+                    if (e.sickMonths && Array.isArray(e.sickMonths)) {
+                        usedSick = e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                    }
 
-                grandVacationUsed += usedVac;
-                grandVacationRemaining += remVac;
-                grandSickUsed += usedSick;
-            });
+                    grandVacationUsed += usedVac;
+                    grandVacationRemaining += remVac;
+                    grandSickUsed += usedSick;
+                });
+            }
 
             const vacUsedEl = document.getElementById('kpi-total-vacation-used');
             const vacRemEl = document.getElementById('kpi-total-vacation-rem');
@@ -1077,7 +1081,8 @@
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify({
                         action: "SUBMIT_LEAVE",
                         request: newReq
