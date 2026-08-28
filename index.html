@@ -490,10 +490,9 @@
         window.onload = function() {
             try {
                 setupDynamicDates();
-                loadLocalOrOfficialData(); // แสดงผลข้อมูลตั้งต้นทันที ไม่ให้หน้าเว็บค้าง
+                loadLocalOrOfficialData();
                 renderAllViews();
                 switchTab('dashboard');
-                // โหลดซิงก์จาก Cloud แบบ Background Non-blocking
                 loadCloudDataBackground();
             } catch (err) {
                 console.error("Initialization Error:", err);
@@ -567,14 +566,13 @@
             } catch (e) {}
         }
 
-        // ================= BACKGROUND CLOUD SYNC =================
         async function loadCloudDataBackground() {
             const syncIndicator = document.getElementById('sync-indicator');
             const syncText = document.getElementById('sync-text');
 
             try {
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 วินาที Timeout กันค้าง
+                const timeoutId = setTimeout(() => controller.abort(), 4000);
 
                 const res = await fetch(GOOGLE_SCRIPT_URL, { signal: controller.signal });
                 clearTimeout(timeoutId);
@@ -638,7 +636,6 @@
             }
         }
 
-        // ชุดข้อมูลทางการล่าสุดตาม Spreadsheet
         function initOfficialDataset() {
             employees = [
                 {
