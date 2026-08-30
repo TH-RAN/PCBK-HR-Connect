@@ -67,13 +67,13 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Real-Time Date & Sync Status -->
+                <!-- Admin Status & Dynamic Date -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
-                    <div id="sync-status" class="flex items-center space-x-1.5 text-[11px] bg-slate-100 px-2.5 py-1 rounded-lg">
-                        <span id="sync-indicator" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span id="sync-text" class="text-slate-600">พร้อมใช้งาน</span>
-                    </div>
-                    <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
+                    <button type="button" onclick="handleAdminToggle()" id="btn-admin-status" class="flex items-center space-x-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition font-medium cursor-pointer">
+                        <i id="admin-icon" class="fa-solid fa-lock text-slate-500"></i>
+                        <span id="admin-status-text">ดูอย่างเดียว</span>
+                    </button>
+                    <div class="hidden sm:flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
                         <i class="fa-regular fa-calendar-check text-blue-600"></i>
                         <span id="header-realtime-date" class="font-bold">วันนี้: กำลังโหลด...</span>
                     </div>
@@ -191,18 +191,18 @@
             </div>
         </section>
 
-        <!-- ================= TAB 2: FULL MATRIX LEAVE SUMMARY TABLE (EDITABLE) ================= -->
+        <!-- ================= TAB 2: FULL MATRIX LEAVE SUMMARY TABLE ================= -->
         <section id="tab-summary" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
                         <div class="flex items-center space-x-2">
                             <h2 class="font-bold text-slate-900 text-lg" id="summary-table-header-title">สรุปตารางลาของพนักงาน</h2>
-                            <span class="bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center">
-                                <i class="fa-solid fa-cloud-arrow-up mr-1"></i> ซิงก์ข้อมูลคลาวด์ทุกเครื่องอัตโนมัติ
+                            <span id="badge-lock-status" class="bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center">
+                                <i class="fa-solid fa-eye mr-1"></i> โหมดดูอย่างเดียว
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5">แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ</p>
+                        <p class="text-xs text-slate-500 mt-0.5" id="summary-desc-text">พนักงานทั่วไปสามารถตรวจสอบยอดวันลาได้แบบเรียลไทม์</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -210,7 +210,7 @@
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                             <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ หรือตำแหน่ง..." class="w-full sm:w-48 pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
-                        <button type="button" onclick="triggerExcelImport()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition flex items-center space-x-1 shadow-sm cursor-pointer">
+                        <button type="button" id="btn-excel-import" onclick="triggerExcelImport()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition items-center space-x-1 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
                         </button>
                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
@@ -294,7 +294,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1, 2]</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -398,7 +398,7 @@
 
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1, 2]
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -439,8 +439,8 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1, 2]
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1, 2]
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -471,6 +471,7 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
+        const ADMIN_PASSWORD = "pcbk2026"; // รหัสผ่าน Admin สำหรับปลดล็อกการแก้ไขตาราง
 
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -486,6 +487,7 @@
         let employees = [];
         let requests = []; 
         let activeModalReqId = null;
+        let isAdmin = false;
 
         const defaultDataset = [
             {
@@ -558,6 +560,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
+            checkAdminStatus();
             loadInitialData();
             renderAllViews();
             switchTab('dashboard');
@@ -581,6 +584,65 @@
             const formEnd = document.getElementById('form-end-date');
             if (formStart) formStart.value = todayRealISO;
             if (formEnd) formEnd.value = todayRealISO;
+        }
+
+        // ================= ADMIN LOCK CONTROLS =================
+        function checkAdminStatus() {
+            isAdmin = localStorage.getItem('pcbk_is_admin') === 'true';
+            updateAdminUI();
+        }
+
+        function handleAdminToggle() {
+            if (isAdmin) {
+                const conf = confirm("คุณต้องการออกจากโหมดผู้ดูแล (เปลี่ยนเป็นโหมดดูอย่างเดียว) หรือไม่?");
+                if (conf) {
+                    isAdmin = false;
+                    localStorage.setItem('pcbk_is_admin', 'false');
+                    updateAdminUI();
+                    renderSummaryTable();
+                    showToast("เปลี่ยนเป็นโหมดดูอย่างเดียวเรียบร้อย");
+                }
+            } else {
+                const pwd = prompt("กรุณากรอกรหัสผ่าน Admin เพื่อปลดล็อกการแก้ไขตาราง:");
+                if (pwd === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    localStorage.setItem('pcbk_is_admin', 'true');
+                    updateAdminUI();
+                    renderSummaryTable();
+                    showToast("ปลดล็อกสิทธิ์ผู้ดูแล (แก้ไขตารางได้) เรียบร้อย");
+                } else if (pwd !== null) {
+                    alert("รหัสผ่านไม่ถูกต้อง");
+                }
+            }
+        }
+
+        function updateAdminUI() {
+            const btn = document.getElementById('btn-admin-status');
+            const icon = document.getElementById('admin-icon');
+            const txt = document.getElementById('admin-status-text');
+            const lockBadge = document.getElementById('badge-lock-status');
+            const descTxt = document.getElementById('summary-desc-text');
+            const btnImport = document.getElementById('btn-excel-import');
+
+            if (isAdmin) {
+                if (btn) btn.className = "flex items-center space-x-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-300 transition font-bold cursor-pointer";
+                if (icon) icon.className = "fa-solid fa-lock-open text-emerald-600";
+                if (txt) txt.innerText = "ผู้ดูแล (แก้ไขได้)";
+                if (lockBadge) lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
+                if (lockBadge) lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ";
+                if (btnImport) btnImport.classList.remove('hidden');
+                if (btnImport) btnImport.classList.add('flex');
+            } else {
+                if (btn) btn.className = "flex items-center space-x-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition font-medium cursor-pointer";
+                if (icon) icon.className = "fa-solid fa-lock text-slate-500";
+                if (txt) txt.innerText = "ดูอย่างเดียว";
+                if (lockBadge) lockBadge.className = "bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
+                if (lockBadge) lockBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> โหมดดูอย่างเดียว`;
+                if (descTxt) descTxt.innerText = "พนักงานทั่วไปสามารถตรวจสอบยอดวันลาได้แบบเรียลไทม์ (คลิกปุ่มล็อคด้านบนขวาเพื่อใส่รหัสแก้ไข)";
+                if (btnImport) btnImport.classList.add('hidden');
+                if (btnImport) btnImport.classList.remove('flex');
+            }
         }
 
         function switchTab(tabId) {
@@ -611,8 +673,8 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v10');
-                const localReq = localStorage.getItem('pcbk_req_v10');
+                const localEmp = localStorage.getItem('pcbk_emp_v11');
+                const localReq = localStorage.getItem('pcbk_req_v11');
 
                 if (localEmp && JSON.parse(localEmp).length > 0) {
                     employees = JSON.parse(localEmp);
@@ -634,16 +696,13 @@
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v10', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v10', JSON.stringify(requests));
+                localStorage.setItem('pcbk_emp_v11', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v11', JSON.stringify(requests));
             } catch (e) {}
         }
 
         // ================= CLOUD SYNC =================
         async function syncFromCloud() {
-            const syncIndicator = document.getElementById('sync-indicator');
-            const syncText = document.getElementById('sync-text');
-
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
@@ -659,18 +718,9 @@
                     }
                     
                     saveLocalData();
-                    if (syncIndicator && syncText) {
-                        syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
-                        syncText.innerText = "ซิงก์ Cloud แล้ว";
-                    }
                     renderAllViews();
                 }
-            } catch (err) {
-                if (syncIndicator && syncText) {
-                    syncIndicator.className = "w-2 h-2 rounded-full bg-emerald-500";
-                    syncText.innerText = "พร้อมใช้งาน";
-                }
-            }
+            } catch (err) {}
         }
 
         async function saveEmployeesToCloud() {
@@ -831,6 +881,9 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
+            // ตรวจสอบสิทธิ์การแก้ไข (ถ้าไม่ใช่ Admin ให้ใส่ disabled เพื่อป้องกันการพิมพ์)
+            const inputAttr = isAdmin ? '' : 'disabled style="pointer-events: none; opacity: 0.9;"';
+
             filtered.forEach((e) => {
                 const empIndex = employees.findIndex(emp => emp.id === e.id);
                 
@@ -867,9 +920,9 @@
                         <td class="p-2 text-center text-slate-500">${e.dob || '-'}</td>
                         <td class="p-2 text-center text-slate-500">${e.startDate || '-'}</td>
                         <td class="p-1 text-center font-bold bg-purple-50 text-purple-900">
-                            <input type="number" step="0.25" min="0" value="${e.carryVacation !== undefined ? e.carryVacation : 0}" 
+                            <input type="number" step="0.25" min="0" value="${e.carryVacation !== undefined ? e.carryVacation : 0}" ${inputAttr}
                                 onchange="updateEmpField(${empIndex}, 'carryVacation', this.value)"
-                                class="w-12 text-center bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-purple-500 rounded p-0.5 font-bold text-purple-950">
+                                class="w-12 text-center bg-transparent ${isAdmin ? 'hover:bg-white focus:bg-white focus:ring-1 focus:ring-purple-500' : ''} rounded p-0.5 font-bold text-purple-950">
                         </td>
                 `;
 
@@ -879,14 +932,14 @@
 
                     rowHtml += `
                         <td class="p-0 text-center bg-amber-50/40">
-                            <input type="number" step="0.25" min="0" value="${addVal > 0 ? addVal : ''}" placeholder="0"
+                            <input type="number" step="0.25" min="0" value="${addVal > 0 ? addVal : ''}" placeholder="0" ${inputAttr}
                                 onchange="updateVacAccruedMonth(${empIndex}, ${m}, this.value)"
-                                class="w-8 text-center text-[10px] text-slate-500 bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-amber-500 rounded p-0.5">
+                                class="w-8 text-center text-[10px] text-slate-500 bg-transparent ${isAdmin ? 'hover:bg-white focus:bg-white focus:ring-1 focus:ring-amber-500' : ''} rounded p-0.5">
                         </td>
                         <td class="p-0 text-center ${usedVal > 0 ? 'bg-amber-100/60' : ''}">
-                            <input type="number" step="0.25" min="0" value="${usedVal > 0 ? usedVal : ''}" placeholder="-"
+                            <input type="number" step="0.25" min="0" value="${usedVal > 0 ? usedVal : ''}" placeholder="-" ${inputAttr}
                                 onchange="updateVacUsedMonth(${empIndex}, ${m}, this.value)"
-                                class="w-9 text-center text-[11px] font-semibold ${usedVal > 0 ? 'text-amber-950 font-bold' : 'text-slate-400'} bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-amber-500 rounded p-0.5">
+                                class="w-9 text-center text-[11px] font-semibold ${usedVal > 0 ? 'text-amber-950 font-bold' : 'text-slate-400'} bg-transparent ${isAdmin ? 'hover:bg-white focus:bg-white focus:ring-1 focus:ring-amber-500' : ''} rounded p-0.5">
                         </td>
                     `;
                 }
@@ -901,9 +954,9 @@
                     const sickVal = e.sickMonths[m] !== undefined ? e.sickMonths[m] : 0;
                     rowHtml += `
                         <td class="p-0 text-center ${sickVal > 0 ? 'bg-emerald-100/60' : 'bg-emerald-50/20'}">
-                            <input type="number" step="0.25" min="0" value="${sickVal > 0 ? sickVal : ''}" placeholder="-"
+                            <input type="number" step="0.25" min="0" value="${sickVal > 0 ? sickVal : ''}" placeholder="-" ${inputAttr}
                                 onchange="updateSickMonth(${empIndex}, ${m}, this.value)"
-                                class="w-9 text-center text-[11px] font-semibold ${sickVal > 0 ? 'text-emerald-900 font-bold' : 'text-slate-400'} bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-emerald-500 rounded p-0.5">
+                                class="w-9 text-center text-[11px] font-semibold ${sickVal > 0 ? 'text-emerald-900 font-bold' : 'text-slate-400'} bg-transparent ${isAdmin ? 'hover:bg-white focus:bg-white focus:ring-1 focus:ring-emerald-500' : ''} rounded p-0.5">
                         </td>
                     `;
                 }
@@ -911,14 +964,14 @@
                 rowHtml += `
                     <td class="p-2 text-center font-bold bg-emerald-100 text-emerald-900 text-sm">${totalSickUsed}</td>
                     <td class="p-1 text-center font-bold bg-purple-100 text-purple-950">
-                        <input type="number" step="0.25" min="0" value="${finalOtherUsed > 0 ? finalOtherUsed : ''}" placeholder="0"
+                        <input type="number" step="0.25" min="0" value="${finalOtherUsed > 0 ? finalOtherUsed : ''}" placeholder="0" ${inputAttr}
                             onchange="updateEmpField(${empIndex}, 'otherLeaveDays', this.value)"
-                            class="w-10 text-center text-[11px] font-bold bg-transparent hover:bg-white focus:bg-white focus:ring-1 focus:ring-purple-500 rounded p-0.5">
+                            class="w-10 text-center text-[11px] font-bold bg-transparent ${isAdmin ? 'hover:bg-white focus:bg-white focus:ring-1 focus:ring-purple-500' : ''} rounded p-0.5">
                     </td>
                     <td class="p-1 text-xs">
-                        <input type="text" value="${e.note || ''}" placeholder="หมายเหตุ"
+                        <input type="text" value="${e.note || ''}" placeholder="${isAdmin ? 'หมายเหตุ' : '-'}" ${inputAttr}
                             onchange="updateEmpField(${empIndex}, 'note', this.value)"
-                            class="w-full text-xs text-slate-600 bg-transparent hover:bg-white focus:bg-white border-0 hover:border rounded p-1">
+                            class="w-full text-xs text-slate-600 bg-transparent ${isAdmin ? 'hover:bg-white focus:bg-white border-0 hover:border' : ''} rounded p-1">
                     </td>
                 </tr>`;
 
@@ -927,6 +980,7 @@
         }
 
         async function updateEmpField(empIndex, field, val) {
+            if (!isAdmin) return;
             if (field === 'carryVacation' || field === 'otherLeaveDays') {
                 employees[empIndex][field] = parseFloat(val) || 0;
             } else {
@@ -939,6 +993,7 @@
         }
 
         async function updateVacAccruedMonth(empIndex, monthIdx, val) {
+            if (!isAdmin) return;
             employees[empIndex].vacationAccrued[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
@@ -947,6 +1002,7 @@
         }
 
         async function updateVacUsedMonth(empIndex, monthIdx, val) {
+            if (!isAdmin) return;
             employees[empIndex].vacationUsedMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
@@ -955,6 +1011,7 @@
         }
 
         async function updateSickMonth(empIndex, monthIdx, val) {
+            if (!isAdmin) return;
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
@@ -1213,6 +1270,10 @@
         }
 
         function triggerExcelImport() {
+            if (!isAdmin) {
+                alert("ต้องปลดล็อกสิทธิ์ผู้ดูแลก่อนจึงจะนำเข้าไฟล์ได้");
+                return;
+            }
             document.getElementById('excel-file-input').click();
         }
 
