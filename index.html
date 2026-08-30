@@ -294,7 +294,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
+                    <p class="text-xs text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com[cite: 1, 2]</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -398,7 +398,7 @@
 
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
+                        <span>ปลายทางส่งใบลา: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1, 2]
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -414,7 +414,7 @@
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
                 <div class="border-b border-slate-100 pb-3">
                     <h2 class="font-bold text-slate-900 text-lg">ศูนย์การพิจารณาอนุมัติวันลา</h2>
-                    <p class="text-xs text-slate-500">กดอนุมัติเพื่อตัดยอดวันลาลงในตาราง Matrix ประจำเดือนทันที</p>
+                    <p class="text-xs text-slate-500">ตรวจสอบและพิจารณาอนุมัติวันลา (เฉพาะผู้ดูแลระบบที่มีรหัสผ่านเท่านั้น)[cite: 1, 2]</p>
                 </div>
 
                 <div id="approval-list" class="space-y-3">
@@ -439,8 +439,8 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
+                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1, 2]
+                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>[cite: 1, 2]
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -453,11 +453,15 @@
             </div>
 
             <div class="flex items-center justify-end space-x-2 pt-2">
-                <button type="button" id="email-btn-reject" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition cursor-pointer">
+                <!-- Action buttons in modal will only show if Admin -->
+                <button type="button" id="email-btn-reject" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition cursor-pointer">
                     <i class="fa-solid fa-xmark mr-1"></i> ไม่อนุมัติ
                 </button>
-                <button type="button" id="email-btn-approve" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition cursor-pointer">
+                <button type="button" id="email-btn-approve" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition cursor-pointer">
                     <i class="fa-solid fa-check mr-1"></i> อนุมัติคำขอนี้
+                </button>
+                <button type="button" onclick="closeEmailModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2 rounded-xl transition cursor-pointer">
+                    ปิด
                 </button>
             </div>
         </div>
@@ -471,7 +475,7 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
-        const ADMIN_PASSWORD = "pcbk2026"; // รหัสผ่าน Admin สำหรับปลดล็อกการแก้ไขตาราง
+        const ADMIN_PASSWORD = "pcbk2026"; // รหัสผ่าน Admin
 
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -600,16 +604,18 @@
                     localStorage.setItem('pcbk_is_admin', 'false');
                     updateAdminUI();
                     renderSummaryTable();
+                    renderApprovalQueue();
                     showToast("เปลี่ยนเป็นโหมดดูอย่างเดียวเรียบร้อย");
                 }
             } else {
-                const pwd = prompt("กรุณากรอกรหัสผ่าน Admin เพื่อปลดล็อกการแก้ไขตาราง:");
+                const pwd = prompt("กรุณากรอกรหัสผ่าน Admin เพื่อปลดล็อกสิทธิ์จัดการ:");
                 if (pwd === ADMIN_PASSWORD) {
                     isAdmin = true;
                     localStorage.setItem('pcbk_is_admin', 'true');
                     updateAdminUI();
                     renderSummaryTable();
-                    showToast("ปลดล็อกสิทธิ์ผู้ดูแล (แก้ไขตารางได้) เรียบร้อย");
+                    renderApprovalQueue();
+                    showToast("ปลดล็อกสิทธิ์ผู้ดูแลเรียบร้อย");
                 } else if (pwd !== null) {
                     alert("รหัสผ่านไม่ถูกต้อง");
                 }
@@ -627,7 +633,7 @@
             if (isAdmin) {
                 if (btn) btn.className = "flex items-center space-x-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-300 transition font-bold cursor-pointer";
                 if (icon) icon.className = "fa-solid fa-lock-open text-emerald-600";
-                if (txt) txt.innerText = "ผู้ดูแล (แก้ไขได้)";
+                if (txt) txt.innerText = "ผู้ดูแล (แก้ไข/อนุมัติได้)";
                 if (lockBadge) lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                 if (lockBadge) lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ";
@@ -639,7 +645,7 @@
                 if (txt) txt.innerText = "ดูอย่างเดียว";
                 if (lockBadge) lockBadge.className = "bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                 if (lockBadge) lockBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> โหมดดูอย่างเดียว`;
-                if (descTxt) descTxt.innerText = "พนักงานทั่วไปสามารถตรวจสอบยอดวันลาได้แบบเรียลไทม์ (คลิกปุ่มล็อคด้านบนขวาเพื่อใส่รหัสแก้ไข)";
+                if (descTxt) descTxt.innerText = "พนักงานทั่วไปสามารถตรวจสอบยอดวันลาได้แบบเรียลไทม์ (คลิกปุ่มล็อคด้านบนขวาเพื่อใส่รหัส Admin)";
                 if (btnImport) btnImport.classList.add('hidden');
                 if (btnImport) btnImport.classList.remove('flex');
             }
@@ -673,8 +679,8 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v11');
-                const localReq = localStorage.getItem('pcbk_req_v11');
+                const localEmp = localStorage.getItem('pcbk_emp_v12');
+                const localReq = localStorage.getItem('pcbk_req_v12');
 
                 if (localEmp && JSON.parse(localEmp).length > 0) {
                     employees = JSON.parse(localEmp);
@@ -696,8 +702,8 @@
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v11', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v11', JSON.stringify(requests));
+                localStorage.setItem('pcbk_emp_v12', JSON.stringify(employees));
+                localStorage.setItem('pcbk_req_v12', JSON.stringify(requests));
             } catch (e) {}
         }
 
@@ -881,7 +887,6 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
-            // ตรวจสอบสิทธิ์การแก้ไข (ถ้าไม่ใช่ Admin ให้ใส่ disabled เพื่อป้องกันการพิมพ์)
             const inputAttr = isAdmin ? '' : 'disabled style="pointer-events: none; opacity: 0.9;"';
 
             filtered.forEach((e) => {
@@ -1198,7 +1203,7 @@
                             <button type="button" onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition cursor-pointer">
                                 <i class="fa-solid fa-envelope mr-1"></i> ดูรายละเอียด
                             </button>
-                            ${r.status === 'รออนุมัติ' ? `
+                            ${(isAdmin && r.status === 'รออนุมัติ') ? `
                                 <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">อนุมัติ</button>
                                 <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">ปฏิเสธ</button>
                             ` : ''}
@@ -1221,8 +1226,16 @@
             const btnApprove = document.getElementById('email-btn-approve');
             const btnReject = document.getElementById('email-btn-reject');
 
-            btnApprove.onclick = function() { approveLeaveRequest(req.id); closeEmailModal(); };
-            btnReject.onclick = function() { rejectLeaveRequest(req.id); closeEmailModal(); };
+            // แสดงปุ่มอนุมัติใน Modal เฉพาะ Admin
+            if (isAdmin && req.status === 'รออนุมัติ') {
+                btnApprove.classList.remove('hidden');
+                btnReject.classList.remove('hidden');
+                btnApprove.onclick = function() { approveLeaveRequest(req.id); closeEmailModal(); };
+                btnReject.onclick = function() { rejectLeaveRequest(req.id); closeEmailModal(); };
+            } else {
+                btnApprove.classList.add('hidden');
+                btnReject.classList.add('hidden');
+            }
 
             document.getElementById('email-modal').classList.remove('hidden');
         }
@@ -1233,6 +1246,10 @@
         }
 
         async function approveLeaveRequest(reqId) {
+            if (!isAdmin) {
+                alert("ต้องปลดล็อกสิทธิ์ผู้ดูแลก่อนจึงจะดำเนินการได้");
+                return;
+            }
             const req = requests.find(r => r.id === reqId);
             if (req && req.status !== 'อนุมัติแล้ว') {
                 req.status = 'อนุมัติแล้ว';
@@ -1260,6 +1277,10 @@
         }
 
         async function rejectLeaveRequest(reqId) {
+            if (!isAdmin) {
+                alert("ต้องปลดล็อกสิทธิ์ผู้ดูแลก่อนจึงจะดำเนินการได้");
+                return;
+            }
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
