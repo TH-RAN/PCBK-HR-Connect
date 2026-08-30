@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -294,7 +294,7 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> Online Leave Request Form
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">Submit your leave request for supervisory notification to Secretary.fine@gmail.com</p>
+                    <p class="text-xs text-slate-500 mt-1">Submit your leave request for supervisory notification to Secretary.fine@gmail.com[cite: 1]</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
@@ -398,7 +398,7 @@
 
                     <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
                         <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>Approval Email Recipient: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
+                        <span>Approval Email Recipient: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1]
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -439,8 +439,8 @@
             </div>
 
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">To:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
-                <div><span class="text-slate-400">Subject:</span> <strong class="text-blue-600">[Leave Request] <span id="email-emp-name">Employee</span> requests <span id="email-leave-type">Vacation</span></strong></div>
+                <div><span class="text-slate-400">To:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1]
+                <div><span class="text-slate-400">Subject:</span> <strong class="text-blue-600">[Leave Request] <span id="email-emp-name">Employee</span> requests <span id="email-leave-type">Vacation</span></strong></div>[cite: 1]
             </div>
 
             <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
@@ -560,6 +560,15 @@
             }
         ];
 
+        // Helper to normalize status across Thai and English versions
+        function isApprovedStatus(status) {
+            return status === 'Approved' || status === 'อนุมัติแล้ว';
+        }
+
+        function isRejectedStatus(status) {
+            return status === 'Rejected' || status === 'ไม่อนุมัติ';
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             checkAdminStatus();
@@ -677,18 +686,19 @@
 
         function loadInitialData() {
             try {
-                const localEmp = localStorage.getItem('pcbk_emp_v13_en');
-                const localReq = localStorage.getItem('pcbk_req_v13_en');
+                // Read from unified persistent master storage
+                const masterEmp = localStorage.getItem('pcbk_master_employees');
+                const masterReq = localStorage.getItem('pcbk_master_requests');
 
-                if (localEmp && JSON.parse(localEmp).length > 0) {
-                    employees = JSON.parse(localEmp);
+                if (masterEmp && JSON.parse(masterEmp).length > 0) {
+                    employees = JSON.parse(masterEmp);
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset));
                     saveLocalData();
                 }
 
-                if (localReq) {
-                    requests = JSON.parse(localReq);
+                if (masterReq) {
+                    requests = JSON.parse(masterReq);
                 } else {
                     requests = [];
                 }
@@ -700,8 +710,8 @@
 
         function saveLocalData() {
             try {
-                localStorage.setItem('pcbk_emp_v13_en', JSON.stringify(employees));
-                localStorage.setItem('pcbk_req_v13_en', JSON.stringify(requests));
+                localStorage.setItem('pcbk_master_employees', JSON.stringify(employees));
+                localStorage.setItem('pcbk_master_requests', JSON.stringify(requests));
             } catch (e) {}
         }
 
@@ -766,11 +776,11 @@
         }
 
         function updateBadges() {
-            const todayApprovedLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && r.status === 'Approved');
+            const todayApprovedLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && isApprovedStatus(r.status));
             const todayBadge = document.getElementById('badge-today-count');
             if (todayBadge) todayBadge.innerText = todayApprovedLeaves.length;
 
-            const pendingReqs = requests.filter(r => r.status === 'Pending Approval');
+            const pendingReqs = requests.filter(r => !isApprovedStatus(r.status) && !isRejectedStatus(r.status));
             const pendingBadge = document.getElementById('badge-pending-count');
             if (pendingBadge) {
                 pendingBadge.innerText = pendingReqs.length;
@@ -783,7 +793,7 @@
         }
 
         function renderTodayDashboard() {
-            const todayLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && r.status === 'Approved');
+            const todayLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && isApprovedStatus(r.status));
             const countEl = document.getElementById('kpi-today-leave-count');
             const listContainer = document.getElementById('today-leave-list-container');
             const statusChip = document.getElementById('today-status-chip');
@@ -1178,9 +1188,13 @@
             }
 
             requests.forEach(r => {
-                const statusBadge = r.status === 'Approved' 
+                const isApp = isApprovedStatus(r.status);
+                const isRej = isRejectedStatus(r.status);
+                const isPend = !isApp && !isRej;
+
+                const statusBadge = isApp
                     ? '<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold">Approved</span>'
-                    : r.status === 'Rejected'
+                    : isRej
                     ? '<span class="bg-rose-100 text-rose-700 text-xs px-2.5 py-1 rounded-full font-bold">Rejected</span>'
                     : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">Pending</span>';
 
@@ -1201,7 +1215,7 @@
                             <button type="button" onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition cursor-pointer">
                                 <i class="fa-solid fa-envelope mr-1"></i> View Details
                             </button>
-                            ${(isAdmin && r.status === 'Pending Approval') ? `
+                            ${(isAdmin && isPend) ? `
                                 <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">Approve</button>
                                 <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">Reject</button>
                             ` : ''}
@@ -1215,6 +1229,8 @@
             if (!req) return;
             activeModalReqId = reqId;
 
+            const isPend = !isApprovedStatus(req.status) && !isRejectedStatus(req.status);
+
             document.getElementById('email-emp-name').innerText = req.empName;
             document.getElementById('email-leave-type').innerText = `${req.type} (${req.days} Day${req.days > 1 ? 's' : ''})`;
             document.getElementById('email-detail-type').innerText = `${req.type} (${req.days} Day${req.days > 1 ? 's' : ''})`;
@@ -1224,7 +1240,7 @@
             const btnApprove = document.getElementById('email-btn-approve');
             const btnReject = document.getElementById('email-btn-reject');
 
-            if (isAdmin && req.status === 'Pending Approval') {
+            if (isAdmin && isPend) {
                 btnApprove.classList.remove('hidden');
                 btnReject.classList.remove('hidden');
                 btnApprove.onclick = function() { approveLeaveRequest(req.id); closeEmailModal(); };
@@ -1248,7 +1264,7 @@
                 return;
             }
             const req = requests.find(r => r.id === reqId);
-            if (req && req.status !== 'Approved') {
+            if (req && !isApprovedStatus(req.status)) {
                 req.status = 'Approved';
 
                 const emp = employees.find(e => e.id === req.empId);
