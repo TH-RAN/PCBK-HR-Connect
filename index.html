@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Leave Connect - ระบบบริหารจัดการงานบุคคลและวันลา</title>
+    <title>HR Leave Connect - PCBK</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -38,7 +38,11 @@
         }
         .card-hover:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.05);
+        }
+        .my-row-highlight {
+            background-color: #eff6ff !important;
+            border-left: 4px solid #3b82f6 !important;
         }
         ::-webkit-scrollbar {
             height: 6px;
@@ -66,12 +70,12 @@
     <!-- ================= LOGIN OVERLAY MODAL ================= -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-fade-in relative">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-lg shadow-blue-200">
-                <i class="fa-solid fa-users-gear"></i>
+            <div class="flex justify-center">
+                <img src="https://raw.githubusercontent.com/TH-RAN/PCBK-HR-Connect/main/LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 object-contain" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=pcbk'">
             </div>
 
             <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">HR Leave Connect</h2>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">PCBK HR-Connect</h2>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1">กรุณากรอกรหัสพนักงาน หรือรหัสผู้ดูแลระบบ</p>
             </div>
 
@@ -107,13 +111,11 @@
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- System Brand -->
+                <!-- System Brand with Official PCBK Logo -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-100">
-                        <i class="fa-solid fa-users-gear"></i>
-                    </div>
+                    <img src="https://raw.githubusercontent.com/TH-RAN/PCBK-HR-Connect/main/LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-10 w-auto object-contain" onerror="this.style.display='none'">
                     <div>
-                        <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">HR Leave Connect</h1>
+                        <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK HR-Connect</h1>
                         <p class="text-[11px] sm:text-xs text-slate-500">ระบบบริหารจัดการงานบุคคล วันลา และสถิติประจำปี</p>
                     </div>
                 </div>
@@ -168,9 +170,9 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ================= TAB 1: EXECUTIVE DASHBOARD ================= -->
+        <!-- ================= TAB 1: EXECUTIVE DASHBOARD (TWO-COLUMN DESKTOP LAYOUT) ================= -->
         <section id="tab-dashboard" class="tab-content space-y-6">
             <!-- Hero Gradient Banner -->
             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-3xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -195,103 +197,110 @@
                 </div>
             </div>
 
-            <!-- 4 Top KPI Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                    <div>
-                        <span class="text-slate-500 text-xs font-medium">พนักงานลางานวันนี้</span>
-                        <div class="text-3xl font-extrabold text-blue-900 mt-1" id="kpi-today-leave-count">0 คน</div>
-                        <p class="text-xs text-emerald-600 font-semibold mt-2 flex items-center" id="kpi-today-desc">
-                            <i class="fa-solid fa-chart-line mr-1"></i> พร้อมปฏิบัติงาน 100%
-                        </p>
-                    </div>
-                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-user-group"></i>
-                    </div>
-                </div>
+            <!-- Two-Column Side-by-Side Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column: KPI Cards & Today Absences -->
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-500 text-xs font-medium">พนักงานลางานวันนี้</span>
+                                <div class="text-3xl font-extrabold text-blue-900 mt-1" id="kpi-today-leave-count">0 คน</div>
+                                <p class="text-xs text-emerald-600 font-semibold mt-2 flex items-center" id="kpi-today-desc">
+                                    <i class="fa-solid fa-chart-line mr-1"></i> พร้อมปฏิบัติงาน 100%
+                                </p>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-user-group"></i>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                    <div>
-                        <span class="text-slate-500 text-xs font-medium" id="kpi-title-vac-used">พักร้อนใช้ไปทั้งปี</span>
-                        <div class="text-3xl font-extrabold text-amber-500 mt-1" id="kpi-total-vacation-used">0 วัน</div>
-                        <p class="text-xs text-slate-500 mt-2">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> วัน / พนักงาน</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-umbrella-beach"></i>
-                    </div>
-                </div>
+                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-500 text-xs font-medium" id="kpi-title-vac-used">พักร้อนใช้ไปทั้งปี</span>
+                                <div class="text-3xl font-extrabold text-amber-500 mt-1" id="kpi-total-vacation-used">0 วัน</div>
+                                <p class="text-xs text-slate-500 mt-2">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> วัน / พนักงาน</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-umbrella-beach"></i>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                    <div>
-                        <span class="text-slate-500 text-xs font-medium">สิทธิ์พักร้อนคงเหลือรวม</span>
-                        <div class="text-3xl font-extrabold text-emerald-600 mt-1" id="kpi-total-vacation-rem">0 วัน</div>
-                        <p class="text-xs text-blue-600 font-semibold mt-2">+1 วัน/เดือน (ทบสะสมข้ามปีได้)</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-hourglass-half"></i>
-                    </div>
-                </div>
+                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-500 text-xs font-medium">สิทธิ์พักร้อนคงเหลือรวม</span>
+                                <div class="text-3xl font-extrabold text-emerald-600 mt-1" id="kpi-total-vacation-rem">0 วัน</div>
+                                <p class="text-xs text-blue-600 font-semibold mt-2">+1 วัน/เดือน (ทบสะสมข้ามปีได้)</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                    <div>
-                        <span class="text-slate-500 text-xs font-medium" id="kpi-title-sick-used">ลาป่วยสะสมทั้งปี</span>
-                        <div class="text-3xl font-extrabold text-rose-500 mt-1" id="kpi-total-sick-used">0 วัน</div>
-                        <p class="text-xs text-slate-500 mt-2">โควตากฎหมายแรงงาน: ไม่เกิน 30 วัน/ปี</p>
-                    </div>
-                    <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-heart-pulse"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Attendance List Section -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-base flex items-center">
-                            <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ลางานในวันนี้</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานเพื่อความสะดวกในการประสานงานและส่งต่องาน</p>
-                    </div>
-                    <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full font-bold" id="today-status-chip">
-                        ลางาน 0 คน
-                    </span>
-                </div>
-
-                <div id="today-leave-list-container" class="py-4 text-center space-y-2">
-                    <!-- Dynamic Leaves -->
-                </div>
-            </div>
-
-            <!-- Chart Analytics (Monthly Bar & Donut Distribution) -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                                <i class="fa-solid fa-chart-simple text-blue-600 mr-2"></i> สถิติการลางานรายเดือน (ม.ค. - ธ.ค.)
-                            </h3>
-                            <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน ลาป่วย และภารกิจ/ลาอื่นๆ รายเดือน</p>
+                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
+                            <div>
+                                <span class="text-slate-500 text-xs font-medium" id="kpi-title-sick-used">ลาป่วยสะสมทั้งปี</span>
+                                <div class="text-3xl font-extrabold text-rose-500 mt-1" id="kpi-total-sick-used">0 วัน</div>
+                                <p class="text-xs text-slate-500 mt-2">โควตา: ไม่เกิน 30 วันทำการ/ปี</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-lg">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="h-64 relative">
-                        <canvas id="monthlyTrendBarChart"></canvas>
+
+                    <!-- Attendance List Box -->
+                    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
+                                    <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ลางานวันนี้</span>
+                                </h3>
+                                <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานประจำวัน</p>
+                            </div>
+                            <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full font-bold" id="today-status-chip">
+                                ลางาน 0 คน
+                            </span>
+                        </div>
+
+                        <div id="today-leave-list-container" class="py-2 text-center space-y-2">
+                            <!-- Dynamic Leaves -->
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                            <i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> สัดส่วนประเภทการลา
-                        </h3>
-                        <p class="text-xs text-slate-500">การกระจายตัวของวันลาแต่ละประเภท</p>
+                <!-- Right Column: Monthly Bar Chart & Leave Distribution Donut -->
+                <div class="lg:col-span-6 space-y-6">
+                    <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
+                                    <i class="fa-solid fa-chart-simple text-blue-600 mr-2"></i> สถิติการลางานรายเดือน (ม.ค. - ธ.ค.)
+                                </h3>
+                                <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน ลาป่วย และภารกิจ/ลาอื่นๆ</p>
+                            </div>
+                        </div>
+                        <div class="h-60 relative">
+                            <canvas id="monthlyTrendBarChart"></canvas>
+                        </div>
                     </div>
-                    <div class="h-52 relative">
-                        <canvas id="leaveDistributionDonutChart"></canvas>
-                    </div>
-                    <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-xs text-slate-600 font-semibold">
-                        <span>รวมวันลาทั้งหมด:</span>
-                        <span id="grand-total-leaves-txt" class="text-slate-900 font-bold text-sm">0 วัน</span>
+
+                    <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
+                                    <i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> สัดส่วนประเภทการลาทั้งหมด
+                                </h3>
+                                <p class="text-xs text-slate-500">การกระจายตัวของวันลาแต่ละประเภท</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-400 block">รวมวันลาทั้งหมด</span>
+                                <span id="grand-total-leaves-txt" class="text-slate-900 font-bold text-sm">0 วัน</span>
+                            </div>
+                        </div>
+                        <div class="h-52 relative">
+                            <canvas id="leaveDistributionDonutChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -308,7 +317,7 @@
                                 <i class="fa-solid fa-eye mr-1"></i> โหมดดูอย่างเดียว (View Only)
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-0.5" id="summary-desc-text">ตรวจสอบยอดสะสมและประวัติการลาประจำปีของบุคลากรทุกคน</p>
+                        <p class="text-xs text-slate-500 mt-0.5" id="summary-desc-text">ตรวจสอบยอดสะสมและประวัติการลาประจำปีของบุคลากรทุกคน (แถวสีฟ้าคือข้อมูลบัญชีของคุณ)</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -400,32 +409,44 @@
                     <h2 class="font-bold text-slate-900 text-xl flex items-center">
                         <i class="fa-solid fa-file-signature text-blue-600 mr-2.5"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">กรอกข้อมูลการลาเพื่อส่งอีเมลขออนุมัติไปยัง Secretary.fine@gmail.com</p>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">กรอกข้อมูลการลาและตรวจสอบวันลาคงเหลือแบบเรียลไทม์</p>
                 </div>
 
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-5 text-xs sm:text-sm">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1.5">เลือกชื่อพนักงาน *</label>
-                        <select id="form-emp-id" required class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-slate-800">
+                        <select id="form-emp-id" required onchange="handleFormEmpChange()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-slate-800">
                             <option value="">-- เลือกชื่อพนักงาน --</option>
                         </select>
+                    </div>
+
+                    <!-- กล่องแสดงสิทธิ์คงเหลือของพนักงานที่เลือก -->
+                    <div id="emp-quota-status-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-2 gap-3 text-center">
+                        <div class="bg-white p-2.5 rounded-xl border border-amber-200 shadow-xs">
+                            <span class="text-[11px] text-slate-500 block">สิทธิ์พักร้อนคงเหลือ</span>
+                            <span id="form-vacation-quota-txt" class="font-extrabold text-amber-600 text-base">0.0 วัน</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-rose-200 shadow-xs">
+                            <span class="text-[11px] text-slate-500 block">สิทธิ์ลาป่วยคงเหลือ</span>
+                            <span id="form-sick-quota-txt" class="font-extrabold text-rose-600 text-base">30.0 วัน</span>
+                        </div>
                     </div>
 
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1.5">ประเภทการลางาน (3 ประเภทหลัก) *</label>
                         <div class="grid grid-cols-3 gap-3">
                             <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_type" value="ลาพักร้อน" required checked onchange="toggleLeaveTypeFields()" class="hidden">
+                                <input type="radio" name="leave_type" value="ลาพักร้อน" required checked onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
                                 <i class="fa-solid fa-umbrella-beach text-amber-600 text-lg mb-1"></i>
                                 <span class="font-bold text-xs">1. ลาพักร้อน</span>
                             </label>
                             <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_type" value="ลาป่วย" required onchange="toggleLeaveTypeFields()" class="hidden">
+                                <input type="radio" name="leave_type" value="ลาป่วย" required onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
                                 <i class="fa-solid fa-bed-pulse text-rose-600 text-lg mb-1"></i>
                                 <span class="font-bold text-xs">2. ลาป่วย</span>
                             </label>
                             <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_type" value="ลาอื่นๆ" required onchange="toggleLeaveTypeFields()" class="hidden">
+                                <input type="radio" name="leave_type" value="ลาอื่นๆ" required onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
                                 <i class="fa-solid fa-folder-open text-purple-600 text-lg mb-1"></i>
                                 <span class="font-bold text-xs">3. ลาอื่นๆ/ภารกิจ</span>
                             </label>
@@ -505,14 +526,15 @@
                         <span id="form-day-count" class="font-extrabold text-sm text-blue-700">1 วัน</span>
                     </div>
 
+                    <!-- ข้อความแจ้งเตือนสีแดงเมื่อลาเกินสิทธิ์ -->
+                    <div id="leave-quota-warning" class="hidden bg-rose-50 border border-rose-300 text-rose-700 p-3.5 rounded-2xl text-xs font-bold flex items-center space-x-2">
+                        <i class="fa-solid fa-triangle-exclamation text-base"></i>
+                        <span id="leave-quota-warning-txt">ไม่สามารถลาเกินสิทธิ์วันลาคงเหลือที่กำหนดได้</span>
+                    </div>
+
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">เหตุผลการลา / ช่องทางติดต่อ *</label>
                         <textarea id="form-reason" rows="3" required placeholder="เช่น ติดต่อธุระราชการ / โทร 081-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
-                    </div>
-
-                    <div class="bg-slate-100 border border-slate-200 rounded-2xl p-3.5 flex items-center space-x-2 text-xs text-slate-600">
-                        <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-lg"></i>
-                        <span>ปลายทางส่งอีเมลขออนุมัติ: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>
                     </div>
 
                     <button type="submit" id="btn-submit-form" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-200 transition flex items-center justify-center space-x-2 cursor-pointer">
@@ -526,9 +548,11 @@
         <!-- ================= TAB 4: APPROVAL CENTER ================= -->
         <section id="tab-approval-center" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                <div class="border-b border-slate-100 pb-3">
-                    <h2 class="font-bold text-slate-900 text-xl">ศูนย์พิจารณาอนุมัติวันลา (Approval Center)</h2>
-                    <p class="text-xs sm:text-sm text-slate-500">ตรวจสอบและพิจารณาอนุมัติคำขอลางาน (เฉพาะผู้ดูแลระบบที่มีรหัสผ่านเท่านั้น)</p>
+                <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-xl">ศูนย์พิจารณาอนุมัติวันลา (Approval Center)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ตรวจสอบและพิจารณาอนุมัติคำขอลางาน (เฉพาะผู้ดูแลระบบที่มีรหัสผ่านเท่านั้น)</p>
+                    </div>
                 </div>
 
                 <div id="approval-list" class="space-y-3">
@@ -537,66 +561,62 @@
             </div>
         </section>
 
-        <!-- ================= TAB 5: MY PROFILE ================= -->
+        <!-- ================= TAB 5: MY PROFILE (REDESIGNED MODERN CLEAN) ================= -->
         <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
-                <div class="h-36 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 relative"></div>
-
-                <div class="px-6 pb-6 pt-0 relative">
-                    <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 gap-4 border-b border-slate-100 pb-6">
-                        <div class="flex flex-col sm:flex-row items-center sm:items-end space-y-3 sm:space-y-0 sm:space-x-5">
-                            <div class="relative group">
-                                <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-2xl object-cover border-4 border-white shadow-md bg-slate-100">
-                                <label for="profile-photo-upload" class="absolute bottom-1 right-1 w-8 h-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
-                                    <i class="fa-solid fa-camera text-xs"></i>
-                                </label>
-                                <input type="file" id="profile-photo-upload" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
-                            </div>
-                            <div class="text-center sm:text-left space-y-1">
-                                <div class="flex items-center justify-center sm:justify-start space-x-2">
-                                    <h2 id="profile-card-name" class="text-xl font-bold text-slate-900">Guest User</h2>
-                                    <span id="profile-card-role-chip" class="bg-blue-100 text-blue-700 text-xs px-2.5 py-0.5 rounded-full font-bold">พนักงาน</span>
-                                </div>
-                                <p id="profile-card-position" class="text-xs text-slate-500">Position Not Assigned</p>
-                                <p class="text-xs text-slate-400 font-mono">รหัสพนักงาน: <strong id="profile-card-id" class="text-slate-700">-</strong></p>
-                            </div>
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+                <!-- Clean Modern Header -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
+                    <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+                        <div class="relative group">
+                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50">
+                            <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
+                                <i class="fa-solid fa-camera text-xs"></i>
+                            </label>
+                            <input type="file" id="profile-photo-upload" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
                         </div>
-
-                        <div class="flex justify-center">
-                            <button type="button" onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2.5 rounded-2xl border border-rose-200 transition cursor-pointer">
-                                <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> ออกจากระบบ (Sign Out)
-                            </button>
+                        <div class="space-y-1">
+                            <div class="flex items-center justify-center sm:justify-start space-x-2">
+                                <h2 id="profile-card-name" class="text-2xl font-extrabold text-slate-900">กำลังโหลด...</h2>
+                                <span id="profile-card-role-chip" class="bg-blue-50 text-blue-700 border border-blue-200 text-xs px-2.5 py-0.5 rounded-full font-bold">พนักงาน</span>
+                            </div>
+                            <p id="profile-card-position" class="text-sm font-medium text-slate-600">Position Not Assigned</p>
+                            <p class="text-xs text-slate-400 font-mono">รหัสพนักงาน: <strong id="profile-card-id" class="text-slate-700 font-bold">-</strong></p>
                         </div>
                     </div>
 
-                    <!-- Personal Metrics Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
-                        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 text-center">
-                            <span class="text-xs text-amber-800 font-semibold uppercase tracking-wider">วันพักร้อนคงเหลือ</span>
-                            <div class="text-2xl font-extrabold text-amber-600 mt-1" id="profile-vacation-rem">0 วัน</div>
-                            <p class="text-[11px] text-amber-700/80 mt-1">+1 วัน/เดือน สะสมข้ามปีได้</p>
-                        </div>
-                        <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-4 text-center">
-                            <span class="text-xs text-rose-800 font-semibold uppercase tracking-wider">พักร้อนใช้ไปทั้งปี</span>
-                            <div class="text-2xl font-extrabold text-rose-600 mt-1" id="profile-vacation-used">0 วัน</div>
-                            <p class="text-[11px] text-rose-700/80 mt-1">ยอดรวมที่ลาไปในปีนี้</p>
-                        </div>
-                        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 text-center">
-                            <span class="text-xs text-emerald-800 font-semibold uppercase tracking-wider">ลาป่วยใช้ไปทั้งปี</span>
-                            <div class="text-2xl font-extrabold text-emerald-600 mt-1" id="profile-sick-used">0 วัน</div>
-                            <p class="text-[11px] text-emerald-700/80 mt-1">โควตาปีละไม่เกิน 30 วันทำการ</p>
-                        </div>
-                    </div>
+                    <button type="button" onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold px-4 py-2.5 rounded-2xl border border-rose-200 transition cursor-pointer flex items-center space-x-1.5">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>ออกจากระบบ</span>
+                    </button>
+                </div>
 
-                    <!-- Personnel Detail List -->
-                    <div class="mt-6 border border-slate-200 rounded-2xl p-5 bg-slate-50 space-y-3 text-xs">
-                        <h4 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">ข้อมูลประวัติพนักงาน</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-600">
-                            <div><span class="text-slate-400">วัน/เดือน/ปีเกิด:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
-                            <div><span class="text-slate-400">วันเริ่มงาน:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
-                            <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                            <div><span class="text-slate-400">สถานะอุปกรณ์:</span> <strong class="text-emerald-700 font-medium">จดจำอุปกรณ์และซิงก์ Cloud แล้ว</strong></div>
-                        </div>
+                <!-- Clean Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-amber-50/60 border border-amber-200/80 rounded-3xl p-5 text-center">
+                        <span class="text-xs text-amber-800 font-semibold uppercase tracking-wider block">วันพักร้อนคงเหลือ</span>
+                        <div class="text-3xl font-extrabold text-amber-600 mt-1.5" id="profile-vacation-rem">0 วัน</div>
+                        <p class="text-[11px] text-amber-700/80 mt-1">+1 วัน/เดือน สะสมข้ามปีได้</p>
+                    </div>
+                    <div class="bg-rose-50/60 border border-rose-200/80 rounded-3xl p-5 text-center">
+                        <span class="text-xs text-rose-800 font-semibold uppercase tracking-wider block">พักร้อนใช้ไปทั้งปี</span>
+                        <div class="text-3xl font-extrabold text-rose-600 mt-1.5" id="profile-vacation-used">0 วัน</div>
+                        <p class="text-[11px] text-rose-700/80 mt-1">ยอดรวมที่ลาไปในปีนี้</p>
+                    </div>
+                    <div class="bg-emerald-50/60 border border-emerald-200/80 rounded-3xl p-5 text-center">
+                        <span class="text-xs text-emerald-800 font-semibold uppercase tracking-wider block">ลาป่วยใช้ไปทั้งปี</span>
+                        <div class="text-3xl font-extrabold text-emerald-600 mt-1.5" id="profile-sick-used">0 วัน</div>
+                        <p class="text-[11px] text-emerald-700/80 mt-1">โควตาปีละไม่เกิน 30 วันทำการ</p>
+                    </div>
+                </div>
+
+                <!-- Personal Information Clean Box -->
+                <div class="border border-slate-200/80 rounded-3xl p-6 bg-slate-50/60 space-y-3 text-xs sm:text-sm">
+                    <h4 class="font-bold text-slate-800 border-b border-slate-200/80 pb-2">ข้อมูลประวัติพนักงาน</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-600 pt-1">
+                        <div><span class="text-slate-400">วัน/เดือน/ปีเกิด:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
+                        <div><span class="text-slate-400">วันเริ่มงาน:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
+                        <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
+                        <div><span class="text-slate-400">สถานะอุปกรณ์:</span> <strong class="text-emerald-700 font-medium">จดจำอุปกรณ์และซิงก์ Cloud แล้ว</strong></div>
                     </div>
                 </div>
             </div>
@@ -617,14 +637,9 @@
                 <button type="button" onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs space-y-1">
-                <div><span class="text-slate-400">ถึง:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>
-                <div><span class="text-slate-400">หัวข้อ:</span> <strong class="text-blue-600">[คำขอลางาน] <span id="email-emp-name">พนักงาน</span> ขออนุมัติ <span id="email-leave-type">ลาพักร้อน</span></strong></div>
-            </div>
-
             <div class="border border-slate-200 p-4 rounded-2xl text-slate-700 space-y-2 text-xs">
                 <p>เรียน ผู้บังคับบัญชา / HR,</p>
-                <p>พนักงานมีความประสงค์ขอยื่นเรื่อง <strong id="email-detail-type" class="text-slate-900">ลาพักร้อน</strong> โดยมีรายละเอียดดังนี้:</p>
+                <p>พนักงาน <strong id="email-emp-name" class="text-slate-900">-</strong> ได้ยื่นเรื่อง <strong id="email-detail-type" class="text-slate-900">ลาพักร้อน</strong> โดยมีรายละเอียดดังนี้:</p>
                 <ul class="list-disc list-inside space-y-1.5 bg-slate-50 p-3 rounded-xl">
                     <li><strong>ช่วงวันลา:</strong> <span id="email-detail-dates">-</span></li>
                     <li><strong>เหตุผล / ช่องทางติดต่อ:</strong> <span id="email-detail-reason">-</span></li>
@@ -633,10 +648,10 @@
 
             <div class="flex items-center justify-end space-x-2 pt-2">
                 <button type="button" id="email-btn-reject" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2.5 rounded-xl transition cursor-pointer">
-                    <i class="fa-solid fa-xmark mr-1"></i> ปฏิเสธ (Reject)
+                    <i class="fa-solid fa-xmark mr-1"></i> ปฏิเสธ
                 </button>
                 <button type="button" id="email-btn-approve" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl shadow transition cursor-pointer">
-                    <i class="fa-solid fa-check mr-1"></i> อนุมัติ (Approve)
+                    <i class="fa-solid fa-check mr-1"></i> อนุมัติ
                 </button>
                 <button type="button" onclick="closeEmailModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-xl transition cursor-pointer">
                     ปิด
@@ -680,55 +695,55 @@
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 3, id: "1102033", name: "นางสาวภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
+                seq: 3, id: "1102033", name: "ภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0.25, 0, 0, 2, 0, 1, 2, 0.25, 0, 0, 0, 0],
                 sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 4, id: "1104008", name: "นางสาวกนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
+                seq: 4, id: "1104008", name: "กนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [1.5, 0, 3, 1, 0.5, 2, 1, 1, 0, 0, 0, 0],
                 sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: ""
             },
             {
-                seq: 5, id: "1103020", name: "นายชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
+                seq: 5, id: "1103020", name: "ชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 6, id: "1103059", name: "นายปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
+                seq: 6, id: "1103059", name: "ปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 7, id: "1102049", name: "นางสาวณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
+                seq: 7, id: "1102049", name: "ณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [3, 0.25, 1, 3.75, 0, 1, 3, 1, 0, 0, 0, 0],
                 sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 8, id: "1102050", name: "นางสาวภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
+                seq: 8, id: "1102050", name: "ภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [3, 0, 1, 2, 3, 1, 1, 1, 0, 0, 0, 0],
                 sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 9, id: "1102051", name: "นางสาวอาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
+                seq: 9, id: "1102051", name: "อาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
                 vacationAccrued: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
                 vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED"
             },
             {
-                seq: 10, id: "1102055", name: "นายรัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
+                seq: 10, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
-                seq: 11, id: "1103063", name: "นายกฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
+                seq: 11, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
@@ -750,6 +765,16 @@
 
         function isRejectedStatus(status) {
             return status === 'Rejected' || status === 'ไม่อนุมัติ';
+        }
+
+        // Helper: จัดการการแสดงผลชื่อตามเงื่อนไข (คงคำนำหน้าเฉพาะผู้บริหาร 2 ท่าน)
+        function formatDisplayName(emp) {
+            if (!emp) return '';
+            const raw = emp.name || '';
+            if (raw.includes('ชัยศักดิ์') || raw.includes('ลลนา')) {
+                return raw;
+            }
+            return raw.replace(/^(นาย|นางสาว|นาง)\s*/g, '');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -814,7 +839,7 @@
             renderAllViews();
             switchTab('dashboard');
             syncFromCloud();
-            showToast(`ยินดีต้อนรับคุณ ${currentUser.name}`);
+            showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             return true;
         }
 
@@ -841,7 +866,7 @@
             const roleEl = document.getElementById('header-role-badge');
             const avatarEl = document.getElementById('header-user-avatar');
 
-            if (nameEl) nameEl.innerText = currentUser.name.split(' ')[0] || currentUser.name;
+            if (nameEl) nameEl.innerText = formatDisplayName(currentUser).split(' ')[0] || formatDisplayName(currentUser);
             if (roleEl) {
                 roleEl.innerText = isAdmin ? 'ผู้ดูแลระบบ' : 'พนักงาน';
                 roleEl.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold' : 'bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-bold';
@@ -870,7 +895,7 @@
             const savedPhoto = localStorage.getItem(`pcbk_avatar_${currentUser.id}`);
             if (photoEl) photoEl.src = savedPhoto || `https://api.dicebear.com/7.x/bottts/svg?seed=${currentUser.id}`;
 
-            if (nameEl) nameEl.innerText = currentUser.name;
+            if (nameEl) nameEl.innerText = formatDisplayName(currentUser);
             if (posEl) posEl.innerText = currentUser.position;
             if (idEl) idEl.innerText = currentUser.id;
             if (dobEl) dobEl.innerText = currentUser.dob || '-';
@@ -940,7 +965,7 @@
             if (kpiSickUsedTitle) kpiSickUsedTitle.innerText = `ลาป่วยสะสมทั้งปี (${currentYearBE})`;
 
             const listTitle = document.getElementById('today-leave-list-title');
-            if (listTitle) listTitle.innerText = `รายชื่อพนักงานที่ลางานในวันนี้ (${todayRealThaiText})`;
+            if (listTitle) listTitle.innerText = `รายชื่อพนักงานที่ลางานวันนี้ (${todayRealThaiText})`;
 
             const formStart = document.getElementById('form-start-date');
             const formEnd = document.getElementById('form-end-date');
@@ -965,7 +990,7 @@
                     lockBadge.className = "bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> โหมดดูอย่างเดียว (View Only)`;
                 }
-                if (descTxt) descTxt.innerText = "ตรวจสอบยอดสะสมและประวัติการลาประจำปีของบุคลากรทุกคน";
+                if (descTxt) descTxt.innerText = "ตรวจสอบยอดสะสมและประวัติการลาประจำปีของบุคลากรทุกคน (แถวสีฟ้าคือข้อมูลบัญชีของคุณ)";
                 if (btnImport) { btnImport.classList.add('hidden'); btnImport.classList.remove('flex'); }
             }
         }
@@ -996,7 +1021,10 @@
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
-            if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
+            if (tabId === 'request-form') {
+                renderEmpSelectOptions('form-emp-id');
+                handleFormEmpChange();
+            }
             if (tabId === 'profile') renderProfileTab();
         }
 
@@ -1149,7 +1177,7 @@
                 if (kpiTodayDesc) kpiTodayDesc.innerHTML = `<i class="fa-solid fa-chart-line mr-1 text-blue-600"></i> พร้อมปฏิบัติงาน ${attendancePct}%`;
                 
                 if (listContainer) {
-                    let cardsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-left">`;
+                    let cardsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">`;
                     todayLeaves.forEach(r => {
                         const emp = employees.find(e => e.id === r.empId);
                         const pos = emp ? emp.position : 'พนักงาน';
@@ -1157,7 +1185,7 @@
                         cardsHtml += `
                             <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2 card-hover">
                                 <div class="flex items-center justify-between">
-                                    <span class="font-bold text-slate-900 text-xs">${r.empName}</span>
+                                    <span class="font-bold text-slate-900 text-xs">${formatDisplayName(emp) || r.empName}</span>
                                     <span class="text-[10px] ${badgeColor} px-2.5 py-0.5 rounded-full font-bold">${r.type}</span>
                                 </div>
                                 <p class="text-[11px] text-slate-500">รหัส: ${r.empId} • ${pos}</p>
@@ -1246,7 +1274,7 @@
                     totalOtherAll += oth;
                 });
 
-                // Stacked Bar Chart (ม.ค. - ธ.ค.)
+                // Stacked Bar Chart
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
                 if (barCanvas && barCanvas.offsetParent !== null) {
                     if (monthlyBarChartInstance) monthlyBarChartInstance.destroy();
@@ -1324,7 +1352,7 @@
             } catch (err) {}
         }
 
-        // ================= FULL MATRIX RENDERING =================
+        // ================= FULL MATRIX RENDERING (WITH ROW HIGHLIGHT) =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -1366,11 +1394,18 @@
                 const remainingVacation = Math.max(0, carryVal + totalAccrued - totalVacationUsed);
                 const finalOtherUsed = parseFloat(e.otherLeaveDays) || 0;
 
+                // ตรวจสอบว่าเป็นบัญชีที่ล็อกอินอยู่หรือไม่ เพื่อทำการไฮไลต์สีฟ้าอ่อน
+                const isCurrentLoggedIn = currentUser && String(currentUser.id) === String(e.id);
+                const rowHighlightClass = isCurrentLoggedIn ? 'my-row-highlight font-semibold' : 'hover:bg-slate-100/80';
+
                 let rowHtml = `
-                    <tr class="hover:bg-slate-100/80 transition text-slate-800 divide-x divide-slate-200">
+                    <tr class="${rowHighlightClass} transition text-slate-800 divide-x divide-slate-200">
                         <td class="p-2 text-center font-bold text-slate-500 bg-white sticky left-0 z-10">${e.seq}</td>
                         <td class="p-2 text-center font-mono text-slate-600">${e.id}</td>
-                        <td class="p-2 font-bold text-slate-900 bg-white sticky left-10 z-10 shadow-r">${e.name}</td>
+                        <td class="p-2 font-bold text-slate-900 bg-white sticky left-10 z-10 shadow-r">
+                            ${e.name}
+                            ${isCurrentLoggedIn ? '<span class="ml-1.5 bg-blue-100 text-blue-700 text-[9px] px-1.5 py-0.5 rounded-full font-bold">บัญชีคุณ</span>' : ''}
+                        </td>
                         <td class="p-2 text-slate-600 text-[11px]">${e.position}</td>
                         <td class="p-2 text-center text-slate-500">${e.dob || '-'}</td>
                         <td class="p-2 text-center text-slate-500">${e.startDate || '-'}</td>
@@ -1480,8 +1515,40 @@
             sel.innerHTML = '<option value="">-- เลือกชื่อพนักงาน --</option>';
             employees.forEach(e => {
                 const isCurrent = currentUser && String(currentUser.id) === String(e.id) ? 'selected' : '';
-                sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${e.name} (${e.position})</option>`;
+                sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${formatDisplayName(e)} (${e.position})</option>`;
             });
+        }
+
+        // Helper: คำนวณสิทธิ์คงเหลือของพนักงานที่เลือกในฟอร์ม
+        function getEmpRemainingQuotas(empId) {
+            const emp = employees.find(x => x.id === empId);
+            if (!emp) return { vacRem: 0, sickRem: 30 };
+
+            let accrued = 0;
+            if (emp.vacationAccrued) {
+                for (let m = 0; m < 12; m++) accrued += parseFloat(emp.vacationAccrued[m]) || 0;
+            }
+            const usedVac = emp.vacationUsedMonths ? emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
+            const carry = parseFloat(emp.carryVacation) || 0;
+            const vacRem = Math.max(0, carry + accrued - usedVac);
+
+            const usedSick = emp.sickMonths ? emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
+            const sickRem = Math.max(0, 30 - usedSick);
+
+            return { vacRem, sickRem };
+        }
+
+        function handleFormEmpChange() {
+            const empId = document.getElementById('form-emp-id')?.value;
+            const quota = getEmpRemainingQuotas(empId);
+
+            const vacTxt = document.getElementById('form-vacation-quota-txt');
+            const sickTxt = document.getElementById('form-sick-quota-txt');
+
+            if (vacTxt) vacTxt.innerText = `${quota.vacRem.toFixed(2)} วัน`;
+            if (sickTxt) sickTxt.innerText = `${quota.sickRem.toFixed(2)} วัน`;
+
+            calculateDays();
         }
 
         function toggleLeaveTypeFields() {
@@ -1530,35 +1597,68 @@
         function calculateDays() {
             const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
             const countEl = document.getElementById('form-day-count');
-            if (!countEl) return 1;
+            let days = 1;
 
             if (durType === 'HALF') {
-                countEl.innerText = '0.5 วัน (4 ชั่วโมง)';
-                return 0.5;
-            }
-
-            if (durType === 'QUARTER') {
+                days = 0.5;
+                if (countEl) countEl.innerText = '0.5 วัน (4 ชั่วโมง)';
+            } else if (durType === 'QUARTER') {
+                days = 0.25;
                 const startTime = document.getElementById('quarter-start-time')?.value || '10:00';
                 const endTime = document.getElementById('quarter-end-time')?.value || '12:00';
-                countEl.innerText = `0.25 วัน (2 ชั่วโมง : ${startTime} - ${endTime} น.)`;
-                return 0.25;
-            }
+                if (countEl) countEl.innerText = `0.25 วัน (2 ชั่วโมง : ${startTime} - ${endTime} น.)`;
+            } else {
+                const startStr = document.getElementById('form-start-date')?.value;
+                const endStr = document.getElementById('form-end-date')?.value;
 
-            const startStr = document.getElementById('form-start-date')?.value;
-            const endStr = document.getElementById('form-end-date')?.value;
-
-            if (startStr && endStr) {
-                const start = new Date(startStr);
-                const end = new Date(endStr);
-                if (end >= start) {
-                    const diffTime = Math.abs(end - start);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                    countEl.innerText = `${diffDays} วัน`;
-                    return diffDays;
+                if (startStr && endStr) {
+                    const start = new Date(startStr);
+                    const end = new Date(endStr);
+                    if (end >= start) {
+                        const diffTime = Math.abs(end - start);
+                        days = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        if (countEl) countEl.innerText = `${days} วัน`;
+                    }
                 }
             }
-            countEl.innerText = '1 วัน';
-            return 1;
+
+            // Real-time Quota Validation & Red Warning Box
+            const empId = document.getElementById('form-emp-id')?.value;
+            const leaveType = document.querySelector('input[name="leave_type"]:checked')?.value || 'ลาพักร้อน';
+            const warningBox = document.getElementById('leave-quota-warning');
+            const warningTxt = document.getElementById('leave-quota-warning-txt');
+            const submitBtn = document.getElementById('btn-submit-form');
+
+            if (empId) {
+                const quota = getEmpRemainingQuotas(empId);
+                let isExceeded = false;
+                let message = '';
+
+                if (leaveType === 'ลาพักร้อน' && days > quota.vacRem) {
+                    isExceeded = true;
+                    message = `ไม่สามารถลาพักร้อนเกินสิทธิ์ที่เหลืออยู่ได้ (ต้องการลา ${days} วัน แต่สิทธิ์คงเหลือ ${quota.vacRem.toFixed(2)} วัน)`;
+                } else if (leaveType === 'ลาป่วย' && days > quota.sickRem) {
+                    isExceeded = true;
+                    message = `ไม่สามารถลาป่วยเกินโควตากฎหมายแรงงานได้ (สิทธิ์คงเหลือ ${quota.sickRem.toFixed(2)} วัน)`;
+                }
+
+                if (isExceeded) {
+                    if (warningBox) warningBox.classList.remove('hidden');
+                    if (warningTxt) warningTxt.innerText = message;
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
+                } else {
+                    if (warningBox) warningBox.classList.add('hidden');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                }
+            }
+
+            return days;
         }
 
         async function handleLeaveSubmit(e) {
@@ -1579,7 +1679,6 @@
             const days = calculateDays();
             let reason = document.getElementById('form-reason').value;
 
-            // ถ้าเป็นการลาอื่นๆ ให้ดึงรายละเอียดประเภทการลามาต่อท้ายหัวข้อ
             if (type === 'ลาอื่นๆ') {
                 const otherDetail = document.getElementById('form-other-type-detail')?.value.trim();
                 if (otherDetail) {
@@ -1599,7 +1698,7 @@
             const newReq = {
                 id: `REQ-${Date.now().toString().slice(-4)}`,
                 empId: emp.id,
-                empName: emp.name,
+                empName: formatDisplayName(emp),
                 type: type,
                 startDate: startDate,
                 endDate: endDate,
@@ -1614,7 +1713,7 @@
             const submitBtn = document.getElementById('btn-submit-form');
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลและแจ้งเตือนอีเมล...`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลเข้าระบบ...`;
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
@@ -1637,9 +1736,10 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast("ส่งใบลาและแจ้งเตือนเข้า Secretary.fine@gmail.com เรียบร้อยแล้ว");
+            showToast("ยื่นใบลาเข้าระบบเรียบร้อยแล้ว");
         }
 
+        // ================= APPROVAL CENTER & ADMIN DELETE =================
         function renderApprovalQueue() {
             const container = document.getElementById('approval-list');
             if (!container) return;
@@ -1688,9 +1788,28 @@
                                 <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer">อนุมัติ</button>
                                 <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer">ปฏิเสธ</button>
                             ` : ''}
+                            ${isAdmin ? `
+                                <button type="button" onclick="deleteLeaveRequest('${r.id}')" title="ลบรายการนี้ (Admin Only)" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl border border-rose-200 transition cursor-pointer">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            ` : ''}
                         </div>
                     </div>`;
             });
+        }
+
+        async function deleteLeaveRequest(reqId) {
+            if (!isAdmin) {
+                alert("ต้องใช้สิทธิ์ผู้ดูแลระบบ (Admin) ในการลบรายการ");
+                return;
+            }
+            const conf = confirm("คุณต้องการลบรายการคำขอลานี้อย่างถาวรหรือไม่?");
+            if (conf) {
+                requests = requests.filter(r => r.id !== reqId);
+                renderAllViews();
+                await saveAllToCloud();
+                showToast("ลบรายการคำขอลาเรียบร้อยแล้ว");
+            }
         }
 
         function openEmailModal(reqId) {
@@ -1701,7 +1820,6 @@
             const isPend = !isApprovedStatus(req.status) && !isRejectedStatus(req.status);
 
             document.getElementById('email-emp-name').innerText = req.empName;
-            document.getElementById('email-leave-type').innerText = `${req.type} (${req.days} วัน)`;
             document.getElementById('email-detail-type').innerText = `${req.type} (${req.days} วัน)`;
             document.getElementById('email-detail-dates').innerText = `${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
             document.getElementById('email-detail-reason').innerText = req.reason;
@@ -1748,7 +1866,6 @@
                         if (!emp.sickMonths) emp.sickMonths = Array(12).fill(0);
                         emp.sickMonths[monthIdx] = (parseFloat(emp.sickMonths[monthIdx]) || 0) + parseFloat(req.days);
                     } else {
-                        // ลาอื่นๆ หรือภารกิจนอกสถานที่ (บันทึกเฉพาะช่อง Other Leave โดยไม่หักพักร้อน)
                         emp.otherLeaveDays = (parseFloat(emp.otherLeaveDays) || 0) + parseFloat(req.days);
                     }
                 }
