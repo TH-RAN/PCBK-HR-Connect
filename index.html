@@ -26,7 +26,7 @@
             background-color: #eff6ff;
         }
         .modal-blur {
-            backdrop-filter: blur(6px);
+            backdrop-filter: blur(8px);
         }
         ::-webkit-scrollbar {
             height: 7px;
@@ -51,6 +51,47 @@
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col antialiased">
 
+    <!-- ================= LOGIN OVERLAY MODAL ================= -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-900/80 modal-blur z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-fade-in relative">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-lg shadow-blue-200">
+                <i class="fa-solid fa-users-gear"></i>
+            </div>
+
+            <div>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">PCBK-HR-Connect</h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Please enter your Employee ID or Admin Key</p>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Access Code / Employee ID</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-id-card absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                        <input type="password" id="login-input-code" required placeholder="e.g. 1102055 or Admin Key" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white font-mono tracking-wider">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs">
+                    <label class="flex items-center space-x-2 text-slate-600 cursor-pointer">
+                        <input type="checkbox" id="login-remember-me" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <span>Remember on this device</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-blue-200 transition duration-200 flex items-center justify-center space-x-2 cursor-pointer">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Sign In</span>
+                </button>
+            </form>
+
+            <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-3">
+                Secure access for authorized PCBK personnel only
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= APP HEADER ================= -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -67,16 +108,17 @@
                     </div>
                 </div>
 
-                <!-- Admin Status & Dynamic Date -->
+                <!-- User Session & Admin Controls -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
-                    <button type="button" onclick="handleAdminToggle()" id="btn-admin-status" class="flex items-center space-x-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition font-medium cursor-pointer">
-                        <i id="admin-icon" class="fa-solid fa-lock text-slate-500"></i>
-                        <span id="admin-status-text">View Only</span>
-                    </button>
-                    <div class="hidden sm:flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
-                        <i class="fa-regular fa-calendar-check text-blue-600"></i>
-                        <span id="header-realtime-date" class="font-bold">Today: Loading...</span>
+                    <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium cursor-pointer" onclick="switchTab('profile')">
+                        <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-5 h-5 rounded-full object-cover bg-blue-100">
+                        <span id="header-user-name" class="text-slate-800 font-bold">Guest</span>
+                        <span id="header-role-badge" class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded-md font-bold">User</span>
                     </div>
+
+                    <button type="button" onclick="handleLogout()" title="Sign Out / Switch Account" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs transition border border-rose-200 cursor-pointer">
+                        <i class="fa-solid fa-power-off"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -101,6 +143,10 @@
                     <i class="fa-solid fa-envelope-circle-check"></i>
                     <span>Approval Center</span>
                     <span id="badge-pending-count" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
+                    <i class="fa-solid fa-id-badge"></i>
+                    <span>My Profile</span>
                 </button>
             </div>
         </div>
@@ -423,6 +469,73 @@
             </div>
         </section>
 
+        <!-- ================= TAB 5: MY PROFILE ================= -->
+        <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <!-- Cover Banner -->
+                <div class="h-32 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 relative"></div>
+
+                <!-- Profile Info Header -->
+                <div class="px-6 pb-6 pt-0 relative">
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 gap-4 border-b border-slate-100 pb-6">
+                        <div class="flex flex-col sm:flex-row items-center sm:items-end space-y-3 sm:space-y-0 sm:space-x-5">
+                            <div class="relative group">
+                                <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-2xl object-cover border-4 border-white shadow-md bg-slate-100">
+                                <label for="profile-photo-upload" class="absolute bottom-1 right-1 w-8 h-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
+                                    <i class="fa-solid fa-camera text-xs"></i>
+                                </label>
+                                <input type="file" id="profile-photo-upload" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
+                            </div>
+                            <div class="text-center sm:text-left space-y-1">
+                                <div class="flex items-center justify-center sm:justify-start space-x-2">
+                                    <h2 id="profile-card-name" class="text-xl font-bold text-slate-900">Guest User</h2>
+                                    <span id="profile-card-role-chip" class="bg-blue-100 text-blue-700 text-xs px-2.5 py-0.5 rounded-full font-bold">Staff</span>
+                                </div>
+                                <p id="profile-card-position" class="text-xs text-slate-500">Position Not Assigned</p>
+                                <p class="text-xs text-slate-400 font-mono">ID: <strong id="profile-card-id" class="text-slate-700">-</strong></p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <button type="button" onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2 rounded-xl border border-rose-200 transition cursor-pointer">
+                                <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Sign Out
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Personal Metrics Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6">
+                        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 text-center">
+                            <span class="text-xs text-amber-800 font-semibold uppercase tracking-wider">Vacation Balance</span>
+                            <div class="text-2xl font-extrabold text-amber-600 mt-1" id="profile-vacation-rem">0 Days</div>
+                            <p class="text-[11px] text-amber-700/80 mt-1">+1 Day/month accrual</p>
+                        </div>
+                        <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-4 text-center">
+                            <span class="text-xs text-rose-800 font-semibold uppercase tracking-wider">Vacation Used (YTD)</span>
+                            <div class="text-2xl font-extrabold text-rose-600 mt-1" id="profile-vacation-used">0 Days</div>
+                            <p class="text-[11px] text-rose-700/80 mt-1">Total taken this year</p>
+                        </div>
+                        <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 text-center">
+                            <span class="text-xs text-emerald-800 font-semibold uppercase tracking-wider">Sick Leave Used</span>
+                            <div class="text-2xl font-extrabold text-emerald-600 mt-1" id="profile-sick-used">0 Days</div>
+                            <p class="text-[11px] text-emerald-700/80 mt-1">Quota: Max 30 days/yr</p>
+                        </div>
+                    </div>
+
+                    <!-- Personnel Detail List -->
+                    <div class="mt-6 border border-slate-200 rounded-2xl p-5 bg-slate-50 space-y-3 text-xs">
+                        <h4 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">Employment Information</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-600">
+                            <div><span class="text-slate-400">Date of Birth:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
+                            <div><span class="text-slate-400">Employment Start Date:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
+                            <div><span class="text-slate-400">Carried Vacation (Last Year):</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> Days</div>
+                            <div><span class="text-slate-400">Device Login Status:</span> <strong class="text-emerald-700 font-medium">Device Recognized & Synchronized</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Modal: Detail Modal -->
@@ -474,7 +587,7 @@
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
-        const ADMIN_PASSWORD = "pcbk2026"; // Admin password to unlock editable controls
+        const ADMIN_PASSWORD = "pcbk2026"; // Admin key
 
         const now = new Date();
         const currentYearAD = now.getFullYear();
@@ -489,6 +602,7 @@
         let employees = [];
         let requests = []; 
         let activeModalReqId = null;
+        let currentUser = null; // Current logged-in user object
         let isAdmin = false;
 
         const defaultDataset = [
@@ -560,7 +674,6 @@
             }
         ];
 
-        // Helper to normalize status across Thai and English versions
         function isApprovedStatus(status) {
             return status === 'Approved' || status === 'อนุมัติแล้ว';
         }
@@ -571,12 +684,152 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
-            checkAdminStatus();
             loadInitialData();
+            checkAutoLogin();
+        });
+
+        // ================= AUTHENTICATION & DEVICE REMEMBER =================
+        function checkAutoLogin() {
+            const rememberedId = localStorage.getItem('pcbk_device_auth_code');
+            if (rememberedId) {
+                performLogin(rememberedId, false);
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const code = document.getElementById('login-input-code').value.trim();
+            const rememberMe = document.getElementById('login-remember-me').checked;
+
+            if (performLogin(code, rememberMe)) {
+                document.getElementById('login-modal').classList.add('hidden');
+            } else {
+                alert("Invalid Employee ID or Admin Access Code");
+            }
+        }
+
+        function performLogin(code, saveToDevice) {
+            if (code === ADMIN_PASSWORD) {
+                isAdmin = true;
+                currentUser = { id: "ADMIN", name: "System Administrator", position: "HR Executive", isMasterAdmin: true };
+            } else {
+                const foundEmp = employees.find(e => e.id.toLowerCase() === code.toLowerCase());
+                if (!foundEmp) return false;
+                currentUser = foundEmp;
+                isAdmin = false;
+            }
+
+            if (saveToDevice) {
+                localStorage.setItem('pcbk_device_auth_code', code);
+            }
+
+            document.getElementById('login-modal').classList.add('hidden');
+            updateUserSessionUI();
             renderAllViews();
             switchTab('dashboard');
             syncFromCloud();
-        });
+            showToast(`Welcome back, ${currentUser.name}`);
+            return true;
+        }
+
+        function handleLogout() {
+            const conf = confirm("Do you wish to sign out of this device?");
+            if (conf) {
+                localStorage.removeItem('pcbk_device_auth_code');
+                currentUser = null;
+                isAdmin = false;
+                document.getElementById('login-input-code').value = '';
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        }
+
+        function updateUserSessionUI() {
+            if (!currentUser) return;
+
+            const nameEl = document.getElementById('header-user-name');
+            const roleEl = document.getElementById('header-role-badge');
+            const avatarEl = document.getElementById('header-user-avatar');
+
+            if (nameEl) nameEl.innerText = currentUser.name.split(' ')[0] || currentUser.name;
+            if (roleEl) roleEl.innerText = isAdmin ? 'Admin' : 'Staff';
+            if (roleEl) roleEl.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded-md font-bold' : 'bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded-md font-bold';
+
+            // Load personal photo from localStorage
+            const savedPhoto = localStorage.getItem(`pcbk_avatar_${currentUser.id}`);
+            const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${currentUser.id}`;
+            if (avatarEl) avatarEl.src = savedPhoto || defaultAvatar;
+
+            updateAdminUI();
+            renderProfileTab();
+        }
+
+        function renderProfileTab() {
+            if (!currentUser) return;
+
+            const photoEl = document.getElementById('profile-card-avatar');
+            const nameEl = document.getElementById('profile-card-name');
+            const posEl = document.getElementById('profile-card-position');
+            const idEl = document.getElementById('profile-card-id');
+            const roleChip = document.getElementById('profile-card-role-chip');
+            const dobEl = document.getElementById('profile-card-dob');
+            const startEl = document.getElementById('profile-card-start');
+            const carryEl = document.getElementById('profile-card-carry');
+
+            const savedPhoto = localStorage.getItem(`pcbk_avatar_${currentUser.id}`);
+            if (photoEl) photoEl.src = savedPhoto || `https://api.dicebear.com/7.x/bottts/svg?seed=${currentUser.id}`;
+
+            if (nameEl) nameEl.innerText = currentUser.name;
+            if (posEl) posEl.innerText = currentUser.position;
+            if (idEl) idEl.innerText = currentUser.id;
+            if (dobEl) dobEl.innerText = currentUser.dob || 'Not specified';
+            if (startEl) startEl.innerText = currentUser.startDate || 'Not specified';
+            if (carryEl) carryEl.innerText = currentUser.carryVacation || '0';
+
+            if (roleChip) {
+                roleChip.innerText = isAdmin ? 'Administrator' : 'Staff Member';
+                roleChip.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold' : 'bg-blue-100 text-blue-700 text-xs px-2.5 py-0.5 rounded-full font-bold';
+            }
+
+            // Calculate personal balances
+            let totalAccrued = 0;
+            if (currentUser.vacationAccrued && Array.isArray(currentUser.vacationAccrued)) {
+                totalAccrued = currentUser.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+            }
+            let totalVacUsed = 0;
+            if (currentUser.vacationUsedMonths && Array.isArray(currentUser.vacationUsedMonths)) {
+                totalVacUsed = currentUser.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+            }
+            let totalSickUsed = 0;
+            if (currentUser.sickMonths && Array.isArray(currentUser.sickMonths)) {
+                totalSickUsed = currentUser.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+            }
+            const carry = parseFloat(currentUser.carryVacation) || 0;
+            const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
+
+            const pVacRem = document.getElementById('profile-vacation-rem');
+            const pVacUsed = document.getElementById('profile-vacation-used');
+            const pSickUsed = document.getElementById('profile-sick-used');
+
+            if (pVacRem) pVacRem.innerText = `${remVac} Days`;
+            if (pVacUsed) pVacUsed.innerText = `${totalVacUsed} Days`;
+            if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} Days`;
+        }
+
+        function handleProfilePhotoUpload(e) {
+            const file = e.target.files[0];
+            if (!file || !currentUser) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const base64Data = event.target.result;
+                localStorage.setItem(`pcbk_avatar_${currentUser.id}`, base64Data);
+                updateUserSessionUI();
+                showToast("Profile photo updated successfully!");
+            };
+            reader.readAsDataURL(file);
+        }
 
         function setupDynamicDates() {
             const headerDateEl = document.getElementById('header-realtime-date');
@@ -597,69 +850,30 @@
             if (formEnd) formEnd.value = todayRealISO;
         }
 
-        // ================= ADMIN LOCK CONTROLS =================
-        function checkAdminStatus() {
-            isAdmin = localStorage.getItem('pcbk_is_admin') === 'true';
-            updateAdminUI();
-        }
-
-        function handleAdminToggle() {
-            if (isAdmin) {
-                const conf = confirm("Switch to View Only mode (Lock table editing & approval)?");
-                if (conf) {
-                    isAdmin = false;
-                    localStorage.setItem('pcbk_is_admin', 'false');
-                    updateAdminUI();
-                    renderSummaryTable();
-                    renderApprovalQueue();
-                    showToast("Switched to View Only Mode");
-                }
-            } else {
-                const pwd = prompt("Enter Admin Password to unlock management privileges:");
-                if (pwd === ADMIN_PASSWORD) {
-                    isAdmin = true;
-                    localStorage.setItem('pcbk_is_admin', 'true');
-                    updateAdminUI();
-                    renderSummaryTable();
-                    renderApprovalQueue();
-                    showToast("Admin Privileges Granted");
-                } else if (pwd !== null) {
-                    alert("Invalid Password");
-                }
-            }
-        }
-
         function updateAdminUI() {
-            const btn = document.getElementById('btn-admin-status');
-            const icon = document.getElementById('admin-icon');
-            const txt = document.getElementById('admin-status-text');
             const lockBadge = document.getElementById('badge-lock-status');
             const descTxt = document.getElementById('summary-desc-text');
             const btnImport = document.getElementById('btn-excel-import');
 
             if (isAdmin) {
-                if (btn) btn.className = "flex items-center space-x-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-xl border border-emerald-300 transition font-bold cursor-pointer";
-                if (icon) icon.className = "fa-solid fa-lock-open text-emerald-600";
-                if (txt) txt.innerText = "Admin (Editor)";
-                if (lockBadge) lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
-                if (lockBadge) lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Admin Editing Mode`;
+                if (lockBadge) {
+                    lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
+                    lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> Admin Editing Mode`;
+                }
                 if (descTxt) descTxt.innerText = "Modifications in table cells will automatically sync with Google Cloud database.";
-                if (btnImport) btnImport.classList.remove('hidden');
-                if (btnImport) btnImport.classList.add('flex');
+                if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
-                if (btn) btn.className = "flex items-center space-x-1.5 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 transition font-medium cursor-pointer";
-                if (icon) icon.className = "fa-solid fa-lock text-slate-500";
-                if (txt) txt.innerText = "View Only";
-                if (lockBadge) lockBadge.className = "bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
-                if (lockBadge) lockBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> View Only Mode`;
-                if (descTxt) descTxt.innerText = "Personnel records and monthly accrual balances are updated in real-time (Click lock icon above to enter Admin Mode).";
-                if (btnImport) btnImport.classList.add('hidden');
-                if (btnImport) btnImport.classList.remove('flex');
+                if (lockBadge) {
+                    lockBadge.className = "bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
+                    lockBadge.innerHTML = `<i class="fa-solid fa-eye mr-1"></i> View Only Mode`;
+                }
+                if (descTxt) descTxt.innerText = "Personnel records and monthly accrual balances are updated in real-time.";
+                if (btnImport) { btnImport.classList.add('hidden'); btnImport.classList.remove('flex'); }
             }
         }
 
         function switchTab(tabId) {
-            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center'];
+            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'profile'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
                 const content = document.getElementById(`tab-${id}`);
@@ -682,11 +896,11 @@
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
             if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
+            if (tabId === 'profile') renderProfileTab();
         }
 
         function loadInitialData() {
             try {
-                // Read from unified persistent master storage
                 const masterEmp = localStorage.getItem('pcbk_master_employees');
                 const masterReq = localStorage.getItem('pcbk_master_requests');
 
@@ -773,6 +987,7 @@
             renderSummaryTable();
             renderApprovalQueue();
             updateBadges();
+            renderProfileTab();
         }
 
         function updateBadges() {
@@ -1037,7 +1252,8 @@
             if (!sel) return;
             sel.innerHTML = '<option value="">-- Choose Employee --</option>';
             employees.forEach(e => {
-                sel.innerHTML += `<option value="${e.id}">${e.name} (${e.position})</option>`;
+                const isCurrent = currentUser && currentUser.id === e.id ? 'selected' : '';
+                sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${e.name} (${e.position})</option>`;
             });
         }
 
@@ -1137,7 +1353,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com',[cite: 1]
                 status: 'Pending Approval',
                 createdAt: todayRealISO,
                 year: currentYearAD.toString()
