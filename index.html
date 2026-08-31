@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js for Dynamic Analytics -->
+    <!-- Chart.js for Analytics -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <!-- SheetJS for Excel Upload/Download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -778,6 +778,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
+            renderAllViews();
             checkAutoLogin();
         });
 
@@ -788,7 +789,10 @@
                 performLogin(rememberedId, false);
             } else {
                 const loginModal = document.getElementById('login-modal');
-                if (loginModal) loginModal.classList.remove('hidden');
+                if (loginModal) {
+                    loginModal.style.display = 'flex';
+                    loginModal.classList.remove('hidden');
+                }
             }
         }
 
@@ -808,29 +812,33 @@
         function performLogin(code, saveToDevice) {
             if (!code) return false;
 
-            if (code === ADMIN_PASSWORD) {
+            const trimmed = String(code).trim();
+            if (trimmed === ADMIN_PASSWORD) {
                 isAdmin = true;
                 currentUser = { id: "ADMIN", name: "System Administrator", position: "HR Executive", isMasterAdmin: true };
             } else {
-                const foundEmp = employees.find(e => String(e.id).trim().toLowerCase() === String(code).trim().toLowerCase());
+                const foundEmp = employees.find(e => String(e.id).trim().toLowerCase() === trimmed.toLowerCase());
                 if (!foundEmp) return false;
                 currentUser = foundEmp;
                 isAdmin = false;
             }
 
             if (saveToDevice) {
-                localStorage.setItem('pcbk_device_auth_code', code);
+                localStorage.setItem('pcbk_device_auth_code', trimmed);
             }
 
             // Immediately Hide Modal
             const modal = document.getElementById('login-modal');
-            if (modal) modal.classList.add('hidden');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
+            }
 
             updateUserSessionUI();
             renderAllViews();
             switchTab('dashboard');
             syncFromCloud();
-            showToast(`Welcome back, ${currentUser.name}`);
+            showToast(`Welcome, ${currentUser.name}`);
             return true;
         }
 
@@ -843,7 +851,10 @@
                 const codeInput = document.getElementById('login-input-code');
                 if (codeInput) codeInput.value = '';
                 const modal = document.getElementById('login-modal');
-                if (modal) modal.classList.remove('hidden');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.remove('hidden');
+                }
             }
         }
 
@@ -996,12 +1007,12 @@
 
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
-                setTimeout(renderDashboardCharts, 50);
+                setTimeout(renderDashboardCharts, 60);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
             if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
-            if (tabId === 'analytics') setTimeout(renderAnalyticsCharts, 50);
+            if (tabId === 'analytics') setTimeout(renderAnalyticsCharts, 60);
             if (tabId === 'profile') renderProfileTab();
         }
 
@@ -1206,6 +1217,8 @@
         // ================= CHART.JS ANALYTICS ENGINE =================
         function renderDashboardCharts() {
             try {
+                if (typeof Chart === 'undefined') return;
+
                 let totalVacUsed = 0;
                 let totalVacRem = 0;
                 const monthlyTrend = Array(12).fill(0);
@@ -1283,13 +1296,13 @@
                         }
                     });
                 }
-            } catch (err) {
-                console.warn("Chart initialization skipped: Container hidden");
-            }
+            } catch (err) {}
         }
 
         function renderAnalyticsCharts() {
             try {
+                if (typeof Chart === 'undefined') return;
+
                 let totalVac = 0;
                 let totalSick = 0;
                 let totalOther = 0;
@@ -1361,9 +1374,7 @@
                         }
                     });
                 }
-            } catch (err) {
-                console.warn("Analytics chart initialization skipped: Container hidden");
-            }
+            } catch (err) {}
         }
 
         // ================= FULL MATRIX RENDERING =================
@@ -1622,7 +1633,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',[cite: 1]
+                approverEmail: 'Secretary.fine@gmail.com',
                 status: 'Pending Approval',
                 createdAt: todayRealISO,
                 year: currentYearAD.toString()
