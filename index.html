@@ -12,25 +12,45 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Dynamic Analytics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <!-- SheetJS for Excel Upload/Download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body {
+        * {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f8fafc;
+        }
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
         .tab-active {
-            color: #2563eb;
-            border-bottom: 3px solid #2563eb;
-            font-weight: 600;
+            color: #1e40af !important;
+            border-bottom: 3px solid #1e40af !important;
+            font-weight: 700 !important;
             background-color: #eff6ff;
         }
         .modal-blur {
             backdrop-filter: blur(8px);
         }
+        .card-hover {
+            transition: all 0.25s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.07);
+        }
+        .stat-card {
+            background: #ffffff;
+            border-left: 4px solid;
+        }
+        .stat-card-blue { border-left-color: #2563eb; }
+        .stat-card-yellow { border-left-color: #eab308; }
+        .stat-card-green { border-left-color: #16a34a; }
+        .stat-card-red { border-left-color: #e11d48; }
+
         ::-webkit-scrollbar {
-            height: 7px;
-            width: 7px;
+            height: 6px;
+            width: 6px;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
@@ -104,16 +124,21 @@
                         <div class="flex items-center space-x-2">
                             <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK-HR-Connect</h1>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-500">Annual Leave Management & Workforce Statistics</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500">Annual Leave Management & Workforce Analytics</p>
                     </div>
                 </div>
 
                 <!-- User Session & Controls -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium cursor-pointer hover:bg-slate-100 transition" onclick="switchTab('profile')">
-                        <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-5 h-5 rounded-full object-cover bg-blue-100">
+                        <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200">
                         <span id="header-user-name" class="text-slate-800 font-bold">Guest</span>
                         <span id="header-role-badge" class="bg-slate-200 text-slate-700 text-[10px] px-1.5 py-0.5 rounded-md font-bold">User</span>
+                    </div>
+
+                    <div class="hidden md:flex items-center space-x-1.5 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-xl text-xs text-blue-900 font-medium">
+                        <i class="fa-regular fa-calendar-check text-blue-600"></i>
+                        <span id="header-realtime-date" class="font-bold">Today: Loading...</span>
                     </div>
 
                     <button type="button" onclick="handleLogout()" title="Sign Out / Switch Account" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs transition border border-rose-200 cursor-pointer">
@@ -141,8 +166,12 @@
                 </button>
                 <button type="button" onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-envelope-circle-check"></i>
-                    <span>Approval Center</span>
+                    <span>Approvals</span>
                     <span id="badge-pending-count" class="bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                <button type="button" onclick="switchTab('analytics')" id="tab-btn-analytics" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Analytics</span>
                 </button>
                 <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2.5 px-4 text-xs sm:text-sm rounded-t-lg flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-id-badge"></i>
@@ -168,52 +197,87 @@
                 </div>
             </div>
 
-            <!-- KPI Cards -->
+            <!-- Redesigned KPI Stat Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="stat-card stat-card-green p-5 rounded-2xl border border-slate-200/80 shadow-sm card-hover">
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">On Leave Today</span>
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base">
+                        <div>
+                            <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">On Leave Today</span>
+                            <div class="text-3xl font-extrabold text-slate-900 mt-1" id="kpi-today-leave-count">0 Persons</div>
+                            <p class="text-xs text-slate-500 mt-1" id="kpi-today-desc">
+                                <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> 100% Full Attendance
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-user-check"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-emerald-600 mt-2" id="kpi-today-leave-count">0 Persons</div>
-                    <p class="text-xs text-slate-500 mt-1 flex items-center" id="kpi-today-desc">
-                        <i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> 100% Full Attendance
-                    </p>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="stat-card stat-card-red p-5 rounded-2xl border border-slate-200/80 shadow-sm card-hover">
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Vacation Used (YTD)</span>
-                        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base">
+                        <div>
+                            <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Vacation Used (YTD)</span>
+                            <div class="text-3xl font-extrabold text-rose-600 mt-1" id="kpi-total-vacation-used">0 Days</div>
+                            <p class="text-xs text-slate-500 mt-1">Average <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> Days/Person</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-umbrella-beach"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-rose-600 mt-2" id="kpi-total-vacation-used">0 Days</div>
-                    <p class="text-xs text-slate-500 mt-1">Average <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> Days/Person</p>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="stat-card stat-card-yellow p-5 rounded-2xl border border-slate-200/80 shadow-sm card-hover">
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Remaining Vacation Pool</span>
-                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+                        <div>
+                            <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Vacation Pool Left</span>
+                            <div class="text-3xl font-extrabold text-amber-600 mt-1" id="kpi-total-vacation-rem">0 Days</div>
+                            <p class="text-xs text-emerald-600 font-semibold mt-1">+1 Day/Month Accrual Policy</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-hourglass-half"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-amber-600 mt-2" id="kpi-total-vacation-rem">0 Days</div>
-                    <p class="text-xs text-emerald-600 font-semibold mt-1">+1 Day/Month (Accrual Policy)</p>
                 </div>
 
-                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="stat-card stat-card-blue p-5 rounded-2xl border border-slate-200/80 shadow-sm card-hover">
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Sick Leave (YTD)</span>
-                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base">
+                        <div>
+                            <span class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Sick Leave</span>
+                            <div class="text-3xl font-extrabold text-slate-900 mt-1" id="kpi-total-sick-used">0 Days</div>
+                            <p class="text-xs text-slate-500 mt-1">Quota: Max 30 Working Days/Yr</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
                             <i class="fa-solid fa-bed-pulse"></i>
                         </div>
                     </div>
-                    <div class="text-3xl font-extrabold text-slate-800 mt-2" id="kpi-total-sick-used">0 Days</div>
-                    <p class="text-xs text-slate-500 mt-1">Quota: Max 30 Working Days/Year</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Charts Preview -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
+                            <i class="fa-solid fa-chart-pie text-blue-600 mr-2"></i> Company Vacation Pool Distribution
+                        </h3>
+                        <span class="text-xs text-slate-400" id="dash-chart-year">2026</span>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="balanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 card-hover">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
+                            <i class="fa-solid fa-chart-line text-indigo-600 mr-2"></i> Monthly Leave Usage Trend
+                        </h3>
+                        <span class="text-xs text-slate-400">Jan - Dec</span>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="trendChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -266,7 +330,7 @@
                     </div>
                 </div>
 
-                <!-- Matrix Table -->
+                <!-- Full Matrix Table -->
                 <div class="overflow-x-auto border border-slate-300 rounded-xl shadow-inner relative max-h-[650px]">
                     <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1600px]">
                         <thead>
@@ -334,58 +398,58 @@
         </section>
 
         <!-- ================= TAB 3: LEAVE REQUEST FORM ================= -->
-        <section id="tab-request-form" class="tab-content hidden max-w-xl mx-auto">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-7 space-y-5">
-                <div class="border-b border-slate-100 pb-3">
-                    <h2 class="font-bold text-slate-900 text-lg flex items-center">
-                        <i class="fa-solid fa-file-signature text-blue-600 mr-2"></i> Online Leave Request Form
+        <section id="tab-request-form" class="tab-content hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="font-bold text-slate-900 text-xl flex items-center">
+                        <i class="fa-solid fa-file-signature text-blue-600 mr-2.5"></i> Online Leave Request Form
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">Submit your leave request for supervisory notification to Secretary.fine@gmail.com[cite: 1]</p>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">Submit your leave request for supervisory notification to Secretary.fine@gmail.com[cite: 1]</p>
                 </div>
 
-                <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
+                <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-5 text-xs sm:text-sm">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Select Employee *</label>
-                        <select id="form-emp-id" required class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 text-slate-800">
+                        <label class="block font-semibold text-slate-700 mb-1.5">Select Employee *</label>
+                        <select id="form-emp-id" required class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-slate-800">
                             <option value="">-- Choose Employee --</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Leave Category *</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                        <label class="block font-semibold text-slate-700 mb-1.5">Leave Category *</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_type" value="Annual Vacation Leave" required checked class="hidden">
-                                <i class="fa-solid fa-umbrella-beach text-amber-600 text-base mb-1"></i>
-                                <span class="font-medium text-xs">1. Vacation</span>
+                                <i class="fa-solid fa-umbrella-beach text-amber-600 text-lg mb-1"></i>
+                                <span class="font-bold text-xs">1. Vacation</span>
                             </label>
-                            <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_type" value="Sick Leave" required class="hidden">
-                                <i class="fa-solid fa-bed-pulse text-rose-600 text-base mb-1"></i>
-                                <span class="font-medium text-xs">2. Sick Leave</span>
+                                <i class="fa-solid fa-bed-pulse text-rose-600 text-lg mb-1"></i>
+                                <span class="font-bold text-xs">2. Sick Leave</span>
                             </label>
-                            <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_type" value="Other Leave" required class="hidden">
-                                <i class="fa-solid fa-folder-open text-purple-600 text-base mb-1"></i>
-                                <span class="font-medium text-xs">3. Other</span>
+                                <i class="fa-solid fa-folder-open text-purple-600 text-lg mb-1"></i>
+                                <span class="font-bold text-xs">3. Other</span>
                             </label>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Duration Unit *</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                        <label class="block font-semibold text-slate-700 mb-1.5">Duration Unit *</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">1.0 Day</span>
                                 <span class="text-[10px] text-slate-500">Full Day (8 Hrs)</span>
                             </label>
-                            <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">0.5 Day</span>
                                 <span class="text-[10px] text-slate-500">Half Day (4 Hrs)</span>
                             </label>
-                            <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">0.25 Day</span>
                                 <span class="text-[10px] text-slate-500">Errand (2 Hrs)</span>
@@ -393,30 +457,30 @@
                         </div>
                     </div>
 
-                    <div id="option-half-day" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-2">
+                    <div id="option-half-day" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-2">
                         <label class="block font-semibold text-amber-900 text-xs">Select Half-Day Period *</label>
                         <div class="grid grid-cols-2 gap-2 text-xs">
-                            <label class="bg-white border border-amber-300 rounded-lg p-2 flex items-center space-x-2 cursor-pointer">
+                            <label class="bg-white border border-amber-300 rounded-xl p-2.5 flex items-center space-x-2 cursor-pointer">
                                 <input type="radio" name="half_day_period" value="Morning Session (08:30 - 12:30)" checked class="text-blue-600">
                                 <span>🌅 Morning (08:30 - 12:30)</span>
                             </label>
-                            <label class="bg-white border border-amber-300 rounded-lg p-2 flex items-center space-x-2 cursor-pointer">
+                            <label class="bg-white border border-amber-300 rounded-xl p-2.5 flex items-center space-x-2 cursor-pointer">
                                 <input type="radio" name="half_day_period" value="Afternoon Session (13:30 - 17:30)" class="text-blue-600">
                                 <span>🌤️ Afternoon (13:30 - 17:30)</span>
                             </label>
                         </div>
                     </div>
 
-                    <div id="option-quarter-day" class="hidden bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2">
+                    <div id="option-quarter-day" class="hidden bg-purple-50 border border-purple-200 p-4 rounded-2xl space-y-2">
                         <label class="block font-semibold text-purple-900 text-xs">Specify 2-Hour Time Window *</label>
                         <div class="grid grid-cols-2 gap-3 text-xs">
                             <div>
                                 <label class="block text-slate-600 text-[11px] mb-1">From Time</label>
-                                <input type="time" id="quarter-start-time" value="10:00" class="w-full bg-white border border-purple-300 rounded-lg p-2">
+                                <input type="time" id="quarter-start-time" value="10:00" class="w-full bg-white border border-purple-300 rounded-xl p-2.5">
                             </div>
                             <div>
                                 <label class="block text-slate-600 text-[11px] mb-1">To Time</label>
-                                <input type="time" id="quarter-end-time" value="12:00" class="w-full bg-white border border-purple-300 rounded-lg p-2">
+                                <input type="time" id="quarter-end-time" value="12:00" class="w-full bg-white border border-purple-300 rounded-xl p-2.5">
                             </div>
                         </div>
                     </div>
@@ -424,30 +488,30 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block font-semibold text-slate-700 mb-1">Start Date *</label>
-                            <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div id="wrapper-end-date">
                             <label class="block font-semibold text-slate-700 mb-1">End Date *</label>
-                            <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500">
+                            <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500">
                         </div>
                     </div>
 
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 flex justify-between items-center">
-                        <span>Calculated Duration:</span>
-                        <span id="form-day-count" class="font-bold text-sm text-blue-700">1 Day</span>
+                    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-900 flex justify-between items-center">
+                        <span class="font-medium">Calculated Leave Duration:</span>
+                        <span id="form-day-count" class="font-extrabold text-sm text-blue-700">1 Day</span>
                     </div>
 
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Reason / Contact Information *</label>
-                        <textarea id="form-reason" rows="2" required placeholder="e.g. Personal errands / Tel: +66 81-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
+                        <textarea id="form-reason" rows="3" required placeholder="e.g. Personal errands / Tel: +66 81-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
                     </div>
 
-                    <div class="bg-slate-100 border border-slate-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-slate-600">
-                        <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-base"></i>
-                        <span>Approval Email Recipient: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1]
+                    <div class="bg-slate-100 border border-slate-200 rounded-2xl p-3.5 flex items-center space-x-2 text-xs text-slate-600">
+                        <i class="fa-solid fa-envelope-circle-check text-emerald-600 text-lg"></i>
+                        <span>Approval Email Destination: <strong class="text-emerald-700 font-mono">Secretary.fine@gmail.com</strong></span>[cite: 1]
                     </div>
 
-                    <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer">
+                    <button type="submit" id="btn-submit-form" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-200 transition flex items-center justify-center space-x-2 cursor-pointer">
                         <i class="fa-solid fa-paper-plane"></i>
                         <span>Submit Leave Application</span>
                     </button>
@@ -457,10 +521,10 @@
 
         <!-- ================= TAB 4: APPROVAL CENTER ================= -->
         <section id="tab-approval-center" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
                 <div class="border-b border-slate-100 pb-3">
-                    <h2 class="font-bold text-slate-900 text-lg">Leave Approval Center</h2>
-                    <p class="text-xs text-slate-500">Review and authorize pending leave requests (Admin authorization required).</p>
+                    <h2 class="font-bold text-slate-900 text-xl">Leave Approval Center</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Review and authorize pending leave requests (Admin authorization required).</p>
                 </div>
 
                 <div id="approval-list" class="space-y-3">
@@ -469,10 +533,36 @@
             </div>
         </section>
 
-        <!-- ================= TAB 5: MY PROFILE ================= -->
+        <!-- ================= TAB 5: ANALYTICS ================= -->
+        <section id="tab-analytics" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="font-bold text-slate-900 text-xl">Workforce Analytics Report</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Dynamic statistical breakdown of annual employee leave utilization</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 card-hover">
+                        <h3 class="font-bold text-slate-900 text-sm mb-4">Total Leave Category Distribution</h3>
+                        <div class="h-64 relative">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 card-hover">
+                        <h3 class="font-bold text-slate-900 text-sm mb-4">Leave Utilization by Role Category</h3>
+                        <div class="h-64 relative">
+                            <canvas id="departmentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 6: MY PROFILE ================= -->
         <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="h-32 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 relative"></div>
+                <div class="h-36 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 relative"></div>
 
                 <div class="px-6 pb-6 pt-0 relative">
                     <div class="flex flex-col sm:flex-row sm:items-end justify-between -mt-16 gap-4 border-b border-slate-100 pb-6">
@@ -495,7 +585,7 @@
                         </div>
 
                         <div class="flex justify-center">
-                            <button type="button" onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2 rounded-xl border border-rose-200 transition cursor-pointer">
+                            <button type="button" onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2.5 rounded-xl border border-rose-200 transition cursor-pointer">
                                 <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> Sign Out
                             </button>
                         </div>
@@ -527,7 +617,7 @@
                             <div><span class="text-slate-400">Date of Birth:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
                             <div><span class="text-slate-400">Employment Start Date:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
                             <div><span class="text-slate-400">Carried Vacation (Last Year):</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> Days</div>
-                            <div><span class="text-slate-400">Device Login Status:</span> <strong class="text-emerald-700 font-medium">Device Recognized & Synchronized</strong></div>
+                            <div><span class="text-slate-400">Device Session:</span> <strong class="text-emerald-700 font-medium">Synchronized & Remembered</strong></div>
                         </div>
                     </div>
                 </div>
@@ -538,39 +628,39 @@
 
     <!-- Modal: Detail Modal -->
     <div id="email-modal" class="fixed inset-0 bg-slate-900/60 modal-blur z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div class="flex items-center space-x-1.5">
                     <span class="w-3 h-3 rounded-full bg-rose-500"></span>
                     <span class="w-3 h-3 rounded-full bg-amber-500"></span>
                     <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-slate-400 font-mono ml-2">[Leave Request Details]</span>
+                    <span class="text-xs text-slate-400 font-mono ml-2">[Leave Request Authorization]</span>
                 </div>
                 <button type="button" onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
 
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+            <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-xs space-y-1">
                 <div><span class="text-slate-400">To:</span> <strong class="text-emerald-700 font-mono font-bold">Secretary.fine@gmail.com</strong></div>[cite: 1]
                 <div><span class="text-slate-400">Subject:</span> <strong class="text-blue-600">[Leave Request] <span id="email-emp-name">Employee</span> requests <span id="email-leave-type">Vacation</span></strong></div>[cite: 1]
             </div>
 
-            <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
+            <div class="border border-slate-200 p-4 rounded-2xl text-slate-700 space-y-2 text-xs">
                 <p>Dear Management / HR,</p>
                 <p>An employee has submitted an official request for <strong id="email-detail-type" class="text-slate-900">Leave</strong> with the following specifications:</p>
-                <ul class="list-disc list-inside space-y-1 bg-slate-50 p-2.5 rounded-lg">
+                <ul class="list-disc list-inside space-y-1.5 bg-slate-50 p-3 rounded-xl">
                     <li><strong>Schedule:</strong> <span id="email-detail-dates">-</span></li>
                     <li><strong>Reason / Contact:</strong> <span id="email-detail-reason">-</span></li>
                 </ul>
             </div>
 
             <div class="flex items-center justify-end space-x-2 pt-2">
-                <button type="button" id="email-btn-reject" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-xl transition cursor-pointer">
+                <button type="button" id="email-btn-reject" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2.5 rounded-xl transition cursor-pointer">
                     <i class="fa-solid fa-xmark mr-1"></i> Reject
                 </button>
-                <button type="button" id="email-btn-approve" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-xl shadow transition cursor-pointer">
+                <button type="button" id="email-btn-approve" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl shadow transition cursor-pointer">
                     <i class="fa-solid fa-check mr-1"></i> Authorize / Approve
                 </button>
-                <button type="button" onclick="closeEmailModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2 rounded-xl transition cursor-pointer">
+                <button type="button" onclick="closeEmailModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-xl transition cursor-pointer">
                     Close
                 </button>
             </div>
@@ -578,7 +668,7 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-message">Operation Completed</span>
     </div>
@@ -672,6 +762,11 @@
         let currentUser = null;
         let isAdmin = false;
 
+        let balanceChartInstance = null;
+        let trendChartInstance = null;
+        let distributionChartInstance = null;
+        let departmentChartInstance = null;
+
         function isApprovedStatus(status) {
             return status === 'Approved' || status === 'อนุมัติแล้ว';
         }
@@ -686,7 +781,7 @@
             checkAutoLogin();
         });
 
-        // ================= AUTHENTICATION & DEVICE REMEMBER =================
+        // ================= AUTHENTICATION =================
         function checkAutoLogin() {
             const rememberedId = localStorage.getItem('pcbk_device_auth_code');
             if (rememberedId) {
@@ -880,7 +975,7 @@
         }
 
         function switchTab(tabId) {
-            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'profile'];
+            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'analytics', 'profile'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
                 const content = document.getElementById(`tab-${id}`);
@@ -899,10 +994,14 @@
                 }
             });
 
-            if (tabId === 'dashboard') renderTodayDashboard();
+            if (tabId === 'dashboard') {
+                renderTodayDashboard();
+                renderDashboardCharts();
+            }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
             if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
+            if (tabId === 'analytics') renderAnalyticsCharts();
             if (tabId === 'profile') renderProfileTab();
         }
 
@@ -995,6 +1094,7 @@
             renderApprovalQueue();
             updateBadges();
             renderProfileTab();
+            renderDashboardCharts();
         }
 
         function updateBadges() {
@@ -1025,7 +1125,7 @@
 
             if (todayLeaves.length === 0) {
                 if (statusChip) statusChip.innerHTML = `<span class="text-emerald-700 font-bold">🟢 Full Workforce (100%)</span>`;
-                if (kpiTodayDesc) kpiTodayDesc.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> All staff present today`;
+                if (kpiTodayDesc) kpiTodayDesc.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> 100% Full Attendance`;
                 if (listContainer) {
                     listContainer.innerHTML = `
                         <div class="py-6 text-center space-y-2">
@@ -1046,10 +1146,10 @@
                         const emp = employees.find(e => e.id === r.empId);
                         const pos = emp ? emp.position : 'Staff';
                         cardsHtml += `
-                            <div class="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2">
+                            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2 card-hover">
                                 <div class="flex items-center justify-between">
                                     <span class="font-bold text-slate-900 text-xs">${r.empName}</span>
-                                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold">${r.type} (${r.days}d)</span>
+                                    <span class="text-[10px] bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full font-bold">${r.type} (${r.days}d)</span>
                                 </div>
                                 <p class="text-[11px] text-slate-500">${pos}</p>
                                 <div class="text-[11px] text-slate-600 border-t border-slate-200 pt-1.5">
@@ -1102,6 +1202,165 @@
             if (vacRemEl) vacRemEl.innerText = `${grandVacationRemaining} Days`;
             if (sickUsedEl) sickUsedEl.innerText = `${grandSickUsed} Days`;
             if (avgVacEl) avgVacEl.innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
+        }
+
+        // ================= CHART.JS ANALYTICS ENGINE =================
+        function renderDashboardCharts() {
+            let totalVacUsed = 0;
+            let totalVacRem = 0;
+            const monthlyTrend = Array(12).fill(0);
+
+            employees.forEach(e => {
+                let accrued = 0;
+                if (e.vacationAccrued) {
+                    for (let m = 0; m < 12; m++) accrued += parseFloat(e.vacationAccrued[m]) || 0;
+                }
+                if (e.vacationUsedMonths) {
+                    for (let m = 0; m < 12; m++) {
+                        const val = parseFloat(e.vacationUsedMonths[m]) || 0;
+                        monthlyTrend[m] += val;
+                        totalVacUsed += val;
+                    }
+                }
+                const carry = parseFloat(e.carryVacation) || 0;
+                totalVacRem += Math.max(0, carry + accrued - (e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0));
+            });
+
+            // Doughnut Balance Chart
+            const balanceCanvas = document.getElementById('balanceChart');
+            if (balanceCanvas) {
+                if (balanceChartInstance) balanceChartInstance.destroy();
+                const ctx = balanceCanvas.getContext('2d');
+                balanceChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Vacation Taken', 'Vacation Remaining'],
+                        datasets: [{
+                            data: [totalVacUsed, totalVacRem],
+                            backgroundColor: ['#e11d48', '#16a34a'],
+                            borderWidth: 3,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                        }
+                    }
+                });
+            }
+
+            // Monthly Trend Chart
+            const trendCanvas = document.getElementById('trendChart');
+            if (trendCanvas) {
+                if (trendChartInstance) trendChartInstance.destroy();
+                const ctx = trendCanvas.getContext('2d');
+                trendChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{
+                            label: 'Total Vacation Days Used',
+                            data: monthlyTrend,
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                            tension: 0.35,
+                            fill: true,
+                            pointBackgroundColor: '#2563eb',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function renderAnalyticsCharts() {
+            let totalVac = 0;
+            let totalSick = 0;
+            let totalOther = 0;
+
+            const roleGroups = { 'Management': 0, 'Engineering': 0, 'Admin/Finance': 0, 'Operations': 0 };
+
+            employees.forEach(e => {
+                const vac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
+                const sick = e.sickMonths ? e.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
+                const other = parseFloat(e.otherLeaveDays) || 0;
+
+                totalVac += vac;
+                totalSick += sick;
+                totalOther += other;
+
+                const totalAll = vac + sick + other;
+                const pos = (e.position || '').toLowerCase();
+                if (pos.includes('president') || pos.includes('vice')) roleGroups['Management'] += totalAll;
+                else if (pos.includes('engineer') || pos.includes('gis')) roleGroups['Engineering'] += totalAll;
+                else if (pos.includes('accountant') || pos.includes('secretary')) roleGroups['Admin/Finance'] += totalAll;
+                else roleGroups['Operations'] += totalAll;
+            });
+
+            // Distribution Chart
+            const distCanvas = document.getElementById('distributionChart');
+            if (distCanvas) {
+                if (distributionChartInstance) distributionChartInstance.destroy();
+                const ctx = distCanvas.getContext('2d');
+                distributionChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Vacation Leave', 'Sick Leave', 'Other Leave'],
+                        datasets: [{
+                            label: 'Days Utilized',
+                            data: [totalVac, totalSick, totalOther],
+                            backgroundColor: ['#2563eb', '#16a34a', '#8b5cf6'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: { x: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            // Department/Role Chart
+            const deptCanvas = document.getElementById('departmentChart');
+            if (deptCanvas) {
+                if (departmentChartInstance) departmentChartInstance.destroy();
+                const ctx = deptCanvas.getContext('2d');
+                departmentChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(roleGroups),
+                        datasets: [{
+                            label: 'Total Leave Days',
+                            data: Object.values(roleGroups),
+                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
         }
 
         // ================= FULL MATRIX RENDERING =================
@@ -1360,7 +1619,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com',[cite: 1]
                 status: 'Pending Approval',
                 createdAt: todayRealISO,
                 year: currentYearAD.toString()
@@ -1422,7 +1681,7 @@
                     : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">Pending</span>';
 
                 container.innerHTML += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row justify-between sm:items-center gap-4 card-hover">
                         <div class="space-y-1">
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold text-slate-900">${r.empName}</span>
@@ -1432,15 +1691,15 @@
                             <div class="text-xs text-slate-600">
                                 <strong class="text-blue-600">${r.type}</strong> (${r.days} Day${r.days > 1 ? 's' : ''}) | ${r.startDate} to ${r.endDate}
                             </div>
-                            <p class="text-xs text-slate-500 bg-slate-50 p-2 rounded-lg"><strong>Reason / Contact:</strong> ${r.reason}</p>
+                            <p class="text-xs text-slate-500 bg-slate-50 p-2.5 rounded-xl"><strong>Reason / Contact:</strong> ${r.reason}</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button type="button" onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-lg transition cursor-pointer">
+                            <button type="button" onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl transition cursor-pointer">
                                 <i class="fa-solid fa-envelope mr-1"></i> View Details
                             </button>
                             ${(isAdmin && isPend) ? `
-                                <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">Approve</button>
-                                <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-2 rounded-lg transition cursor-pointer">Reject</button>
+                                <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer">Approve</button>
+                                <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer">Reject</button>
                             ` : ''}
                         </div>
                     </div>`;
