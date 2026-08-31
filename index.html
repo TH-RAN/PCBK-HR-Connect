@@ -124,7 +124,7 @@
                         <div class="flex items-center space-x-2">
                             <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK-HR-Connect</h1>
                         </div>
-                        <p class="text-[11px] sm:text-xs text-slate-500">Annual Leave Management & Workforce Analytics</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500">Annual Leave Management & Workforce Statistics</p>
                     </div>
                 </div>
 
@@ -197,7 +197,7 @@
                 </div>
             </div>
 
-            <!-- Redesigned KPI Stat Cards -->
+            <!-- KPI Stat Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="stat-card stat-card-green p-5 rounded-2xl border border-slate-200/80 shadow-sm card-hover">
                     <div class="flex items-center justify-between">
@@ -254,7 +254,7 @@
                 </div>
             </div>
 
-            <!-- Dashboard Charts Preview -->
+            <!-- Dashboard Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 card-hover">
                     <div class="flex items-center justify-between mb-4">
@@ -644,7 +644,7 @@
                 <div><span class="text-slate-400">Subject:</span> <strong class="text-blue-600">[Leave Request] <span id="email-emp-name">Employee</span> requests <span id="email-leave-type">Vacation</span></strong></div>[cite: 1]
             </div>
 
-            <div class="border border-slate-200 p-4 rounded-2xl text-slate-700 space-y-2 text-xs">
+            <div class="border border-slate-200 p-4 rounded-xl text-slate-700 space-y-2 text-xs">
                 <p>Dear Management / HR,</p>
                 <p>An employee has submitted an official request for <strong id="email-detail-type" class="text-slate-900">Leave</strong> with the following specifications:</p>
                 <ul class="list-disc list-inside space-y-1.5 bg-slate-50 p-3 rounded-xl">
@@ -799,8 +799,7 @@
             const rememberMe = document.getElementById('login-remember-me')?.checked || false;
 
             if (performLogin(code, rememberMe)) {
-                const modal = document.getElementById('login-modal');
-                if (modal) modal.classList.add('hidden');
+                // Success handled inside performLogin
             } else {
                 alert("Invalid Employee ID or Admin Access Code");
             }
@@ -823,6 +822,7 @@
                 localStorage.setItem('pcbk_device_auth_code', code);
             }
 
+            // Immediately Hide Modal
             const modal = document.getElementById('login-modal');
             if (modal) modal.classList.add('hidden');
 
@@ -996,12 +996,12 @@
 
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
-                renderDashboardCharts();
+                setTimeout(renderDashboardCharts, 50);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
             if (tabId === 'request-form') renderEmpSelectOptions('form-emp-id');
-            if (tabId === 'analytics') renderAnalyticsCharts();
+            if (tabId === 'analytics') setTimeout(renderAnalyticsCharts, 50);
             if (tabId === 'profile') renderProfileTab();
         }
 
@@ -1094,7 +1094,6 @@
             renderApprovalQueue();
             updateBadges();
             renderProfileTab();
-            renderDashboardCharts();
         }
 
         function updateBadges() {
@@ -1206,160 +1205,164 @@
 
         // ================= CHART.JS ANALYTICS ENGINE =================
         function renderDashboardCharts() {
-            let totalVacUsed = 0;
-            let totalVacRem = 0;
-            const monthlyTrend = Array(12).fill(0);
+            try {
+                let totalVacUsed = 0;
+                let totalVacRem = 0;
+                const monthlyTrend = Array(12).fill(0);
 
-            employees.forEach(e => {
-                let accrued = 0;
-                if (e.vacationAccrued) {
-                    for (let m = 0; m < 12; m++) accrued += parseFloat(e.vacationAccrued[m]) || 0;
-                }
-                if (e.vacationUsedMonths) {
-                    for (let m = 0; m < 12; m++) {
-                        const val = parseFloat(e.vacationUsedMonths[m]) || 0;
-                        monthlyTrend[m] += val;
-                        totalVacUsed += val;
+                employees.forEach(e => {
+                    let accrued = 0;
+                    if (e.vacationAccrued) {
+                        for (let m = 0; m < 12; m++) accrued += parseFloat(e.vacationAccrued[m]) || 0;
                     }
-                }
-                const carry = parseFloat(e.carryVacation) || 0;
-                totalVacRem += Math.max(0, carry + accrued - (e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0));
-            });
-
-            // Doughnut Balance Chart
-            const balanceCanvas = document.getElementById('balanceChart');
-            if (balanceCanvas) {
-                if (balanceChartInstance) balanceChartInstance.destroy();
-                const ctx = balanceCanvas.getContext('2d');
-                balanceChartInstance = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Vacation Taken', 'Vacation Remaining'],
-                        datasets: [{
-                            data: [totalVacUsed, totalVacRem],
-                            backgroundColor: ['#e11d48', '#16a34a'],
-                            borderWidth: 3,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                    if (e.vacationUsedMonths) {
+                        for (let m = 0; m < 12; m++) {
+                            const val = parseFloat(e.vacationUsedMonths[m]) || 0;
+                            monthlyTrend[m] += val;
+                            totalVacUsed += val;
                         }
                     }
+                    const carry = parseFloat(e.carryVacation) || 0;
+                    totalVacRem += Math.max(0, carry + accrued - (e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0));
                 });
-            }
 
-            // Monthly Trend Chart
-            const trendCanvas = document.getElementById('trendChart');
-            if (trendCanvas) {
-                if (trendChartInstance) trendChartInstance.destroy();
-                const ctx = trendCanvas.getContext('2d');
-                trendChartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{
-                            label: 'Total Vacation Days Used',
-                            data: monthlyTrend,
-                            borderColor: '#2563eb',
-                            backgroundColor: 'rgba(37, 99, 235, 0.08)',
-                            tension: 0.35,
-                            fill: true,
-                            pointBackgroundColor: '#2563eb',
-                            pointRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                const balanceCanvas = document.getElementById('balanceChart');
+                if (balanceCanvas && balanceCanvas.offsetParent !== null) {
+                    if (balanceChartInstance) balanceChartInstance.destroy();
+                    const ctx = balanceCanvas.getContext('2d');
+                    balanceChartInstance = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Vacation Taken', 'Vacation Remaining'],
+                            datasets: [{
+                                data: [totalVacUsed, totalVacRem],
+                                backgroundColor: ['#e11d48', '#16a34a'],
+                                borderWidth: 3,
+                                borderColor: '#ffffff'
+                            }]
                         },
-                        scales: {
-                            y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                            x: { grid: { display: false } }
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                            }
                         }
-                    }
-                });
+                    });
+                }
+
+                const trendCanvas = document.getElementById('trendChart');
+                if (trendCanvas && trendCanvas.offsetParent !== null) {
+                    if (trendChartInstance) trendChartInstance.destroy();
+                    const ctx = trendCanvas.getContext('2d');
+                    trendChartInstance = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                            datasets: [{
+                                label: 'Total Vacation Days Used',
+                                data: monthlyTrend,
+                                borderColor: '#2563eb',
+                                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                                tension: 0.35,
+                                fill: true,
+                                pointBackgroundColor: '#2563eb',
+                                pointRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { font: { family: 'Plus Jakarta Sans', size: 11 } } }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn("Chart initialization skipped: Container hidden");
             }
         }
 
         function renderAnalyticsCharts() {
-            let totalVac = 0;
-            let totalSick = 0;
-            let totalOther = 0;
+            try {
+                let totalVac = 0;
+                let totalSick = 0;
+                let totalOther = 0;
 
-            const roleGroups = { 'Management': 0, 'Engineering': 0, 'Admin/Finance': 0, 'Operations': 0 };
+                const roleGroups = { 'Management': 0, 'Engineering': 0, 'Admin/Finance': 0, 'Operations': 0 };
 
-            employees.forEach(e => {
-                const vac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
-                const sick = e.sickMonths ? e.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
-                const other = parseFloat(e.otherLeaveDays) || 0;
+                employees.forEach(e => {
+                    const vac = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
+                    const sick = e.sickMonths ? e.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
+                    const other = parseFloat(e.otherLeaveDays) || 0;
 
-                totalVac += vac;
-                totalSick += sick;
-                totalOther += other;
+                    totalVac += vac;
+                    totalSick += sick;
+                    totalOther += other;
 
-                const totalAll = vac + sick + other;
-                const pos = (e.position || '').toLowerCase();
-                if (pos.includes('president') || pos.includes('vice')) roleGroups['Management'] += totalAll;
-                else if (pos.includes('engineer') || pos.includes('gis')) roleGroups['Engineering'] += totalAll;
-                else if (pos.includes('accountant') || pos.includes('secretary')) roleGroups['Admin/Finance'] += totalAll;
-                else roleGroups['Operations'] += totalAll;
-            });
-
-            // Distribution Chart
-            const distCanvas = document.getElementById('distributionChart');
-            if (distCanvas) {
-                if (distributionChartInstance) distributionChartInstance.destroy();
-                const ctx = distCanvas.getContext('2d');
-                distributionChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Vacation Leave', 'Sick Leave', 'Other Leave'],
-                        datasets: [{
-                            label: 'Days Utilized',
-                            data: [totalVac, totalSick, totalOther],
-                            backgroundColor: ['#2563eb', '#16a34a', '#8b5cf6'],
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
-                        plugins: { legend: { display: false } },
-                        scales: { x: { beginAtZero: true } }
-                    }
+                    const totalAll = vac + sick + other;
+                    const pos = (e.position || '').toLowerCase();
+                    if (pos.includes('president') || pos.includes('vice')) roleGroups['Management'] += totalAll;
+                    else if (pos.includes('engineer') || pos.includes('gis')) roleGroups['Engineering'] += totalAll;
+                    else if (pos.includes('accountant') || pos.includes('secretary')) roleGroups['Admin/Finance'] += totalAll;
+                    else roleGroups['Operations'] += totalAll;
                 });
-            }
 
-            // Department/Role Chart
-            const deptCanvas = document.getElementById('departmentChart');
-            if (deptCanvas) {
-                if (departmentChartInstance) departmentChartInstance.destroy();
-                const ctx = deptCanvas.getContext('2d');
-                departmentChartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(roleGroups),
-                        datasets: [{
-                            label: 'Total Leave Days',
-                            data: Object.values(roleGroups),
-                            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-                            borderRadius: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
+                const distCanvas = document.getElementById('distributionChart');
+                if (distCanvas && distCanvas.offsetParent !== null) {
+                    if (distributionChartInstance) distributionChartInstance.destroy();
+                    const ctx = distCanvas.getContext('2d');
+                    distributionChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Vacation Leave', 'Sick Leave', 'Other Leave'],
+                            datasets: [{
+                                label: 'Days Utilized',
+                                data: [totalVac, totalSick, totalOther],
+                                backgroundColor: ['#2563eb', '#16a34a', '#8b5cf6'],
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            indexAxis: 'y',
+                            plugins: { legend: { display: false } },
+                            scales: { x: { beginAtZero: true } }
+                        }
+                    });
+                }
+
+                const deptCanvas = document.getElementById('departmentChart');
+                if (deptCanvas && deptCanvas.offsetParent !== null) {
+                    if (departmentChartInstance) departmentChartInstance.destroy();
+                    const ctx = deptCanvas.getContext('2d');
+                    departmentChartInstance = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(roleGroups),
+                            datasets: [{
+                                label: 'Total Leave Days',
+                                data: Object.values(roleGroups),
+                                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { y: { beginAtZero: true } }
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn("Analytics chart initialization skipped: Container hidden");
             }
         }
 
