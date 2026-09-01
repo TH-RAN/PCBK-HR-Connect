@@ -142,6 +142,7 @@
             </div>
         </div>
 
+        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -693,7 +694,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUkIUakoS03GBKBRuCfbQ-w_T_I7M-9Qp28tr6plPDjjtC0xnC_jelPSrIYk4pNkShRg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -789,7 +790,6 @@
             }
         }
 
-        // ชุดข้อมูลพนักงาน 10 ท่าน (ตัดคุณอาทิตยาออกเรียบร้อย)
         const defaultDataset = [
             {
                 seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
@@ -1049,7 +1049,6 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // อัปโหลดและบีบอัดภาพแบบ Micro-Optimized (120x120px @ JPEG 0.70)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1187,9 +1186,7 @@
 
                 if (masterEmp && JSON.parse(masterEmp).length > 0) {
                     let parsed = JSON.parse(masterEmp);
-                    // กรองคุณอาทิตยา (1102051) ออกจากหน่วยความจำเดิม
                     employees = parsed.filter(e => String(e.id) !== '1102051');
-                    // รันลำดับใหม่ 1..N
                     employees.forEach((e, idx) => e.seq = idx + 1);
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset));
@@ -1231,7 +1228,6 @@
                     let needsCloudUpdate = false;
 
                     if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        // กรองคุณอาทิตยา (1102051) ออกจากคลาวด์
                         let cloudList = data.employees.filter(e => String(e.id) !== '1102051');
                         cloudList.forEach((cloudEmp, idx) => {
                             cloudEmp.seq = idx + 1;
@@ -1824,7 +1820,7 @@
             }
             const usedVac = emp.vacationUsedMonths ? emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
             const carry = parseFloat(emp.carryVacation) || 0;
-            const vacRem = Math.max(0, carry + accrued - usedVac);
+            const vacRem = Math.max(0, carry + totalAccrued - usedVac);
 
             const usedSick = emp.sickMonths ? emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
             const sickRem = Math.max(0, 30 - usedSick);
