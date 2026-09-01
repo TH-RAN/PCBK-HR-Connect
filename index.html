@@ -883,7 +883,7 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ระบบดึงรูปภาพ: ตรวจสอบจาก LocalStorage ก่อน หากไม่มีให้ใช้ Avatar สำรองน่ารักทันทีโดยไม่โหลดไฟล์พาร์ทผิด
+        // ระบบดึงรูปภาพอัจฉริยะ (ใช้ Avatar สำรองออนไลน์ 100% ป้องกัน Error 404)
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -893,7 +893,6 @@
             if (emp && emp.avatar && emp.avatar.startsWith('http')) {
                 return emp.avatar;
             }
-            // ใช้ Avatar สำรองออนไลน์ทันที ป้องกัน Error 404 บน GitHub Pages
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
             return isFemale 
@@ -1056,7 +1055,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100%)
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -2157,7 +2156,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
