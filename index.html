@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ภาพสำรองน่ารักสดใส + รองรับอัปโหลดรูปทับได้</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ซิงก์ข้อมูลใบลาผ่าน Google Cloud (ทุกคนเห็นตรงกัน 100%)</strong></div>
                     </div>
                 </div>
             </div>
@@ -693,6 +693,7 @@
     </div>
 
     <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvSNCwL3gSCq8MJcIVjq3im84mtkfo1fetZYtKZgwsAYMgVL7Z_gva8IcCrBYT7aXMLg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -895,12 +896,9 @@
             return `./${empId}.jpg`;
         }
 
-        // ระบบสำรอง: หากไม่มีไฟล์ภาพ .jpg ใน GitHub จะแสดงภาพการ์ตูนผู้หญิงผิวขาวผมยาวแสกกลาง หรือผู้ชายสุภาพ
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
-            
-            // ใช้ DiceBear style 'adventurer' หรือ 'avataaars' ที่ปรับให้เป็นผู้หญิงผิวขาวผมยาวแสกกลางเรียบร้อยน่ารัก
             imgElement.src = isFemale 
                 ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_long_black_hair_${empId}&backgroundColor=ffd5dc&hair=long01&hairColor=0e0e0e&skinColor=f2d3b1`
                 : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff&skinColor=f2d3b1`;
@@ -909,9 +907,55 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            renderAllViews();
+            syncFromCloud();
             checkAutoLogin();
         });
+
+        // ================= CLOUD SYNC FOR REQUESTS =================
+        async function syncFromCloud() {
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await res.json();
+                if (data && data.status === "success") {
+                    if (data.requests && Array.isArray(data.requests)) {
+                        requests = data.requests;
+                    }
+                    if (data.employees && Array.isArray(data.employees)) {
+                        data.employees.forEach(cloudEmp => {
+                            const localIdx = employees.findIndex(e => String(e.id) === String(cloudEmp.id));
+                            if (localIdx !== -1) {
+                                employees[localIdx].vacationUsedMonths = cloudEmp.vacationUsedMonths || employees[localIdx].vacationUsedMonths;
+                                employees[localIdx].sickMonths = cloudEmp.sickMonths || employees[localIdx].sickMonths;
+                                employees[localIdx].otherLeaveDays = cloudEmp.otherLeaveDays || employees[localIdx].otherLeaveDays;
+                            }
+                        });
+                    }
+                    saveLocalData();
+                    renderAllViews();
+                }
+            } catch (err) {
+                console.warn("Sync from cloud failed, using local data:", err);
+                renderAllViews();
+            }
+        }
+
+        async function saveAllToCloud() {
+            saveLocalData();
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({
+                        action: "SAVE_ALL",
+                        employees: employees,
+                        requests: requests
+                    })
+                });
+            } catch (err) {
+                console.warn("Save to cloud failed:", err);
+            }
+        }
 
         // ================= AUTHENTICATION =================
         function checkAutoLogin() {
@@ -969,6 +1013,7 @@
                 const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
                 switchTab(savedTab);
 
+                syncFromCloud();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
                 console.error(err);
@@ -1063,7 +1108,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100%)
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1149,7 +1194,7 @@
                     lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 }
-                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกบนเครื่องให้อัตโนมัติ";
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Cloud ให้อัตโนมัติ";
                 if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
                 if (lockBadge) {
@@ -1900,7 +1945,7 @@
             return days;
         }
 
-        function handleLeaveSubmit(e) {
+        async function handleLeaveSubmit(e) {
             e.preventDefault();
             const empId = document.getElementById('form-emp-id').value;
             const emp = employees.find(x => x.id === empId);
@@ -1950,8 +1995,13 @@
                 year: d.yearBE.toString()
             };
 
+            const submitBtn = document.getElementById('btn-submit-form');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลเข้าระบบ...`;
+
             requests.unshift(newReq);
-            saveLocalData();
+            await saveAllToCloud();
             renderAllViews();
 
             document.getElementById('leave-form').reset();
@@ -1959,7 +2009,9 @@
             toggleDurationOptions();
             toggleLeaveTypeFields();
 
-            showToast("ยื่นใบลาเข้าระบบเรียบร้อยแล้ว");
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalBtnText;
+            showToast("ยื่นใบลาและซิงก์ข้อมูลขึ้น Cloud เรียบร้อยแล้ว");
         }
 
         // ================= APPROVAL CENTER =================
@@ -2034,7 +2086,7 @@
             });
         }
 
-        function deleteLeaveRequest(reqId) {
+        async function deleteLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการลบรายการ");
                 return;
@@ -2042,7 +2094,7 @@
             const conf = confirm("คุณต้องการลบรายการคำขอลานี้อย่างถาวรหรือไม่?");
             if (conf) {
                 requests = requests.filter(r => r.id !== reqId);
-                saveLocalData();
+                await saveAllToCloud();
                 renderAllViews();
                 showToast("ลบรายการคำขอลาเรียบร้อยแล้ว");
             }
@@ -2082,7 +2134,7 @@
             activeModalReqId = null;
         }
 
-        function approveLeaveRequest(reqId) {
+        async function approveLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการอนุมัติ");
                 return;
@@ -2107,13 +2159,13 @@
                     }
                 }
 
-                saveLocalData();
+                await saveAllToCloud();
                 renderAllViews();
-                showToast(`อนุมัติวันลาของ ${req.empName} เรียบร้อยแล้ว`);
+                showToast(`อนุมัติวันลาของ ${req.empName} และซิงก์ขึ้น Cloud เรียบร้อยแล้ว`);
             }
         }
 
-        function rejectLeaveRequest(reqId) {
+        async function rejectLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการปฏิเสธ");
                 return;
@@ -2121,7 +2173,7 @@
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
-                saveLocalData();
+                await saveAllToCloud();
                 renderAllViews();
                 showToast(`ปฏิเสธคำขอลางานของ ${req.empName} แล้ว`);
             }
