@@ -590,7 +590,7 @@
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
                         <div class="relative group">
-                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50">
+                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-55">
                             <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
                                 <i class="fa-solid fa-camera text-xs"></i>
                             </label>
@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ทำงานแบบ Local Standalone (แปลง Base64 เก็บในเครื่องสำเร็จ 100%)</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ดึงภาพจาก GitHub (.jpg) อัตโนมัติ + รองรับอัปโหลดทับได้</strong></div>
                     </div>
                 </div>
             </div>
@@ -883,16 +883,34 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
+        // ระบบจัดการรูปภาพอัจฉริยะ: เช็คภาพอัปโหลดในเครื่อง -> เช็คไฟล์ .jpg ใน GitHub -> ถ้าไม่มี ใช้ไอคอนชาย/หญิงแยกตามบุคคลทันที
         function getEmployeeAvatar(empId) {
-            const emp = employees.find(e => String(e.id) === String(empId));
-            if (emp && emp.avatar && emp.avatar.startsWith('data:image')) {
-                return emp.avatar;
-            }
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
                 return localSaved;
             }
-            return `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
+            const emp = employees.find(e => String(e.id) === String(empId));
+            if (emp && emp.avatar && emp.avatar.startsWith('http')) {
+                return emp.avatar;
+            }
+
+            // รายชื่อพนักงานหญิง (ให้ใช้ไอคอนผู้หญิง)
+            const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
+            const isFemale = femaleIds.includes(String(empId));
+            const defaultSeed = isFemale ? `female_${empId}` : `male_${empId}`;
+
+            // หากหาไฟล์ .jpg ใน GitHub ไม่เจอ ระบบจะเปลี่ยนไปใช้ Avatar ชาย/หญิง อัตโนมัติทันที
+            return `./${empId}.jpg`;
+        }
+
+        // ฟังก์ชันช่วยดักจับกรณีโหลดรูปจาก GitHub ไม่พบ ให้แปลงเป็นไอคอนการ์ตูนชาย/หญิงทันที
+        function handleImageError(imgElement, empId) {
+            const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
+            const isFemale = femaleIds.includes(String(empId));
+            // ใช้ DiceBear แยกเพศ (หญิงใช้ avataaars หรือ notionists, ชายใช้สไตล์เท่ๆ)
+            imgElement.src = isFemale 
+                ? `https://api.dicebear.com/7.x/avataaars/svg?seed=woman_${empId}&backgroundColor=b6e3f4`
+                : `https://api.dicebear.com/7.x/avataaars/svg?seed=man_${empId}&backgroundColor=c0aede`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -987,7 +1005,10 @@
                 roleEl.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold' : 'bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-bold';
             }
 
-            if (avatarEl) avatarEl.src = getEmployeeAvatar(currentUser.id);
+            if (avatarEl) {
+                avatarEl.src = getEmployeeAvatar(currentUser.id);
+                avatarEl.onerror = function() { handleImageError(this, currentUser.id); };
+            }
 
             updateAdminUI();
             renderProfileTab();
@@ -1006,7 +1027,10 @@
             const tenureEl = document.getElementById('profile-card-tenure');
             const carryEl = document.getElementById('profile-card-carry');
 
-            if (photoEl) photoEl.src = getEmployeeAvatar(currentUser.id);
+            if (photoEl) {
+                photoEl.src = getEmployeeAvatar(currentUser.id);
+                photoEl.onerror = function() { handleImageError(this, currentUser.id); };
+            }
 
             if (nameEl) nameEl.innerText = formatDisplayName(currentUser);
             if (posEl) posEl.innerText = currentUser.position;
@@ -1046,7 +1070,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบแปลงไฟล์ภาพเป็น Base64 บันทึกเก็บในเครื่องทันที 100% สำเร็จแน่นอน
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100% สำเร็จแน่นอน)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1199,13 +1223,6 @@
                 } else {
                     requests = [];
                 }
-
-                employees.forEach(emp => {
-                    const localImg = localStorage.getItem(`pcbk_avatar_${emp.id}`);
-                    if (localImg && localImg.startsWith('data:image')) {
-                        emp.avatar = localImg;
-                    }
-                });
             } catch (e) {
                 employees = JSON.parse(JSON.stringify(defaultDataset));
                 requests = [];
@@ -1309,7 +1326,7 @@
                                 <div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-2.5">
-                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-8 h-8 rounded-full object-cover bg-blue-100 border border-slate-200">
+                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-8 h-8 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="handleImageError(this, '${r.empId}')">
                                             <div>
                                                 <span class="font-bold text-slate-900 text-xs block leading-tight">${formatDisplayName(emp) || r.empName}</span>
                                                 <span class="text-[10px] text-slate-400 font-mono">รหัส: ${r.empId}</span>
@@ -1522,7 +1539,7 @@
 
                 execGrid.innerHTML += `
                     <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
-                        <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
+                        <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white" onerror="handleImageError(this, '${emp.id}')">
                         <div class="space-y-1.5 flex-1">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                                 <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
@@ -1547,7 +1564,7 @@
                 staffGrid.innerHTML += `
                     <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
                         <div class="flex items-start space-x-3.5">
-                            <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
+                            <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white" onerror="handleImageError(this, '${emp.id}')">
                             <div class="space-y-0.5 flex-1">
                                 <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
                                 <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
