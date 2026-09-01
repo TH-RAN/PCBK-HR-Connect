@@ -69,7 +69,7 @@
 
     <!-- ================= LOGIN OVERLAY MODAL ================= -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-fade-in relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
             <div class="flex justify-center items-center">
                 <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
             </div>
@@ -86,6 +86,10 @@
                         <i class="fa-solid fa-id-card absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
                         <input type="text" id="login-input-code" required placeholder="เช่น 1102055 หรือ Admin Key" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white font-mono tracking-wider">
                     </div>
+                </div>
+
+                <div id="login-error-msg" class="hidden text-rose-600 text-xs font-semibold bg-rose-50 border border-rose-200 p-2.5 rounded-xl text-center">
+                    รหัสพนักงานหรือรหัส Admin ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
                 </div>
 
                 <div class="flex items-center justify-between text-xs">
@@ -111,7 +115,6 @@
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- System Brand with Official PCBK Logo -->
                 <div class="flex items-center space-x-3">
                     <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-11 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
                     <div>
@@ -120,7 +123,6 @@
                     </div>
                 </div>
 
-                <!-- User Session & Date -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-2xl text-xs font-medium cursor-pointer hover:bg-slate-100 transition" onclick="switchTab('profile')">
                         <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200">
@@ -140,7 +142,6 @@
             </div>
         </div>
 
-        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -172,7 +173,7 @@
     <!-- Main Content Area -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ================= TAB 1: EXECUTIVE DASHBOARD ================= -->
+        <!-- ================= TAB 1: DASHBOARD ================= -->
         <section id="tab-dashboard" class="tab-content space-y-6">
             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-3xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="relative z-10 space-y-1.5">
@@ -181,7 +182,7 @@
                         <span>สถานะองค์กร Real-Time ประจำวัน</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold tracking-tight">ภาพรวมกำลังคนและการลางาน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังอัปเดตข้อมูลตามวันเวลาปัจจุบัน...</p>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังอัปเดตข้อมูล...</p>
                 </div>
 
                 <div class="flex items-center space-x-2.5 relative z-10">
@@ -196,9 +197,7 @@
                 </div>
             </div>
 
-            <!-- Two-Column Side-by-Side Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Left Column -->
                 <div class="lg:col-span-6 space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
@@ -248,7 +247,6 @@
                         </div>
                     </div>
 
-                    <!-- Attendance List Box with Avatars -->
                     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div>
@@ -262,13 +260,10 @@
                             </span>
                         </div>
 
-                        <div id="today-leave-list-container" class="py-2 text-center space-y-2">
-                            <!-- Dynamic Leaves -->
-                        </div>
+                        <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
                     </div>
                 </div>
 
-                <!-- Right Column -->
                 <div class="lg:col-span-6 space-y-6">
                     <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
                         <div class="flex items-center justify-between">
@@ -305,7 +300,7 @@
             </div>
         </section>
 
-        <!-- ================= TAB 2: FULL MATRIX LEAVE SUMMARY TABLE ================= -->
+        <!-- ================= TAB 2: SUMMARY TABLE ================= -->
         <section id="tab-summary" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -334,7 +329,6 @@
                     </div>
                 </div>
 
-                <!-- Matrix Table -->
                 <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner relative max-h-[650px]">
                     <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1600px]">
                         <thead>
@@ -345,13 +339,9 @@
                                 <th rowspan="3" class="p-2 min-w-[180px]">ตำแหน่ง</th>
                                 <th rowspan="3" class="p-2">วันเกิด</th>
                                 <th rowspan="3" class="p-2">วันเริ่มงาน</th>
-                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[85px]">
-                                    ทบวันพักร้อน<br><span class="text-[10px] font-normal">สะสมปีก่อน</span>
-                                </th>
+                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[85px]">ทบวันพักร้อน<br><span class="text-[10px] font-normal">สะสมปีก่อน</span></th>
                                 <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน (เพิ่มเดือนละ 1 วันทบได้)</th>
-                                <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">
-                                    ลาป่วย <span class="text-[10px] font-normal">(ปีละไม่เกิน 30 วันทำการ)</span>
-                                </th>
+                                <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">ลาป่วย <span class="text-[10px] font-normal">(ปีละไม่เกิน 30 วันทำการ)</span></th>
                                 <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[75px]">ลาอื่นๆ/ภารกิจ<br>(รวมทั้งปี)</th>
                                 <th rowspan="3" class="p-2 min-w-[130px]">หมายเหตุ / สถานะ</th>
                             </tr>
@@ -360,11 +350,9 @@
                                 <th rowspan="2" class="p-2 bg-amber-200 text-amber-950 font-bold min-w-[70px]">รวมเพิ่ม<br>พักร้อน</th>
                                 <th rowspan="2" class="p-2 bg-rose-200 text-rose-950 font-bold min-w-[70px]">รวมใช้<br>พักร้อน</th>
                                 <th rowspan="2" class="p-2 bg-yellow-300 text-yellow-950 font-bold min-w-[70px]">คงเหลือ<br>พักร้อน</th>
-
                                 <th colspan="12" class="p-1.5 bg-emerald-50 text-emerald-900">รายเดือน (ม.ค. - ธ.ค.)</th>
                                 <th rowspan="2" class="p-2 bg-emerald-200 text-emerald-950 font-bold min-w-[70px]">รวมใช้<br>ลาป่วย</th>
                             </tr>
-
                             <tr class="bg-slate-50 text-slate-600 text-[10px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[65px] z-10">
                                 <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ม.ค.</th>
                                 <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.พ.</th>
@@ -378,7 +366,6 @@
                                 <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ต.ค.</th>
                                 <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">พ.ย.</th>
                                 <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ธ.ค.</th>
-
                                 <th class="p-1 bg-emerald-50">ม.ค.</th>
                                 <th class="p-1 bg-emerald-50">ก.พ.</th>
                                 <th class="p-1 bg-emerald-50">มี.ค.</th>
@@ -393,9 +380,7 @@
                                 <th class="p-1 bg-emerald-50">ธ.ค.</th>
                             </tr>
                         </thead>
-                        <tbody id="summary-table-body" class="divide-y divide-slate-200">
-                            <!-- Dynamic Rows -->
-                        </tbody>
+                        <tbody id="summary-table-body" class="divide-y divide-slate-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -419,7 +404,6 @@
                         </select>
                     </div>
 
-                    <!-- กล่องแสดงสิทธิ์คงเหลือของพนักงานที่เลือก -->
                     <div id="emp-quota-status-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-2 gap-3 text-center">
                         <div class="bg-white p-2.5 rounded-xl border border-amber-200 shadow-xs">
                             <span class="text-[11px] text-slate-500 block">สิทธิ์พักร้อนคงเหลือ</span>
@@ -432,7 +416,7 @@
                     </div>
 
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1.5">ประเภทการลางาน (3 ประเภทหลัก) *</label>
+                        <label class="block font-semibold text-slate-700 mb-1.5">ประเภทการลางาน *</label>
                         <div class="grid grid-cols-3 gap-3">
                             <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_type" value="ลาพักร้อน" required checked onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
@@ -452,12 +436,11 @@
                         </div>
                     </div>
 
-                    <!-- กล่องข้อความพิเศษสำหรับการลาอื่นๆ/ภารกิจภายนอก -->
                     <div id="wrapper-other-leave-detail" class="hidden bg-purple-50/80 border border-purple-200 p-4 rounded-2xl space-y-2 animate-fade-in">
                         <label class="block font-bold text-purple-950 text-xs flex items-center">
                             <i class="fa-solid fa-circle-info text-purple-600 mr-1.5"></i> ระบุประเภทภารกิจ / การลาอื่นๆ (ไม่หักวันลาพักร้อน) *
                         </label>
-                        <input type="text" id="form-other-type-detail" placeholder="เช่น ไปอบรมสัมมนาบัญชี, ติดต่อราชการนอกสถานที่, ดูงานโครงการ" class="w-full bg-white border border-purple-300 rounded-xl p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-purple-500">
+                        <input type="text" id="form-other-type-detail" placeholder="เช่น ไปอบรมสัมมนาบัญชี, ติดต่อราชการนอกสถานที่" class="w-full bg-white border border-purple-300 rounded-xl p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-purple-500">
                     </div>
 
                     <div>
@@ -525,7 +508,6 @@
                         <span id="form-day-count" class="font-extrabold text-sm text-blue-700">1 วัน</span>
                     </div>
 
-                    <!-- ข้อความแจ้งเตือนสีแดงเมื่อลาเกินสิทธิ์ -->
                     <div id="leave-quota-warning" class="hidden bg-rose-50 border border-rose-300 text-rose-700 p-3.5 rounded-2xl text-xs font-bold flex items-center space-x-2">
                         <i class="fa-solid fa-triangle-exclamation text-base"></i>
                         <span id="leave-quota-warning-txt">ไม่สามารถลาเกินสิทธิ์วันลาคงเหลือที่กำหนดได้</span>
@@ -554,16 +536,13 @@
                     </div>
                 </div>
 
-                <div id="approval-list" class="space-y-3">
-                    <!-- Dynamic -->
-                </div>
+                <div id="approval-list" class="space-y-3"></div>
             </div>
         </section>
 
         <!-- ================= TAB 5: MY PROFILE ================= -->
         <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-                <!-- Clean Modern Header -->
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
                         <div class="relative group">
@@ -589,7 +568,6 @@
                     </button>
                 </div>
 
-                <!-- Clean Stats Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div class="bg-amber-50/60 border border-amber-200/80 rounded-3xl p-5 text-center">
                         <span class="text-xs text-amber-800 font-semibold uppercase tracking-wider block">วันพักร้อนคงเหลือ</span>
@@ -608,13 +586,11 @@
                     </div>
                 </div>
 
-                <!-- Personal Information Clean Box -->
                 <div class="border border-slate-200/80 rounded-3xl p-6 bg-slate-50/60 space-y-4 text-xs sm:text-sm">
                     <h4 class="font-bold text-slate-800 border-b border-slate-200/80 pb-2">ข้อมูลประวัติและการทำงาน</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-600 pt-1">
                         <div><span class="text-slate-400">วัน/เดือน/ปีเกิด:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
                         <div><span class="text-slate-400">วันเริ่มงาน:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
-                        <!-- จุดคำนวณอายุงานอัตโนมัติ (ปี เดือน วัน) -->
                         <div class="sm:col-span-2 bg-blue-50/80 border border-blue-200 p-3.5 rounded-2xl flex items-center justify-between">
                             <span class="text-blue-900 font-bold flex items-center">
                                 <i class="fa-solid fa-business-time mr-2 text-blue-600 text-base"></i> อายุงานรวมที่ PCBK:
@@ -691,7 +667,6 @@
             return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
         }
 
-        // คำนวณอายุงานอัตโนมัติอย่างปลอดภัย
         function calculateWorkTenure(startDateStr) {
             try {
                 if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
@@ -882,13 +857,16 @@
         function handleLoginSubmit(e) {
             e.preventDefault();
             const codeInput = document.getElementById('login-input-code');
+            const errorBox = document.getElementById('login-error-msg');
             const code = codeInput ? codeInput.value.trim() : '';
             const rememberMe = document.getElementById('login-remember-me')?.checked || false;
+
+            if (errorBox) errorBox.classList.add('hidden');
 
             if (performLogin(code, rememberMe)) {
                 // Done
             } else {
-                alert("รหัสพนักงาน หรือรหัส Admin ไม่ถูกต้อง");
+                if (errorBox) errorBox.classList.remove('hidden');
             }
         }
 
@@ -910,18 +888,21 @@
                 localStorage.setItem('pcbk_device_auth_code', trimmed);
             }
 
-            // ซ่อนหน้าต่าง Modal ทันที 100%
+            // ลบ Login Modal ออกจาก DOM ทันทีเพื่อป้องกันปัญหาค้าง
             const modal = document.getElementById('login-modal');
             if (modal) {
-                modal.classList.add('hidden');
-                modal.style.setProperty('display', 'none', 'important');
+                modal.remove();
             }
 
-            updateUserSessionUI();
-            renderAllViews();
-            switchTab('dashboard');
-            syncFromCloud();
-            showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
+            try {
+                updateUserSessionUI();
+                renderAllViews();
+                switchTab('dashboard');
+                syncFromCloud();
+                showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
+            } catch (err) {
+                console.error(err);
+            }
             return true;
         }
 
@@ -929,15 +910,7 @@
             const conf = confirm("คุณต้องการออกจากระบบบนอุปกรณ์นี้หรือไม่?");
             if (conf) {
                 localStorage.removeItem('pcbk_device_auth_code');
-                currentUser = null;
-                isAdmin = false;
-                const codeInput = document.getElementById('login-input-code');
-                if (codeInput) codeInput.value = '';
-                const modal = document.getElementById('login-modal');
-                if (modal) {
-                    modal.style.setProperty('display', 'flex', 'important');
-                    modal.classList.remove('hidden');
-                }
+                location.reload();
             }
         }
 
@@ -1128,7 +1101,7 @@
 
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
-                setTimeout(renderDashboardCharts, 60);
+                setTimeout(renderDashboardCharts, 80);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
@@ -1403,7 +1376,6 @@
                     totalOtherAll += oth;
                 });
 
-                // Stacked Bar Chart
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
                 if (barCanvas && barCanvas.offsetParent !== null) {
                     if (monthlyBarChartInstance) monthlyBarChartInstance.destroy();
@@ -1447,7 +1419,6 @@
                     });
                 }
 
-                // Donut Proportion Chart
                 const donutCanvas = document.getElementById('leaveDistributionDonutChart');
                 if (donutCanvas && donutCanvas.offsetParent !== null) {
                     if (leaveDonutChartInstance) leaveDonutChartInstance.destroy();
@@ -1839,7 +1810,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',[cite: 1, 2]
+                approverEmail: 'Secretary.fine@gmail.com',
                 status: 'รออนุมัติ',
                 createdAt: d.iso,
                 year: d.yearBE.toString()
@@ -1874,7 +1845,7 @@
             showToast("ยื่นใบลาเข้าระบบเรียบร้อยแล้ว");
         }
 
-        // ================= APPROVAL CENTER & ROLE-BASED FILTERING =================
+        // ================= APPROVAL CENTER =================
         function renderApprovalQueue() {
             const container = document.getElementById('approval-list');
             const subtitle = document.getElementById('approval-center-subtitle');
