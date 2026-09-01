@@ -69,7 +69,7 @@
 
     <!-- ================= LOGIN OVERLAY MODAL ================= -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-fade-in relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
             <div class="flex justify-center items-center">
                 <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
             </div>
@@ -142,6 +142,7 @@
             </div>
         </div>
 
+        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -570,9 +571,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
                         <h3 class="font-bold text-slate-800 text-sm">คณะผู้บริหารระดับสูง (Executive Board)</h3>
                     </div>
-                    <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic Executives -->
-                    </div>
+                    <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
                 <!-- Staff & Operations -->
@@ -581,9 +580,7 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
                         <h3 class="font-bold text-slate-800 text-sm">พนักงาน</h3>
                     </div>
-                    <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Dynamic Staff Sorted by Tenure -->
-                    </div>
+                    <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </div>
         </section>
@@ -715,10 +712,9 @@
             return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
         }
 
-        // แปลงวันเริ่มงานเป็น timestamp เพื่อใช้เปรียบเทียบเรียงลำดับอายุงาน
         function getStartDateTimestamp(startDateStr) {
             if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
-                return 9999999999999; // ให้อยู่ท้ายสุด
+                return 9999999999999;
             }
             const thaiMonthMap = {
                 "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
@@ -954,6 +950,7 @@
                 localStorage.setItem('pcbk_device_auth_code', trimmed);
             }
 
+            // ซ่อนและลบ Login Modal ออกจาก DOM ทันที
             const modal = document.getElementById('login-modal');
             if (modal) {
                 modal.remove();
@@ -962,7 +959,11 @@
             try {
                 updateUserSessionUI();
                 renderAllViews();
-                switchTab('dashboard');
+                
+                // ดึงแท็บล่าสุดที่เคยเปิดค้างไว้จาก localStorage (ถ้าไม่มีจะเปิด dashboard)
+                const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
+                switchTab(savedTab);
+
                 syncFromCloud();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
@@ -975,6 +976,7 @@
             const conf = confirm("คุณต้องการออกจากระบบบนอุปกรณ์นี้หรือไม่?");
             if (conf) {
                 localStorage.removeItem('pcbk_device_auth_code');
+                localStorage.removeItem('pcbk_active_tab');
                 location.reload();
             }
         }
@@ -1146,6 +1148,9 @@
         }
 
         function switchTab(tabId) {
+            // บันทึกแท็บปัจจุบันลงใน localStorage เพื่อเปิดค้างไว้เมื่อ Refresh
+            localStorage.setItem('pcbk_active_tab', tabId);
+
             const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'directory', 'profile'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
@@ -1523,7 +1528,7 @@
             } catch (err) {}
         }
 
-        // ================= TAB 5: STAFF DIRECTORY RENDERING (SORTED BY TENURE) =================
+        // ================= TAB 5: STAFF DIRECTORY =================
         function renderStaffDirectory() {
             const execGrid = document.getElementById('directory-executives-grid');
             const staffGrid = document.getElementById('directory-staff-grid');
@@ -1540,11 +1545,9 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
-            // แยกผู้บริหารและการจัดเรียงพนักงานตามอายุงานมาก -> น้อย
             const execList = filtered.filter(e => e.id === '1101001' || e.id === '1102003');
             const staffList = filtered.filter(e => e.id !== '1101001' && e.id !== '1102003');
 
-            // เรียงลำดับพนักงานตาม timestamp วันเริ่มงาน (เริ่มก่อน = อายุงานมากสุด)
             staffList.sort((a, b) => {
                 const timeA = getStartDateTimestamp(a.startDate);
                 const timeB = getStartDateTimestamp(b.startDate);
@@ -1969,7 +1972,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com'[cite: 1, 2],
+                approverEmail: 'Secretary.fine@gmail.com',
                 status: 'รออนุมัติ',
                 createdAt: d.iso,
                 year: d.yearBE.toString()
