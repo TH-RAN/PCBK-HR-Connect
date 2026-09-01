@@ -693,7 +693,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPb1slRxBTQvAamKJKVd7N-E4hgFyhshlPOmEqsB5d1wcPF38GneGsZClr361l1OTFMA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvSNCwL3gSCq8MJcIVjq3im84mtkfo1fetZYtKZgwsAYMgVL7Z_gva8IcCrBYT7aXMLg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -1138,7 +1138,7 @@
                     lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 }
-                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ";
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Cloud ให้อัตโนมัติ";
                 if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
                 if (lockBadge) {
@@ -2163,7 +2163,7 @@
                 btnReject.classList.add('hidden');
             }
 
-            document.getElementById('email-modal').classList.add('hidden');
+            document.getElementById('email-modal').classList.remove('hidden');
         }
 
         function closeEmailModal() {
@@ -2274,15 +2274,15 @@
         }
 
         function showToast(msg) {
-            const toy = document.getElementById('toast');
+            const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toast-message');
-            if (!toy || !msgEl) return;
+            if (!toast || !msgEl) return;
             msgEl.innerText = msg;
-            toy.classList.remove('translate-y-20', 'opacity-0');
-            toy.classList.add('translate-y-0', 'opacity-100');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
-                toy.classList.remove('translate-y-0', 'opacity-100');
-                toy.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
     </script>
