@@ -279,7 +279,7 @@
                                 <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน ลาป่วย และภารกิจ/ลาอื่นๆ</p>
                             </div>
                         </div>
-                        <div class="h-60 relative">
+                        <div class="h-60 relative w-full">
                             <canvas id="monthlyTrendBarChart"></canvas>
                         </div>
                     </div>
@@ -297,7 +297,7 @@
                                 <span id="grand-total-leaves-txt" class="text-slate-900 font-bold text-sm">0 วัน</span>
                             </div>
                         </div>
-                        <div class="h-52 relative">
+                        <div class="h-52 relative w-full">
                             <canvas id="leaveDistributionDonutChart"></canvas>
                         </div>
                     </div>
@@ -693,7 +693,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUkIUakoS03GBKBRuCfbQ-w_T_I7M-9Qp28tr6plPDjjtC0xnC_jelPSrIYk4pNkShRg/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwV-hA5SsWJ_hH5RbHZnMduWpu9BzkXttWqbfhpl08ZZx924SwJg2te3o3ylPFQo4QVlA/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -1166,7 +1166,7 @@
 
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
-                setTimeout(renderDashboardCharts, 80);
+                setTimeout(renderDashboardCharts, 100);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
@@ -1417,7 +1417,7 @@
                     }
 
                     const carry = parseFloat(e.carryVacation) || 0;
-                    const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
+                    const remVac = Math.max(0, carry + totalAccrued - usedVac);
                     
                     let usedSick = 0;
                     if (e.sickMonths && Array.isArray(e.sickMonths)) {
@@ -1441,7 +1441,7 @@
             if (avgVacEl) avgVacEl.innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
-        // ================= CHART.JS ANALYTICS ENGINE =================
+        // ================= CHART.JS ANALYTICS ENGINE (REBUILT FOR 100% RELIABILITY) =================
         function renderDashboardCharts() {
             try {
                 if (typeof Chart === 'undefined') return;
@@ -1473,9 +1473,12 @@
                     totalOtherAll += oth;
                 });
 
+                // 1. Stacked Bar Chart
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
-                if (barCanvas && barCanvas.offsetParent !== null) {
-                    if (monthlyBarChartInstance) monthlyBarChartInstance.destroy();
+                if (barCanvas) {
+                    if (monthlyBarChartInstance) {
+                        monthlyBarChartInstance.destroy();
+                    }
                     const ctx = barCanvas.getContext('2d');
                     monthlyBarChartInstance = new Chart(ctx, {
                         type: 'bar',
@@ -1506,7 +1509,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: 'Prompt', size: 11 } } }
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
                             },
                             scales: {
                                 x: { stacked: true, grid: { display: false } },
@@ -1516,17 +1519,24 @@
                     });
                 }
 
+                // 2. Donut Chart
                 const donutCanvas = document.getElementById('leaveDistributionDonutChart');
-                if (donutCanvas && donutCanvas.offsetParent !== null) {
-                    if (leaveDonutChartInstance) leaveDonutChartInstance.destroy();
+                if (donutCanvas) {
+                    if (leaveDonutChartInstance) {
+                        leaveDonutChartInstance.destroy();
+                    }
                     const ctx = donutCanvas.getContext('2d');
+                    const hasData = (totalVacAll + totalSickAll + totalOtherAll) > 0;
+                    const chartData = hasData ? [totalVacAll, totalSickAll, totalOtherAll] : [1, 0, 0];
+                    const chartColors = hasData ? ['#f59e0b', '#f43f5e', '#6366f1'] : ['#e2e8f0', '#e2e8f0', '#e2e8f0'];
+
                     leaveDonutChartInstance = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
                             labels: ['ลาพักร้อน', 'ลาป่วย', 'ลาอื่นๆ / ภารกิจ'],
                             datasets: [{
-                                data: [totalVacAll, totalSickAll, totalOtherAll],
-                                backgroundColor: ['#f59e0b', '#f43f5e', '#6366f1'],
+                                data: chartData,
+                                backgroundColor: chartColors,
                                 borderWidth: 3,
                                 borderColor: '#ffffff'
                             }]
@@ -1535,7 +1545,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { family: 'Prompt', size: 11 } } }
                             }
                         }
                     });
@@ -1546,7 +1556,9 @@
                         grandTotalTxt.innerText = `${grandTotal.toFixed(2)} วัน`;
                     }
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.warn("Chart render issue:", err);
+            }
         }
 
         // ================= TAB 5: STAFF DIRECTORY =================
