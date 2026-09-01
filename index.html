@@ -170,10 +170,11 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ================= TAB 1: EXECUTIVE DASHBOARD ================= -->
+        <!-- ================= TAB 1: EXECUTIVE DASHBOARD (TWO-COLUMN DESKTOP LAYOUT) ================= -->
         <section id="tab-dashboard" class="tab-content space-y-6">
+            <!-- Hero Gradient Banner -->
             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-3xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="relative z-10 space-y-1.5">
                     <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
@@ -463,17 +464,17 @@
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1.5">ระยะเวลาการลา *</label>
                         <div class="grid grid-cols-3 gap-3">
-                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">1.0 วัน</span>
                                 <span class="text-[10px] text-slate-500">เต็มวัน (8 ชม.)</span>
                             </label>
-                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">0.5 วัน</span>
                                 <span class="text-[10px] text-slate-500">ครึ่งวัน (4 ชม.)</span>
                             </label>
-                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">0.25 วัน</span>
                                 <span class="text-[10px] text-slate-500">ออกธุระ (2 ชม.)</span>
@@ -609,11 +610,18 @@
                 </div>
 
                 <!-- Personal Information Clean Box -->
-                <div class="border border-slate-200/80 rounded-3xl p-6 bg-slate-50/60 space-y-3 text-xs sm:text-sm">
-                    <h4 class="font-bold text-slate-800 border-b border-slate-200/80 pb-2">ข้อมูลประวัติพนักงาน</h4>
+                <div class="border border-slate-200/80 rounded-3xl p-6 bg-slate-50/60 space-y-4 text-xs sm:text-sm">
+                    <h4 class="font-bold text-slate-800 border-b border-slate-200/80 pb-2">ข้อมูลประวัติและการทำงาน</h4>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-600 pt-1">
                         <div><span class="text-slate-400">วัน/เดือน/ปีเกิด:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
                         <div><span class="text-slate-400">วันเริ่มงาน:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
+                        <!-- จุดคำนวณอายุงานอัตโนมัติ (ปี เดือน วัน) -->
+                        <div class="sm:col-span-2 bg-blue-50/80 border border-blue-200 p-3.5 rounded-2xl flex items-center justify-between">
+                            <span class="text-blue-900 font-bold flex items-center">
+                                <i class="fa-solid fa-business-time mr-2 text-blue-600 text-base"></i> อายุงานรวมที่ PCBK:
+                            </span>
+                            <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
+                        </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
                         <div><span class="text-slate-400">สถานะอุปกรณ์:</span> <strong class="text-emerald-700 font-medium">จดจำอุปกรณ์และซิงก์ Cloud แล้ว</strong></div>
                     </div>
@@ -682,6 +690,62 @@
             const thaiText = `${liveNow.getDate()} ${thaiMonthsFull[liveNow.getMonth()]} พ.ศ. ${yearBE}`;
 
             return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
+        }
+
+        // ฟังก์ชันคำนวณอายุงาน (ปี เดือน วัน) จากข้อความวันเริ่มงาน
+        function calculateWorkTenure(startDateStr) {
+            if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
+                return 'ยังไม่ได้ระบุวันเริ่มงาน';
+            }
+
+            const thaiMonthMap = {
+                "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
+                "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
+            };
+
+            const parts = startDateStr.trim().split(/\s+/);
+            if (parts.length < 3) return startDateStr;
+
+            const day = parseInt(parts[0], 10);
+            const month = thaiMonthMap[parts[1]];
+            let year = parseInt(parts[2], 10);
+
+            if (isNaN(day) || month === undefined || isNaN(year)) return startDateStr;
+
+            // แปลง พ.ศ. เป็น ค.ศ.
+            if (year > 2400) {
+                year -= 543;
+            }
+
+            const startDate = new Date(year, month, day);
+            const now = new Date();
+
+            if (startDate > now) {
+                return 'เริ่มงานในอนาคต';
+            }
+
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+
+            if (days < 0) {
+                months -= 1;
+                // หาวันที่ของเดือนก่อนหน้า
+                const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                days += prevMonthLastDay;
+            }
+
+            if (months < 0) {
+                years -= 1;
+                months += 12;
+            }
+
+            const res = [];
+            if (years > 0) res.push(`${years} ปี`);
+            if (months > 0) res.push(`${months} เดือน`);
+            if (days > 0 || res.length === 0) res.push(`${days} วัน`);
+
+            return res.join(' ');
         }
 
         const defaultDataset = [
@@ -785,7 +849,6 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // Helper: ดึงภาพโปรไฟล์ของพนักงานจาก Cloud หรือ Default
         function getEmployeeAvatar(empId) {
             const emp = employees.find(e => String(e.id) === String(empId));
             if (emp && emp.avatar) return emp.avatar;
@@ -905,6 +968,7 @@
             const roleChip = document.getElementById('profile-card-role-chip');
             const dobEl = document.getElementById('profile-card-dob');
             const startEl = document.getElementById('profile-card-start');
+            const tenureEl = document.getElementById('profile-card-tenure');
             const carryEl = document.getElementById('profile-card-carry');
 
             if (photoEl) photoEl.src = getEmployeeAvatar(currentUser.id);
@@ -915,6 +979,9 @@
             if (dobEl) dobEl.innerText = currentUser.dob || '-';
             if (startEl) startEl.innerText = currentUser.startDate || '-';
             if (carryEl) carryEl.innerText = currentUser.carryVacation || '0';
+
+            // แสดงผลการคำนวณอายุงานอัตโนมัติ
+            if (tenureEl) tenureEl.innerText = calculateWorkTenure(currentUser.startDate);
 
             if (roleChip) {
                 roleChip.innerText = isAdmin ? 'ผู้ดูแลระบบ (Admin)' : (isExecutiveOrAdmin() ? 'ผู้บริหาร (Executive)' : 'พนักงานประจำ');
@@ -945,7 +1012,6 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // อัปโหลดและย่อขนาดรูปภาพพร้อมซิงก์ขึ้น Google Cloud ทันที
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -955,7 +1021,7 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxDim = 200; // ย่อขนาดเพื่อความรวดเร็วในการโหลดข้ามเครื่อง
+                    const maxDim = 200;
                     let w = img.width;
                     let h = img.height;
                     if (w > h) {
@@ -970,7 +1036,6 @@
 
                     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
-                    // อัปเดตใน Object พนักงาน
                     const empIdx = employees.findIndex(emp => String(emp.id) === String(currentUser.id));
                     if (empIdx !== -1) {
                         employees[empIdx].avatar = compressedBase64;
@@ -1578,6 +1643,7 @@
             
             employees.forEach(e => {
                 const isCurrent = currentUser && String(currentUser.id) === String(e.id) ? 'selected' : '';
+                // ลบวงเล็บซ้อน
                 sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${formatDisplayName(e)} (${e.position})</option>`;
             });
 
@@ -1773,7 +1839,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com',[cite: 1, 2]
                 status: 'รออนุมัติ',
                 createdAt: d.iso,
                 year: d.yearBE.toString()
