@@ -69,7 +69,7 @@
 
     <!-- ================= LOGIN OVERLAY MODAL ================= -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-fade-in relative">
             <div class="flex justify-center items-center">
                 <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
             </div>
@@ -142,7 +142,6 @@
             </div>
         </div>
 
-        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -554,7 +553,7 @@
                         <h2 class="font-bold text-slate-900 text-xl flex items-center">
                             <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบพนักงานและบุคลากร PCBK
                         </h2>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อ สังกัด และข้อมูลสถานะการปฏิบัติงานของสมาชิกในองค์กร</p>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อและข้อมูลประวัติการทำงานของสมาชิกในองค์กร (เรียงตามอายุงาน)</p>
                     </div>
 
                     <div class="flex items-center space-x-2">
@@ -580,10 +579,10 @@
                 <div class="space-y-3 pt-2">
                     <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-                        <h3 class="font-bold text-slate-800 text-sm">ทีมงานและฝ่ายปฏิบัติการ (Personnel & Operations)</h3>
+                        <h3 class="font-bold text-slate-800 text-sm">พนักงาน</h3>
                     </div>
                     <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Dynamic Staff -->
+                        <!-- Dynamic Staff Sorted by Tenure -->
                     </div>
                 </div>
             </div>
@@ -714,6 +713,28 @@
             const thaiText = `${liveNow.getDate()} ${thaiMonthsFull[liveNow.getMonth()]} พ.ศ. ${yearBE}`;
 
             return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
+        }
+
+        // แปลงวันเริ่มงานเป็น timestamp เพื่อใช้เปรียบเทียบเรียงลำดับอายุงาน
+        function getStartDateTimestamp(startDateStr) {
+            if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
+                return 9999999999999; // ให้อยู่ท้ายสุด
+            }
+            const thaiMonthMap = {
+                "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
+                "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
+            };
+            const parts = startDateStr.trim().split(/\s+/);
+            if (parts.length < 3) return 9999999999999;
+
+            const day = parseInt(parts[0], 10);
+            const month = thaiMonthMap[parts[1]];
+            let year = parseInt(parts[2], 10);
+
+            if (isNaN(day) || month === undefined || isNaN(year)) return 9999999999999;
+            if (year > 2400) year -= 543;
+
+            return new Date(year, month, day).getTime();
         }
 
         function calculateWorkTenure(startDateStr) {
@@ -1502,7 +1523,7 @@
             } catch (err) {}
         }
 
-        // ================= TAB 5: STAFF DIRECTORY RENDERING =================
+        // ================= TAB 5: STAFF DIRECTORY RENDERING (SORTED BY TENURE) =================
         function renderStaffDirectory() {
             const execGrid = document.getElementById('directory-executives-grid');
             const staffGrid = document.getElementById('directory-staff-grid');
@@ -1519,58 +1540,71 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
-            filtered.forEach(emp => {
-                const isExec = emp.id === '1101001' || emp.id === '1102003';
+            // แยกผู้บริหารและการจัดเรียงพนักงานตามอายุงานมาก -> น้อย
+            const execList = filtered.filter(e => e.id === '1101001' || e.id === '1102003');
+            const staffList = filtered.filter(e => e.id !== '1101001' && e.id !== '1102003');
+
+            // เรียงลำดับพนักงานตาม timestamp วันเริ่มงาน (เริ่มก่อน = อายุงานมากสุด)
+            staffList.sort((a, b) => {
+                const timeA = getStartDateTimestamp(a.startDate);
+                const timeB = getStartDateTimestamp(b.startDate);
+                return timeA - timeB;
+            });
+
+            execList.forEach(emp => {
                 const avatar = getEmployeeAvatar(emp.id);
                 const tenure = calculateWorkTenure(emp.startDate);
-                const quota = getEmpRemainingQuotas(emp.id);
 
-                if (isExec) {
-                    execGrid.innerHTML += `
-                        <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
-                            <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
-                            <div class="space-y-1.5 flex-1">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                                    <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
-                                    <span class="bg-blue-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold self-center sm:self-auto">Executive Board</span>
-                                </div>
-                                <p class="text-xs text-blue-800 font-medium">${emp.position}</p>
-                                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-blue-100">
-                                    <div>รหัส: <strong class="font-mono">${emp.id}</strong></div>
-                                    <div>เริ่มงาน: <strong>${emp.startDate}</strong></div>
-                                    <div class="col-span-2">อายุงาน: <strong class="text-blue-700">${tenure}</strong></div>
-                                </div>
+                execGrid.innerHTML += `
+                    <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
+                        <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
+                                <span class="bg-blue-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold self-center sm:self-auto">Executive Board</span>
+                            </div>
+                            <p class="text-xs text-blue-800 font-medium">${emp.position}</p>
+                            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-blue-100">
+                                <div>รหัส: <strong class="font-mono">${emp.id}</strong></div>
+                                <div>วันเกิด: <strong>${emp.dob || '-'}</strong></div>
+                                <div>เริ่มงาน: <strong>${emp.startDate}</strong></div>
+                                <div>อายุงาน: <strong class="text-blue-700 font-bold">${tenure}</strong></div>
                             </div>
                         </div>
-                    `;
-                } else {
-                    staffGrid.innerHTML += `
-                        <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
-                            <div class="flex items-start space-x-3.5">
-                                <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
-                                <div class="space-y-0.5 flex-1">
-                                    <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
-                                    <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
-                                    <span class="inline-block text-[10px] text-slate-400 font-mono">ID: ${emp.id}</span>
-                                </div>
-                            </div>
-                            <div class="border-t border-slate-200/80 pt-3 space-y-1.5 text-[11px] text-slate-600">
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">วันเริ่มงาน:</span>
-                                    <strong>${emp.startDate}</strong>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">อายุงาน PCBK:</span>
-                                    <strong class="text-blue-700">${tenure}</strong>
-                                </div>
-                                <div class="flex justify-between items-center pt-1">
-                                    <span class="text-slate-400">สิทธิ์พักร้อนคงเหลือ:</span>
-                                    <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold text-[10px]">${quota.vacRem.toFixed(2)} วัน</span>
-                                </div>
+                    </div>
+                `;
+            });
+
+            staffList.forEach(emp => {
+                const avatar = getEmployeeAvatar(emp.id);
+                const tenure = calculateWorkTenure(emp.startDate);
+
+                staffGrid.innerHTML += `
+                    <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
+                        <div class="flex items-start space-x-3.5">
+                            <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
+                            <div class="space-y-0.5 flex-1">
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
+                                <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
+                                <span class="inline-block text-[10px] text-slate-400 font-mono">รหัส: ${emp.id}</span>
                             </div>
                         </div>
-                    `;
-                }
+                        <div class="border-t border-slate-200/80 pt-3 space-y-1.5 text-[11px] text-slate-600">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">วัน/เดือน/ปีเกิด:</span>
+                                <strong class="text-slate-800">${emp.dob || '-'}</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">วันเริ่มงาน:</span>
+                                <strong>${emp.startDate}</strong>
+                            </div>
+                            <div class="flex justify-between items-center pt-1 border-t border-slate-200/60">
+                                <span class="text-slate-400">อายุงาน PCBK:</span>
+                                <span class="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold text-[10px]">${tenure}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
         }
 
@@ -1935,7 +1969,7 @@
                 endDate: endDate,
                 days: days,
                 reason: reason,
-                approverEmail: 'Secretary.fine@gmail.com',
+                approverEmail: 'Secretary.fine@gmail.com'[cite: 1, 2],
                 status: 'รออนุมัติ',
                 createdAt: d.iso,
                 year: d.yearBE.toString()
