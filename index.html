@@ -70,8 +70,8 @@
     <!-- ================= LOGIN OVERLAY MODAL ================= -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 animate-fade-in relative">
-            <div class="flex justify-center">
-                <img src="https://raw.githubusercontent.com/TH-RAN/PCBK-HR-Connect/main/LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 object-contain" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=pcbk'">
+            <div class="flex justify-center items-center">
+                <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
             </div>
 
             <div>
@@ -113,7 +113,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- System Brand with Official PCBK Logo -->
                 <div class="flex items-center space-x-3">
-                    <img src="https://raw.githubusercontent.com/TH-RAN/PCBK-HR-Connect/main/LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-10 w-auto object-contain" onerror="this.style.display='none'">
+                    <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-11 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
                     <div>
                         <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK HR-Connect</h1>
                         <p class="text-[11px] sm:text-xs text-slate-500">ระบบบริหารจัดการงานบุคคล วันลา และสถิติประจำปี</p>
@@ -182,7 +182,7 @@
                         <span>สถานะองค์กร Real-Time ประจำวัน</span>
                     </div>
                     <h2 class="text-xl sm:text-2xl font-bold tracking-tight">ภาพรวมกำลังคนและการลางาน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">ติดตามการลา สิทธิ์คงเหลือ และคำขออนุมัติแบบครบวงจร</p>
+                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังอัปเดตข้อมูลตามวันเวลาปัจจุบัน...</p>
                 </div>
 
                 <div class="flex items-center space-x-2.5 relative z-10">
@@ -415,7 +415,7 @@
                 <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-5 text-xs sm:text-sm">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1.5">เลือกชื่อพนักงาน *</label>
-                        <select id="form-emp-id" required onchange="handleFormEmpChange()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-slate-800">
+                        <select id="form-emp-id" required onchange="handleFormEmpChange()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-slate-800 disabled:bg-slate-100 disabled:text-slate-600 disabled:cursor-not-allowed">
                             <option value="">-- เลือกชื่อพนักงาน --</option>
                         </select>
                     </div>
@@ -561,7 +561,7 @@
             </div>
         </section>
 
-        <!-- ================= TAB 5: MY PROFILE (REDESIGNED MODERN CLEAN) ================= -->
+        <!-- ================= TAB 5: MY PROFILE ================= -->
         <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
                 <!-- Clean Modern Header -->
@@ -670,16 +670,21 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
-        const now = new Date();
-        const currentYearAD = now.getFullYear();
-        const currentYearBE = currentYearAD + 543;
-        const thaiMonthsFull = [
-            "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-            "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-        ];
-        
-        const todayRealISO = now.toISOString().split('T')[0];
-        const todayRealThaiText = `${now.getDate()} ${thaiMonthsFull[now.getMonth()]} พ.ศ. ${currentYearBE}`;
+        // ฟังก์ชันดึงวันเวลาปัจจุบันแบบ Dynamic เสมอ
+        function getLiveDateData() {
+            const liveNow = new Date();
+            const yearAD = liveNow.getFullYear();
+            const yearBE = yearAD + 543;
+            const thaiMonthsFull = [
+                "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+                "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+            ];
+            
+            const iso = `${yearAD}-${String(liveNow.getMonth() + 1).padStart(2, '0')}-${String(liveNow.getDate()).padStart(2, '0')}`;
+            const thaiText = `${liveNow.getDate()} ${thaiMonthsFull[liveNow.getMonth()]} พ.ศ. ${yearBE}`;
+
+            return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
+        }
 
         const defaultDataset = [
             {
@@ -767,7 +772,6 @@
             return status === 'Rejected' || status === 'ไม่อนุมัติ';
         }
 
-        // Helper: จัดการการแสดงผลชื่อตามเงื่อนไข (คงคำนำหน้าเฉพาะผู้บริหาร 2 ท่าน)
         function formatDisplayName(emp) {
             if (!emp) return '';
             const raw = emp.name || '';
@@ -946,31 +950,33 @@
         }
 
         function setupDynamicDates() {
+            const d = getLiveDateData();
+
             const headerDateEl = document.getElementById('header-realtime-date');
-            if (headerDateEl) headerDateEl.innerText = `วันนี้: ${todayRealThaiText}`;
+            if (headerDateEl) headerDateEl.innerText = `วันนี้: ${d.thaiText}`;
 
             const dashDateEl = document.getElementById('dashboard-full-date');
-            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${todayRealThaiText} — ติดตามการลา สิทธิ์คงเหลือ และคำขออนุมัติแบบครบวงจร`;
+            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${d.thaiText} — ติดตามการลา สิทธิ์คงเหลือ และคำขออนุมัติแบบครบวงจร`;
 
             const tableTitleEl = document.getElementById('summary-table-header-title');
-            if (tableTitleEl) tableTitleEl.innerText = `สรุปตารางวันลาของพนักงาน (ปี ${currentYearBE})`;
+            if (tableTitleEl) tableTitleEl.innerText = `สรุปตารางวันลาของพนักงาน (ปี ${d.yearBE})`;
 
             const tabTitleEl = document.getElementById('tab-summary-title');
-            if (tabTitleEl) tabTitleEl.innerText = `ตารางสรุปวันลา (${currentYearBE})`;
+            if (tabTitleEl) tabTitleEl.innerText = `ตารางสรุปวันลา (${d.yearBE})`;
 
             const kpiVacUsedTitle = document.getElementById('kpi-title-vac-used');
-            if (kpiVacUsedTitle) kpiVacUsedTitle.innerText = `พักร้อนใช้ไปทั้งปี (${currentYearBE})`;
+            if (kpiVacUsedTitle) kpiVacUsedTitle.innerText = `พักร้อนใช้ไปทั้งปี (${d.yearBE})`;
 
             const kpiSickUsedTitle = document.getElementById('kpi-title-sick-used');
-            if (kpiSickUsedTitle) kpiSickUsedTitle.innerText = `ลาป่วยสะสมทั้งปี (${currentYearBE})`;
+            if (kpiSickUsedTitle) kpiSickUsedTitle.innerText = `ลาป่วยสะสมทั้งปี (${d.yearBE})`;
 
             const listTitle = document.getElementById('today-leave-list-title');
-            if (listTitle) listTitle.innerText = `รายชื่อพนักงานที่ลางานวันนี้ (${todayRealThaiText})`;
+            if (listTitle) listTitle.innerText = `รายชื่อพนักงานที่ลางานวันนี้ (${d.thaiText})`;
 
             const formStart = document.getElementById('form-start-date');
             const formEnd = document.getElementById('form-end-date');
-            if (formStart) formStart.value = todayRealISO;
-            if (formEnd) formEnd.value = todayRealISO;
+            if (formStart) formStart.value = d.iso;
+            if (formEnd) formEnd.value = d.iso;
         }
 
         function updateAdminUI() {
@@ -1120,7 +1126,8 @@
         }
 
         function updateBadges() {
-            const todayApprovedLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && isApprovedStatus(r.status));
+            const d = getLiveDateData();
+            const todayApprovedLeaves = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && isApprovedStatus(r.status));
             const todayBadge = document.getElementById('badge-today-count');
             if (todayBadge) todayBadge.innerText = `${todayApprovedLeaves.length} คนลา`;
 
@@ -1143,7 +1150,8 @@
         }
 
         function renderTodayDashboard() {
-            const todayLeaves = requests.filter(r => r.startDate <= todayRealISO && r.endDate >= todayRealISO && isApprovedStatus(r.status));
+            const d = getLiveDateData();
+            const todayLeaves = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && isApprovedStatus(r.status));
             const countEl = document.getElementById('kpi-today-leave-count');
             const listContainer = document.getElementById('today-leave-list-container');
             const statusChip = document.getElementById('today-status-chip');
@@ -1513,13 +1521,21 @@
             const sel = document.getElementById(selectId);
             if (!sel) return;
             sel.innerHTML = '<option value="">-- เลือกชื่อพนักงาน --</option>';
+            
             employees.forEach(e => {
                 const isCurrent = currentUser && String(currentUser.id) === String(e.id) ? 'selected' : '';
                 sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${formatDisplayName(e)} (${e.position})</option>`;
             });
+
+            // ถ้าเป็นพนักงานทั่วไป ให้เลือกชื่อตนเองและล็อกไม่ให้กดเปลี่ยน (Admin เท่านั้นที่เลือกคนอื่นได้)
+            if (!isAdmin && currentUser && currentUser.id !== 'ADMIN') {
+                sel.value = currentUser.id;
+                sel.disabled = true;
+            } else {
+                sel.disabled = false;
+            }
         }
 
-        // Helper: คำนวณสิทธิ์คงเหลือของพนักงานที่เลือกในฟอร์ม
         function getEmpRemainingQuotas(empId) {
             const emp = employees.find(x => x.id === empId);
             if (!emp) return { vacRem: 0, sickRem: 30 };
@@ -1622,7 +1638,6 @@
                 }
             }
 
-            // Real-time Quota Validation & Red Warning Box
             const empId = document.getElementById('form-emp-id')?.value;
             const leaveType = document.querySelector('input[name="leave_type"]:checked')?.value || 'ลาพักร้อน';
             const warningBox = document.getElementById('leave-quota-warning');
@@ -1695,6 +1710,7 @@
                 reason = `[ลาออกจากออฟฟิศ 2 ชม. (${startTime} - ${endTime} น.)] ${reason}`;
             }
 
+            const d = getLiveDateData();
             const newReq = {
                 id: `REQ-${Date.now().toString().slice(-4)}`,
                 empId: emp.id,
@@ -1706,8 +1722,8 @@
                 reason: reason,
                 approverEmail: 'Secretary.fine@gmail.com',
                 status: 'รออนุมัติ',
-                createdAt: todayRealISO,
-                year: currentYearBE.toString()
+                createdAt: d.iso,
+                year: d.yearBE.toString()
             };
 
             const submitBtn = document.getElementById('btn-submit-form');
@@ -1916,6 +1932,7 @@
         }
 
         function exportSummaryToExcel() {
+            const d = getLiveDateData();
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
@@ -1941,8 +1958,8 @@
             });
             const ws = XLSX.utils.json_to_sheet(dataToExport);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, `สรุปวันลา_${currentYearBE}`);
-            XLSX.writeFile(wb, `รายงานสรุปวันลา_ปี_${currentYearBE}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, `สรุปวันลา_${d.yearBE}`);
+            XLSX.writeFile(wb, `รายงานสรุปวันลา_ปี_${d.yearBE}.xlsx`);
             showToast("ส่งออกไฟล์ Excel สำเร็จ");
         }
 
