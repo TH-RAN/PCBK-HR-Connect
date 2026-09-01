@@ -142,7 +142,6 @@
             </div>
         </div>
 
-        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -166,7 +165,7 @@
                 <button type="button" onclick="switchTab('directory')" id="tab-btn-directory" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-address-book"></i>
                     <span>ทำเนียบพนักงาน</span>
-                    <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">11 คน</span>
+                    <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">10 คน</span>
                 </button>
                 <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-user"></i>
@@ -280,7 +279,7 @@
                                 <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน ลาป่วย และภารกิจ/ลาอื่นๆ</p>
                             </div>
                         </div>
-                        <div class="h-60 relative">
+                        <div class="h-60 relative w-full">
                             <canvas id="monthlyTrendBarChart"></canvas>
                         </div>
                     </div>
@@ -298,7 +297,7 @@
                                 <span id="grand-total-leaves-txt" class="text-slate-900 font-bold text-sm">0 วัน</span>
                             </div>
                         </div>
-                        <div class="h-52 relative">
+                        <div class="h-52 relative w-full">
                             <canvas id="leaveDistributionDonutChart"></canvas>
                         </div>
                     </div>
@@ -554,7 +553,7 @@
                         <h2 class="font-bold text-slate-900 text-xl flex items-center">
                             <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบพนักงานและบุคลากร PCBK
                         </h2>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อ สังกัด และข้อมูลสถานะการปฏิบัติงานของสมาชิกในองค์กร</p>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อและข้อมูลประวัติการทำงานของสมาชิกในองค์กร (เรียงตามอายุงาน)</p>
                     </div>
 
                     <div class="flex items-center space-x-2">
@@ -571,20 +570,16 @@
                         <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
                         <h3 class="font-bold text-slate-800 text-sm">คณะผู้บริหารระดับสูง (Executive Board)</h3>
                     </div>
-                    <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic Executives -->
-                    </div>
+                    <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
                 <!-- Staff & Operations -->
                 <div class="space-y-3 pt-2">
                     <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
                         <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-                        <h3 class="font-bold text-slate-800 text-sm">ทีมงานและฝ่ายปฏิบัติการ (Personnel & Operations)</h3>
+                        <h3 class="font-bold text-slate-800 text-sm">พนักงาน</h3>
                     </div>
-                    <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Dynamic Staff -->
-                    </div>
+                    <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </div>
         </section>
@@ -698,7 +693,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPb1slRxBTQvAamKJKVd7N-E4hgFyhshlPOmEqsB5d1wcPF38GneGsZClr361l1OTFMA/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -714,6 +709,27 @@
             const thaiText = `${liveNow.getDate()} ${thaiMonthsFull[liveNow.getMonth()]} พ.ศ. ${yearBE}`;
 
             return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
+        }
+
+        function getStartDateTimestamp(startDateStr) {
+            if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
+                return 9999999999999;
+            }
+            const thaiMonthMap = {
+                "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
+                "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
+            };
+            const parts = startDateStr.trim().split(/\s+/);
+            if (parts.length < 3) return 9999999999999;
+
+            const day = parseInt(parts[0], 10);
+            const month = thaiMonthMap[parts[1]];
+            let year = parseInt(parts[2], 10);
+
+            if (isNaN(day) || month === undefined || isNaN(year)) return 9999999999999;
+            if (year > 2400) year -= 543;
+
+            return new Date(year, month, day).getTime();
         }
 
         function calculateWorkTenure(startDateStr) {
@@ -823,19 +839,13 @@
                 sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
             },
             {
-                seq: 9, id: "1102051", name: "อาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
-                vacationAccrued: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-                vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED", avatar: ""
+                seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 1, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 1, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
             },
             {
-                seq: 10, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
-                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
-            },
-            {
-                seq: 11, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
+                seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
@@ -876,16 +886,26 @@
 
         function getEmployeeAvatar(empId) {
             const emp = employees.find(e => String(e.id) === String(empId));
-            if (emp && emp.avatar) return emp.avatar;
+            if (emp && emp.avatar && emp.avatar.startsWith('data:image')) {
+                return emp.avatar;
+            }
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
-            if (localSaved) return localSaved;
+            if (localSaved && localSaved.startsWith('data:image')) {
+                return localSaved;
+            }
             return `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            renderAllViews();
+            
+            try {
+                syncFromCloud();
+            } catch(e) {
+                renderAllViews();
+            }
+
             checkAutoLogin();
         });
 
@@ -941,7 +961,10 @@
             try {
                 updateUserSessionUI();
                 renderAllViews();
-                switchTab('dashboard');
+                
+                const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
+                switchTab(savedTab);
+
                 syncFromCloud();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
@@ -954,6 +977,7 @@
             const conf = confirm("คุณต้องการออกจากระบบบนอุปกรณ์นี้หรือไม่?");
             if (conf) {
                 localStorage.removeItem('pcbk_device_auth_code');
+                localStorage.removeItem('pcbk_active_tab');
                 location.reload();
             }
         }
@@ -1039,7 +1063,7 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxDim = 200;
+                    const maxDim = 120;
                     let w = img.width;
                     let h = img.height;
                     if (w > h) {
@@ -1052,7 +1076,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
 
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
 
                     const empIdx = employees.findIndex(emp => String(emp.id) === String(currentUser.id));
                     if (empIdx !== -1) {
@@ -1061,11 +1085,13 @@
                     currentUser.avatar = compressedBase64;
 
                     localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
-                    saveEmployeesToCloud();
-                    updateUserSessionUI();
-                    renderTodayDashboard();
-                    renderStaffDirectory();
-                    showToast("อัปโหลดรูปภาพและบันทึกขึ้น Cloud สำเร็จแล้ว");
+                    
+                    saveEmployeesToCloud().then(() => {
+                        updateUserSessionUI();
+                        renderTodayDashboard();
+                        renderStaffDirectory();
+                        showToast("อัปโหลดรูปภาพและซิงก์ขึ้น Cloud สำเร็จแล้ว");
+                    });
                 };
                 img.src = event.target.result;
             };
@@ -1125,6 +1151,8 @@
         }
 
         function switchTab(tabId) {
+            localStorage.setItem('pcbk_active_tab', tabId);
+
             const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'directory', 'profile'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
@@ -1146,7 +1174,7 @@
 
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
-                setTimeout(renderDashboardCharts, 80);
+                setTimeout(renderDashboardCharts, 100);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
@@ -1164,7 +1192,9 @@
                 const masterReq = localStorage.getItem('pcbk_master_requests');
 
                 if (masterEmp && JSON.parse(masterEmp).length > 0) {
-                    employees = JSON.parse(masterEmp);
+                    let parsed = JSON.parse(masterEmp);
+                    employees = parsed.filter(e => String(e.id) !== '1102051');
+                    employees.forEach((e, idx) => e.seq = idx + 1);
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset));
                     saveLocalData();
@@ -1175,6 +1205,13 @@
                 } else {
                     requests = [];
                 }
+
+                employees.forEach(emp => {
+                    const localImg = localStorage.getItem(`pcbk_avatar_${emp.id}`);
+                    if (localImg && localImg.startsWith('data:image')) {
+                        emp.avatar = localImg;
+                    }
+                });
             } catch (e) {
                 employees = JSON.parse(JSON.stringify(defaultDataset));
                 requests = [];
@@ -1188,26 +1225,49 @@
             } catch (e) {}
         }
 
-        // ================= CLOUD SYNC =================
+        // ================= CLOUD SYNC & AUTO HEALING =================
         async function syncFromCloud() {
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
                 
                 if (data && data.status === "success") {
+                    let needsCloudUpdate = false;
+
                     if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        employees = data.employees;
+                        let cloudList = data.employees.filter(e => String(e.id) !== '1102051');
+                        cloudList.forEach((cloudEmp, idx) => {
+                            cloudEmp.seq = idx + 1;
+                            const localAvatar = localStorage.getItem(`pcbk_avatar_${cloudEmp.id}`);
+                            
+                            if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
+                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
+                            } 
+                            else if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
+                                cloudEmp.avatar = localAvatar;
+                                needsCloudUpdate = true;
+                            }
+                        });
+                        employees = cloudList;
                     } else {
-                        saveEmployeesToCloud();
+                        needsCloudUpdate = true;
                     }
+
                     if (data.requests && Array.isArray(data.requests)) {
                         requests = data.requests;
                     }
                     
                     saveLocalData();
                     renderAllViews();
+
+                    if (needsCloudUpdate) {
+                        await saveEmployeesToCloud();
+                    }
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.warn("Sync from cloud failed:", err);
+                renderAllViews();
+            }
         }
 
         async function saveEmployeesToCloud() {
@@ -1427,8 +1487,10 @@
                 });
 
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
-                if (barCanvas && barCanvas.offsetParent !== null) {
-                    if (monthlyBarChartInstance) monthlyBarChartInstance.destroy();
+                if (barCanvas) {
+                    if (monthlyBarChartInstance) {
+                        monthlyBarChartInstance.destroy();
+                    }
                     const ctx = barCanvas.getContext('2d');
                     monthlyBarChartInstance = new Chart(ctx, {
                         type: 'bar',
@@ -1459,7 +1521,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: 'Prompt', size: 11 } } }
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
                             },
                             scales: {
                                 x: { stacked: true, grid: { display: false } },
@@ -1470,16 +1532,22 @@
                 }
 
                 const donutCanvas = document.getElementById('leaveDistributionDonutChart');
-                if (donutCanvas && donutCanvas.offsetParent !== null) {
-                    if (leaveDonutChartInstance) leaveDonutChartInstance.destroy();
+                if (donutCanvas) {
+                    if (leaveDonutChartInstance) {
+                        leaveDonutChartInstance.destroy();
+                    }
                     const ctx = donutCanvas.getContext('2d');
+                    const hasData = (totalVacAll + totalSickAll + totalOtherAll) > 0;
+                    const chartData = hasData ? [totalVacAll, totalSickAll, totalOtherAll] : [1, 0, 0];
+                    const chartColors = hasData ? ['#f59e0b', '#f43f5e', '#6366f1'] : ['#e2e8f0', '#e2e8f0', '#e2e8f0'];
+
                     leaveDonutChartInstance = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
                             labels: ['ลาพักร้อน', 'ลาป่วย', 'ลาอื่นๆ / ภารกิจ'],
                             datasets: [{
-                                data: [totalVacAll, totalSickAll, totalOtherAll],
-                                backgroundColor: ['#f59e0b', '#f43f5e', '#6366f1'],
+                                data: chartData,
+                                backgroundColor: chartColors,
                                 borderWidth: 3,
                                 borderColor: '#ffffff'
                             }]
@@ -1488,7 +1556,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { family: 'Prompt', size: 11 } } }
                             }
                         }
                     });
@@ -1499,10 +1567,12 @@
                         grandTotalTxt.innerText = `${grandTotal.toFixed(2)} วัน`;
                     }
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.warn("Chart render issue:", err);
+            }
         }
 
-        // ================= TAB 5: STAFF DIRECTORY RENDERING =================
+        // ================= TAB 5: STAFF DIRECTORY =================
         function renderStaffDirectory() {
             const execGrid = document.getElementById('directory-executives-grid');
             const staffGrid = document.getElementById('directory-staff-grid');
@@ -1519,58 +1589,69 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
-            filtered.forEach(emp => {
-                const isExec = emp.id === '1101001' || emp.id === '1102003';
+            const execList = filtered.filter(e => e.id === '1101001' || e.id === '1102003');
+            const staffList = filtered.filter(e => e.id !== '1101001' && e.id !== '1102003');
+
+            staffList.sort((a, b) => {
+                const timeA = getStartDateTimestamp(a.startDate);
+                const timeB = getStartDateTimestamp(b.startDate);
+                return timeA - timeB;
+            });
+
+            execList.forEach(emp => {
                 const avatar = getEmployeeAvatar(emp.id);
                 const tenure = calculateWorkTenure(emp.startDate);
-                const quota = getEmpRemainingQuotas(emp.id);
 
-                if (isExec) {
-                    execGrid.innerHTML += `
-                        <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
-                            <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
-                            <div class="space-y-1.5 flex-1">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                                    <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
-                                    <span class="bg-blue-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold self-center sm:self-auto">Executive Board</span>
-                                </div>
-                                <p class="text-xs text-blue-800 font-medium">${emp.position}</p>
-                                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-blue-100">
-                                    <div>รหัส: <strong class="font-mono">${emp.id}</strong></div>
-                                    <div>เริ่มงาน: <strong>${emp.startDate}</strong></div>
-                                    <div class="col-span-2">อายุงาน: <strong class="text-blue-700">${tenure}</strong></div>
-                                </div>
+                execGrid.innerHTML += `
+                    <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
+                        <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
+                        <div class="space-y-1.5 flex-1">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
+                                <span class="bg-blue-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold self-center sm:self-auto">Executive Board</span>
+                            </div>
+                            <p class="text-xs text-blue-800 font-medium">${emp.position}</p>
+                            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-blue-100">
+                                <div>รหัส: <strong class="font-mono">${emp.id}</strong></div>
+                                <div>วันเกิด: <strong>${emp.dob || '-'}</strong></div>
+                                <div>เริ่มงาน: <strong>${emp.startDate}</strong></div>
+                                <div>อายุงาน: <strong class="text-blue-700 font-bold">${tenure}</strong></div>
                             </div>
                         </div>
-                    `;
-                } else {
-                    staffGrid.innerHTML += `
-                        <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
-                            <div class="flex items-start space-x-3.5">
-                                <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
-                                <div class="space-y-0.5 flex-1">
-                                    <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
-                                    <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
-                                    <span class="inline-block text-[10px] text-slate-400 font-mono">ID: ${emp.id}</span>
-                                </div>
-                            </div>
-                            <div class="border-t border-slate-200/80 pt-3 space-y-1.5 text-[11px] text-slate-600">
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">วันเริ่มงาน:</span>
-                                    <strong>${emp.startDate}</strong>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-slate-400">อายุงาน PCBK:</span>
-                                    <strong class="text-blue-700">${tenure}</strong>
-                                </div>
-                                <div class="flex justify-between items-center pt-1">
-                                    <span class="text-slate-400">สิทธิ์พักร้อนคงเหลือ:</span>
-                                    <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold text-[10px]">${quota.vacRem.toFixed(2)} วัน</span>
-                                </div>
+                    </div>
+                `;
+            });
+
+            staffList.forEach(emp => {
+                const avatar = getEmployeeAvatar(emp.id);
+                const tenure = calculateWorkTenure(emp.startDate);
+
+                staffGrid.innerHTML += `
+                    <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
+                        <div class="flex items-start space-x-3.5">
+                            <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
+                            <div class="space-y-0.5 flex-1">
+                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
+                                <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
+                                <span class="inline-block text-[10px] text-slate-400 font-mono">รหัส: ${emp.id}</span>
                             </div>
                         </div>
-                    `;
-                }
+                        <div class="border-t border-slate-200/80 pt-3 space-y-1.5 text-[11px] text-slate-600">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">วัน/เดือน/ปีเกิด:</span>
+                                <strong class="text-slate-800">${emp.dob || '-'}</strong>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">วันเริ่มงาน:</span>
+                                <strong>${emp.startDate}</strong>
+                            </div>
+                            <div class="flex justify-between items-center pt-1 border-t border-slate-200/60">
+                                <span class="text-slate-400">อายุงาน PCBK:</span>
+                                <span class="bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full font-bold text-[10px]">${tenure}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
         }
 
@@ -2009,7 +2090,7 @@
                     ? '<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold">อนุมัติแล้ว</span>'
                     : isRej
                     ? '<span class="bg-rose-100 text-rose-700 text-xs px-2.5 py-1 rounded-full font-bold">ไม่อนุมัติ</span>'
-                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
+                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
 
                 container.innerHTML += `
                     <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row justify-between sm:items-center gap-4 card-hover">
@@ -2082,7 +2163,7 @@
                 btnReject.classList.add('hidden');
             }
 
-            document.getElementById('email-modal').classList.remove('hidden');
+            document.getElementById('email-modal').classList.add('hidden');
         }
 
         function closeEmailModal() {
@@ -2165,7 +2246,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
@@ -2193,15 +2274,15 @@
         }
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
+            const toy = document.getElementById('toast');
             const msgEl = document.getElementById('toast-message');
-            if (!toast || !msgEl) return;
+            if (!toy || !msgEl) return;
             msgEl.innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+            toy.classList.remove('translate-y-20', 'opacity-0');
+            toy.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
+                toy.classList.remove('translate-y-0', 'opacity-100');
+                toy.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
     </script>
