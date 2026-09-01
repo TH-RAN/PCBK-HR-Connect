@@ -142,6 +142,7 @@
             </div>
         </div>
 
+        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -165,7 +166,7 @@
                 <button type="button" onclick="switchTab('directory')" id="tab-btn-directory" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-address-book"></i>
                     <span>ทำเนียบพนักงาน</span>
-                    <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">10 คน</span>
+                    <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">11 คน</span>
                 </button>
                 <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-user"></i>
@@ -279,7 +280,7 @@
                                 <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน ลาป่วย และภารกิจ/ลาอื่นๆ</p>
                             </div>
                         </div>
-                        <div class="h-60 relative w-full">
+                        <div class="h-60 relative">
                             <canvas id="monthlyTrendBarChart"></canvas>
                         </div>
                     </div>
@@ -297,7 +298,7 @@
                                 <span id="grand-total-leaves-txt" class="text-slate-900 font-bold text-sm">0 วัน</span>
                             </div>
                         </div>
-                        <div class="h-52 relative w-full">
+                        <div class="h-52 relative">
                             <canvas id="leaveDistributionDonutChart"></canvas>
                         </div>
                     </div>
@@ -693,7 +694,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEa46Y6grR-vRGdNInvSiM5mM81XNE92hPQP4RbqARYC5sEw4SiHjK0GmrW3Oh7SXoaw/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -839,13 +840,19 @@
                 sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
             },
             {
-                seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
-                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 1, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 1, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                seq: 9, id: "1102051", name: "อาทิตยา รัตนพงษ์", position: "Engineer (วิศวกร)", dob: "15 มี.ค. 2541", startDate: "1 มี.ค. 2564", carryVacation: 6,
+                vacationAccrued: [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+                vacationUsedMonths: [1, 1, 2, 6, 0, 0, 0, 0, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "RESIGNED", avatar: ""
             },
             {
-                seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
+                seq: 10, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+            },
+            {
+                seq: 11, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
@@ -886,26 +893,16 @@
 
         function getEmployeeAvatar(empId) {
             const emp = employees.find(e => String(e.id) === String(empId));
-            if (emp && emp.avatar && emp.avatar.startsWith('data:image')) {
-                return emp.avatar;
-            }
+            if (emp && emp.avatar) return emp.avatar;
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
-            if (localSaved && localSaved.startsWith('data:image')) {
-                return localSaved;
-            }
+            if (localSaved) return localSaved;
             return `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            
-            try {
-                syncFromCloud();
-            } catch(e) {
-                renderAllViews();
-            }
-
+            renderAllViews();
             checkAutoLogin();
         });
 
@@ -953,6 +950,7 @@
                 localStorage.setItem('pcbk_device_auth_code', trimmed);
             }
 
+            // ซ่อนและลบ Login Modal ออกจาก DOM ทันที
             const modal = document.getElementById('login-modal');
             if (modal) {
                 modal.remove();
@@ -962,6 +960,7 @@
                 updateUserSessionUI();
                 renderAllViews();
                 
+                // ดึงแท็บล่าสุดที่เคยเปิดค้างไว้จาก localStorage (ถ้าไม่มีจะเปิด dashboard)
                 const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
                 switchTab(savedTab);
 
@@ -1063,7 +1062,7 @@
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxDim = 120;
+                    const maxDim = 200;
                     let w = img.width;
                     let h = img.height;
                     if (w > h) {
@@ -1076,7 +1075,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
 
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
 
                     const empIdx = employees.findIndex(emp => String(emp.id) === String(currentUser.id));
                     if (empIdx !== -1) {
@@ -1085,13 +1084,11 @@
                     currentUser.avatar = compressedBase64;
 
                     localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
-                    
-                    saveEmployeesToCloud().then(() => {
-                        updateUserSessionUI();
-                        renderTodayDashboard();
-                        renderStaffDirectory();
-                        showToast("อัปโหลดรูปภาพและซิงก์ขึ้น Cloud สำเร็จแล้ว");
-                    });
+                    saveEmployeesToCloud();
+                    updateUserSessionUI();
+                    renderTodayDashboard();
+                    renderStaffDirectory();
+                    showToast("อัปโหลดรูปภาพและบันทึกขึ้น Cloud สำเร็จแล้ว");
                 };
                 img.src = event.target.result;
             };
@@ -1151,6 +1148,7 @@
         }
 
         function switchTab(tabId) {
+            // บันทึกแท็บปัจจุบันลงใน localStorage เพื่อเปิดค้างไว้เมื่อ Refresh
             localStorage.setItem('pcbk_active_tab', tabId);
 
             const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'directory', 'profile'];
@@ -1174,7 +1172,7 @@
 
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
-                setTimeout(renderDashboardCharts, 100);
+                setTimeout(renderDashboardCharts, 80);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
@@ -1192,9 +1190,7 @@
                 const masterReq = localStorage.getItem('pcbk_master_requests');
 
                 if (masterEmp && JSON.parse(masterEmp).length > 0) {
-                    let parsed = JSON.parse(masterEmp);
-                    employees = parsed.filter(e => String(e.id) !== '1102051');
-                    employees.forEach((e, idx) => e.seq = idx + 1);
+                    employees = JSON.parse(masterEmp);
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset));
                     saveLocalData();
@@ -1205,13 +1201,6 @@
                 } else {
                     requests = [];
                 }
-
-                employees.forEach(emp => {
-                    const localImg = localStorage.getItem(`pcbk_avatar_${emp.id}`);
-                    if (localImg && localImg.startsWith('data:image')) {
-                        emp.avatar = localImg;
-                    }
-                });
             } catch (e) {
                 employees = JSON.parse(JSON.stringify(defaultDataset));
                 requests = [];
@@ -1225,49 +1214,26 @@
             } catch (e) {}
         }
 
-        // ================= CLOUD SYNC & AUTO HEALING =================
+        // ================= CLOUD SYNC =================
         async function syncFromCloud() {
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
                 
                 if (data && data.status === "success") {
-                    let needsCloudUpdate = false;
-
                     if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        let cloudList = data.employees.filter(e => String(e.id) !== '1102051');
-                        cloudList.forEach((cloudEmp, idx) => {
-                            cloudEmp.seq = idx + 1;
-                            const localAvatar = localStorage.getItem(`pcbk_avatar_${cloudEmp.id}`);
-                            
-                            if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
-                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
-                            } 
-                            else if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
-                                cloudEmp.avatar = localAvatar;
-                                needsCloudUpdate = true;
-                            }
-                        });
-                        employees = cloudList;
+                        employees = data.employees;
                     } else {
-                        needsCloudUpdate = true;
+                        saveEmployeesToCloud();
                     }
-
                     if (data.requests && Array.isArray(data.requests)) {
                         requests = data.requests;
                     }
                     
                     saveLocalData();
                     renderAllViews();
-
-                    if (needsCloudUpdate) {
-                        await saveEmployeesToCloud();
-                    }
                 }
-            } catch (err) {
-                console.warn("Sync from cloud failed:", err);
-                renderAllViews();
-            }
+            } catch (err) {}
         }
 
         async function saveEmployeesToCloud() {
@@ -1487,10 +1453,8 @@
                 });
 
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
-                if (barCanvas) {
-                    if (monthlyBarChartInstance) {
-                        monthlyBarChartInstance.destroy();
-                    }
+                if (barCanvas && barCanvas.offsetParent !== null) {
+                    if (monthlyBarChartInstance) monthlyBarChartInstance.destroy();
                     const ctx = barCanvas.getContext('2d');
                     monthlyBarChartInstance = new Chart(ctx, {
                         type: 'bar',
@@ -1521,7 +1485,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { family: 'Prompt', size: 11 } } }
                             },
                             scales: {
                                 x: { stacked: true, grid: { display: false } },
@@ -1532,22 +1496,16 @@
                 }
 
                 const donutCanvas = document.getElementById('leaveDistributionDonutChart');
-                if (donutCanvas) {
-                    if (leaveDonutChartInstance) {
-                        leaveDonutChartInstance.destroy();
-                    }
+                if (donutCanvas && donutCanvas.offsetParent !== null) {
+                    if (leaveDonutChartInstance) leaveDonutChartInstance.destroy();
                     const ctx = donutCanvas.getContext('2d');
-                    const hasData = (totalVacAll + totalSickAll + totalOtherAll) > 0;
-                    const chartData = hasData ? [totalVacAll, totalSickAll, totalOtherAll] : [1, 0, 0];
-                    const chartColors = hasData ? ['#f59e0b', '#f43f5e', '#6366f1'] : ['#e2e8f0', '#e2e8f0', '#e2e8f0'];
-
                     leaveDonutChartInstance = new Chart(ctx, {
                         type: 'doughnut',
                         data: {
                             labels: ['ลาพักร้อน', 'ลาป่วย', 'ลาอื่นๆ / ภารกิจ'],
                             datasets: [{
-                                data: chartData,
-                                backgroundColor: chartColors,
+                                data: [totalVacAll, totalSickAll, totalOtherAll],
+                                backgroundColor: ['#f59e0b', '#f43f5e', '#6366f1'],
                                 borderWidth: 3,
                                 borderColor: '#ffffff'
                             }]
@@ -1556,7 +1514,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { family: 'Prompt', size: 11 } } }
+                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
                             }
                         }
                     });
@@ -1567,9 +1525,7 @@
                         grandTotalTxt.innerText = `${grandTotal.toFixed(2)} วัน`;
                     }
                 }
-            } catch (err) {
-                console.warn("Chart render issue:", err);
-            }
+            } catch (err) {}
         }
 
         // ================= TAB 5: STAFF DIRECTORY =================
@@ -2090,7 +2046,7 @@
                     ? '<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold">อนุมัติแล้ว</span>'
                     : isRej
                     ? '<span class="bg-rose-100 text-rose-700 text-xs px-2.5 py-1 rounded-full font-bold">ไม่อนุมัติ</span>'
-                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
+                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
 
                 container.innerHTML += `
                     <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row justify-between sm:items-center gap-4 card-hover">
