@@ -590,7 +590,7 @@
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
                         <div class="relative group">
-                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-55">
+                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50">
                             <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
                                 <i class="fa-solid fa-camera text-xs"></i>
                             </label>
@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ดึงภาพจาก GitHub (.jpg) อัตโนมัติ + รองรับอัปโหลดทับได้</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ภาพสำรองน่ารักสดใส + รองรับอัปโหลดรูปทับได้</strong></div>
                     </div>
                 </div>
             </div>
@@ -883,7 +883,7 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ระบบจัดการรูปภาพอัจฉริยะ: เช็คภาพอัปโหลดในเครื่อง -> เช็คไฟล์ .jpg ใน GitHub -> ถ้าไม่มี ใช้ไอคอนชาย/หญิงแยกตามบุคคลทันที
+        // เช็ครูปภาพ: ถ้ามีอัปโหลดทับในเครื่อง -> ถ้าไม่มี ดึงไฟล์ .jpg ตามรหัสใน GitHub
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -893,24 +893,17 @@
             if (emp && emp.avatar && emp.avatar.startsWith('http')) {
                 return emp.avatar;
             }
-
-            // รายชื่อพนักงานหญิง (ให้ใช้ไอคอนผู้หญิง)
-            const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
-            const isFemale = femaleIds.includes(String(empId));
-            const defaultSeed = isFemale ? `female_${empId}` : `male_${empId}`;
-
-            // หากหาไฟล์ .jpg ใน GitHub ไม่เจอ ระบบจะเปลี่ยนไปใช้ Avatar ชาย/หญิง อัตโนมัติทันที
             return `./${empId}.jpg`;
         }
 
-        // ฟังก์ชันช่วยดักจับกรณีโหลดรูปจาก GitHub ไม่พบ ให้แปลงเป็นไอคอนการ์ตูนชาย/หญิงทันที
+        // หากหาไฟล์รูปใน GitHub ไม่เจอ จะแสดงอวาตาร์การ์ตูนน่ารัก (แยก หญิง/ชาย อัตโนมัติ)
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
-            // ใช้ DiceBear แยกเพศ (หญิงใช้ avataaars หรือ notionists, ชายใช้สไตล์เท่ๆ)
+            // ใช้สไตล์การ์ตูนน่ารักสดใสของ DiceBear
             imgElement.src = isFemale 
-                ? `https://api.dicebear.com/7.x/avataaars/svg?seed=woman_${empId}&backgroundColor=b6e3f4`
-                : `https://api.dicebear.com/7.x/avataaars/svg?seed=man_${empId}&backgroundColor=c0aede`;
+                ? `https://api.dicebear.com/7.x/micah/svg?seed=girl_${empId}&backgroundColor=ffd5dc`
+                : `https://api.dicebear.com/7.x/micah/svg?seed=boy_${empId}&backgroundColor=d1f4ff`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1070,7 +1063,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100% สำเร็จแน่นอน)
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100%)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -2164,7 +2157,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
