@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ภาพสำรองสุภาพเรียบร้อย (ผิวขาวผมยาวแสกกลาง) + รองรับอัปโหลดทับได้</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ภาพสำรองน่ารักสดใส + รองรับอัปโหลดรูปทับได้</strong></div>
                     </div>
                 </div>
             </div>
@@ -895,15 +895,15 @@
             return `./${empId}.jpg`;
         }
 
-        // ระบบสำรอง: ภาพหญิงสาวผิวขาว ผมยาวแสกกลาง เรียบร้อยอ่อนหวาน ละมุนตา
+        // ระบบสำรอง: หากไม่มีไฟล์ภาพ .jpg ใน GitHub จะแสดงภาพการ์ตูนผู้หญิงผิวขาวผมยาวแสกกลาง หรือผู้ชายสุภาพ
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
             
-            // ปรับโทนและคาแรกเตอร์ให้เป็นหญิงสาวผมยาวแสกกลาง หน้าตาน่ารักเรียบร้อย (Skin: f2d3b1 ผิวขาว, Hair: long01 ผมยาว)
+            // ใช้ DiceBear style 'adventurer' หรือ 'avataaars' ที่ปรับให้เป็นผู้หญิงผิวขาวผมยาวแสกกลางเรียบร้อยน่ารัก
             imgElement.src = isFemale 
-                ? `https://api.dicebear.com/7.x/avataaars/svg?seed=sweet_woman_${empId}&backgroundColor=b6e3f4&top=longHair&hairColor=2c1b18&skinColor=ffdbb4`
-                : `https://api.dicebear.com/7.x/avataaars/svg?seed=gentleman_${empId}&backgroundColor=c0aede&top=shortHair&skinColor=ffdbb4`;
+                ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_long_black_hair_${empId}&backgroundColor=ffd5dc&hair=long01&hairColor=0e0e0e&skinColor=f2d3b1`
+                : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff&skinColor=f2d3b1`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
