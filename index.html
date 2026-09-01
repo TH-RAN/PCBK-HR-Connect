@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ระบบ Standalone เสถียรและรวดเร็ว 100%</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ระบบ Standalone ทรงพลัง เสถียร 100% ไม่หมุนค้าง</strong></div>
                     </div>
                 </div>
             </div>
@@ -883,7 +883,6 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ระบบดึงรูปพนักงาน: ตรวจสอบทั้งรูปที่อัปโหลด และไฟล์ .jpg ใน GitHub
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -896,7 +895,6 @@
             return `./${empId}.jpg`;
         }
 
-        // ระบบสำรองกรณีไฟล์รูป .jpg ไม่พบ แสดงภาพการ์ตูนผู้หญิงผิวขาวผมยาวแสกกลาง หรือผู้ชายสุภาพ
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
@@ -1062,7 +1060,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100%)
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1698,7 +1696,7 @@
             });
         }
 
-        async function updateEmpField(empIndex, field, val) {
+        function updateEmpField(empIndex, field, val) {
             if (!isAdmin) return;
             if (field === 'carryVacation' || field === 'otherLeaveDays') {
                 employees[empIndex][field] = parseFloat(val) || 0;
@@ -1708,36 +1706,36 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveAllToCloud();
+            saveLocalData();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
-        async function updateVacAccruedMonth(empIndex, monthIdx, val) {
+        function updateVacAccruedMonth(empIndex, monthIdx, val) {
             if (!isAdmin) return;
             employees[empIndex].vacationAccrued[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveAllToCloud();
+            saveLocalData();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
-        async function updateVacUsedMonth(empIndex, monthIdx, val) {
+        function updateVacUsedMonth(empIndex, monthIdx, val) {
             if (!isAdmin) return;
             employees[empIndex].vacationUsedMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveAllToCloud();
+            saveLocalData();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
-        async function updateSickMonth(empIndex, monthIdx, val) {
+        function updateSickMonth(empIndex, monthIdx, val) {
             if (!isAdmin) return;
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
-            await saveAllToCloud();
+            saveLocalData();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1899,7 +1897,7 @@
             return days;
         }
 
-        async function handleLeaveSubmit(e) {
+        function handleLeaveSubmit(e) {
             e.preventDefault();
             const empId = document.getElementById('form-emp-id').value;
             const emp = employees.find(x => x.id === empId);
@@ -1955,7 +1953,7 @@
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลเข้าระบบ...`;
 
             requests.unshift(newReq);
-            await saveAllToCloud();
+            saveLocalData();
             renderAllViews();
 
             document.getElementById('leave-form').reset();
@@ -2040,7 +2038,7 @@
             });
         }
 
-        async function deleteLeaveRequest(reqId) {
+        function deleteLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการลบรายการ");
                 return;
@@ -2048,7 +2046,7 @@
             const conf = confirm("คุณต้องการลบรายการคำขอลานี้อย่างถาวรหรือไม่?");
             if (conf) {
                 requests = requests.filter(r => r.id !== reqId);
-                await saveAllToCloud();
+                saveLocalData();
                 renderAllViews();
                 showToast("ลบรายการคำขอลาเรียบร้อยแล้ว");
             }
@@ -2088,7 +2086,7 @@
             activeModalReqId = null;
         }
 
-        async function approveLeaveRequest(reqId) {
+        function approveLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการอนุมัติ");
                 return;
@@ -2113,13 +2111,13 @@
                     }
                 }
 
-                await saveAllToCloud();
+                saveLocalData();
                 renderAllViews();
                 showToast(`อนุมัติวันลาของ ${req.empName} เรียบร้อยแล้ว`);
             }
         }
 
-        async function rejectLeaveRequest(reqId) {
+        function rejectLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการปฏิเสธ");
                 return;
@@ -2127,7 +2125,7 @@
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
-                await saveAllToCloud();
+                saveLocalData();
                 renderAllViews();
                 showToast(`ปฏิเสธคำขอลางานของ ${req.empName} แล้ว`);
             }
@@ -2163,7 +2161,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
