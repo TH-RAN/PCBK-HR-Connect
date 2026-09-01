@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ระบบ Standalone ทรงพลัง เสถียร 100% ไม่หมุนค้าง</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ระบบ Standalone เสถียร 100% ไม่หมุนค้าง</strong></div>
                     </div>
                 </div>
             </div>
@@ -883,6 +883,7 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
+        // ระบบดึงรูปภาพ: ตรวจสอบจาก LocalStorage ก่อน หากไม่มีให้ใช้ Avatar สำรองน่ารักทันทีโดยไม่โหลดไฟล์พาร์ทผิด
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -892,13 +893,10 @@
             if (emp && emp.avatar && emp.avatar.startsWith('http')) {
                 return emp.avatar;
             }
-            return `./${empId}.jpg`;
-        }
-
-        function handleImageError(imgElement, empId) {
+            // ใช้ Avatar สำรองออนไลน์ทันที ป้องกัน Error 404 บน GitHub Pages
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
-            imgElement.src = isFemale 
+            return isFemale 
                 ? `https://api.dicebear.com/7.x/avataaars/svg?seed=woman_long_hair_${empId}&backgroundColor=b6e3f4&top=longHair&hairColor=2c1b18&skinColor=ffdbb4`
                 : `https://api.dicebear.com/7.x/avataaars/svg?seed=gentleman_${empId}&backgroundColor=c0aede&top=shortHair&skinColor=ffdbb4`;
         }
@@ -997,7 +995,6 @@
 
             if (avatarEl) {
                 avatarEl.src = getEmployeeAvatar(currentUser.id);
-                avatarEl.onerror = function() { handleImageError(this, currentUser.id); };
             }
 
             updateAdminUI();
@@ -1019,7 +1016,6 @@
 
             if (photoEl) {
                 photoEl.src = getEmployeeAvatar(currentUser.id);
-                photoEl.onerror = function() { handleImageError(this, currentUser.id); };
             }
 
             if (nameEl) nameEl.innerText = formatDisplayName(currentUser);
@@ -1060,7 +1056,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่านเครื่อง
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100%)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1316,7 +1312,7 @@
                                 <div>
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-2.5">
-                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-8 h-8 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="handleImageError(this, '${r.empId}')">
+                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-8 h-8 rounded-full object-cover bg-blue-100 border border-slate-200">
                                             <div>
                                                 <span class="font-bold text-slate-900 text-xs block leading-tight">${formatDisplayName(emp) || r.empName}</span>
                                                 <span class="text-[10px] text-slate-400 font-mono">รหัส: ${r.empId}</span>
@@ -1529,7 +1525,7 @@
 
                 execGrid.innerHTML += `
                     <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
-                        <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white" onerror="handleImageError(this, '${emp.id}')">
+                        <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
                         <div class="space-y-1.5 flex-1">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                                 <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
@@ -1554,9 +1550,9 @@
                 staffGrid.innerHTML += `
                     <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
                         <div class="flex items-start space-x-3.5">
-                            <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white" onerror="handleImageError(this, '${emp.id}')">
+                            <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
                             <div class="space-y-0.5 flex-1">
-                                <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
+                                <h4 class="font-bold text-slate-900 text-sm sm:text-base leading-tight">${formatDisplayName(emp)}</h4>
                                 <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
                                 <span class="inline-block text-[10px] text-slate-400 font-mono">รหัส: ${emp.id}</span>
                             </div>
@@ -2161,7 +2157,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
