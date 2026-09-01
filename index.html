@@ -170,7 +170,7 @@
     </header>
 
     <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         <!-- ================= TAB 1: EXECUTIVE DASHBOARD (TWO-COLUMN DESKTOP LAYOUT) ================= -->
         <section id="tab-dashboard" class="tab-content space-y-6">
@@ -249,7 +249,7 @@
                         </div>
                     </div>
 
-                    <!-- Attendance List Box -->
+                    <!-- Attendance List Box with Avatars -->
                     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                             <div>
@@ -551,7 +551,7 @@
                 <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
                     <div>
                         <h2 class="font-bold text-slate-900 text-xl">ศูนย์พิจารณาอนุมัติวันลา (Approval Center)</h2>
-                        <p class="text-xs sm:text-sm text-slate-500">ตรวจสอบและพิจารณาอนุมัติคำขอลางาน (เฉพาะผู้ดูแลระบบที่มีรหัสผ่านเท่านั้น)</p>
+                        <p class="text-xs sm:text-sm text-slate-500" id="approval-center-subtitle">รายการคำขอลางาน</p>
                     </div>
                 </div>
 
@@ -670,7 +670,6 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyRfMGTXZxgLk9KhzDZa7B2oada73J1_zsgPicW355JGFxI_-eptkxLfIbZJIFnzx1Caw/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
-        // ฟังก์ชันดึงวันเวลาปัจจุบันแบบ Dynamic เสมอ
         function getLiveDateData() {
             const liveNow = new Date();
             const yearAD = liveNow.getFullYear();
@@ -781,6 +780,13 @@
             return raw.replace(/^(นาย|นางสาว|นาง)\s*/g, '');
         }
 
+        // ตรวจสอบสิทธิ์ว่าเป็นผู้บริหาร (ดร.ทั้งสองท่าน) หรือ Admin หรือไม่
+        function isExecutiveOrAdmin() {
+            if (isAdmin) return true;
+            if (!currentUser) return false;
+            return currentUser.id === '1101001' || currentUser.id === '1102003';
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
@@ -872,7 +878,7 @@
 
             if (nameEl) nameEl.innerText = formatDisplayName(currentUser).split(' ')[0] || formatDisplayName(currentUser);
             if (roleEl) {
-                roleEl.innerText = isAdmin ? 'ผู้ดูแลระบบ' : 'พนักงาน';
+                roleEl.innerText = isAdmin ? 'ผู้ดูแลระบบ' : (isExecutiveOrAdmin() ? 'ผู้บริหาร' : 'พนักงาน');
                 roleEl.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold' : 'bg-blue-100 text-blue-700 text-[10px] px-2 py-0.5 rounded-full font-bold';
             }
 
@@ -907,7 +913,7 @@
             if (carryEl) carryEl.innerText = currentUser.carryVacation || '0';
 
             if (roleChip) {
-                roleChip.innerText = isAdmin ? 'ผู้ดูแลระบบ (Admin)' : 'พนักงานประจำ';
+                roleChip.innerText = isAdmin ? 'ผู้ดูแลระบบ (Admin)' : (isExecutiveOrAdmin() ? 'ผู้บริหาร (Executive)' : 'พนักงานประจำ');
                 roleChip.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-xs px-2.5 py-0.5 rounded-full font-bold' : 'bg-blue-100 text-blue-700 text-xs px-2.5 py-0.5 rounded-full font-bold';
             }
 
@@ -944,6 +950,7 @@
                 const base64Data = event.target.result;
                 localStorage.setItem(`pcbk_avatar_${currentUser.id}`, base64Data);
                 updateUserSessionUI();
+                renderTodayDashboard();
                 showToast("อัปโหลดรูปภาพโปรไฟล์เรียบร้อยแล้ว");
             };
             reader.readAsDataURL(file);
@@ -1131,13 +1138,20 @@
             const todayBadge = document.getElementById('badge-today-count');
             if (todayBadge) todayBadge.innerText = `${todayApprovedLeaves.length} คนลา`;
 
-            const pendingReqs = requests.filter(r => !isApprovedStatus(r.status) && !isRejectedStatus(r.status));
+            // นับคำขอที่รอตรวจตามสิทธิ์ของผู้ใช้งาน
+            let pendingCount = 0;
+            if (isExecutiveOrAdmin()) {
+                pendingCount = requests.filter(r => !isApprovedStatus(r.status) && !isRejectedStatus(r.status)).length;
+            } else if (currentUser) {
+                pendingCount = requests.filter(r => String(r.empId) === String(currentUser.id) && !isApprovedStatus(r.status) && !isRejectedStatus(r.status)).length;
+            }
+
             const pendingBadge = document.getElementById('badge-pending-count');
             const heroPendingTxt = document.getElementById('hero-btn-pending-txt');
 
             if (pendingBadge) {
-                pendingBadge.innerText = `${pendingReqs.length} รอตรวจ`;
-                if (pendingReqs.length > 0) {
+                pendingBadge.innerText = `${pendingCount} รอตรวจ`;
+                if (pendingCount > 0) {
                     pendingBadge.className = 'bg-rose-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold animate-pulse';
                 } else {
                     pendingBadge.className = 'bg-slate-200 text-slate-700 text-[11px] px-2 py-0.5 rounded-full font-bold';
@@ -1145,7 +1159,7 @@
             }
 
             if (heroPendingTxt) {
-                heroPendingTxt.innerText = `มีคำขอรออนุมัติ (${pendingReqs.length})`;
+                heroPendingTxt.innerText = `มีคำขอรออนุมัติ (${pendingCount})`;
             }
         }
 
@@ -1190,14 +1204,27 @@
                         const emp = employees.find(e => e.id === r.empId);
                         const pos = emp ? emp.position : 'พนักงาน';
                         const badgeColor = r.type.includes('พักร้อน') ? 'bg-amber-100 text-amber-900' : r.type.includes('ป่วย') ? 'bg-rose-100 text-rose-900' : 'bg-purple-100 text-purple-900';
+                        
+                        const savedAvatar = localStorage.getItem(`pcbk_avatar_${r.empId}`);
+                        const defaultAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${r.empId}`;
+                        const avatarSrc = savedAvatar || defaultAvatar;
+
                         cardsHtml += `
-                            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2 card-hover">
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-slate-900 text-xs">${formatDisplayName(emp) || r.empName}</span>
-                                    <span class="text-[10px] ${badgeColor} px-2.5 py-0.5 rounded-full font-bold">${r.type}</span>
+                            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2 card-hover flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2.5">
+                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-8 h-8 rounded-full object-cover bg-blue-100 border border-slate-200">
+                                            <div>
+                                                <span class="font-bold text-slate-900 text-xs block leading-tight">${formatDisplayName(emp) || r.empName}</span>
+                                                <span class="text-[10px] text-slate-400 font-mono">รหัส: ${r.empId}</span>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] ${badgeColor} px-2.5 py-0.5 rounded-full font-bold">${r.type}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-2">${pos}</p>
                                 </div>
-                                <p class="text-[11px] text-slate-500">รหัส: ${r.empId} • ${pos}</p>
-                                <div class="text-[11px] text-slate-600 border-t border-slate-200 pt-2 space-y-1">
+                                <div class="text-[11px] text-slate-600 border-t border-slate-200 pt-2 space-y-0.5">
                                     <div><strong>ระยะเวลา:</strong> ${r.days} วัน</div>
                                     <div><strong>เหตุผล/รายละเอียด:</strong> ${r.reason || '-'}</div>
                                 </div>
@@ -1402,7 +1429,6 @@
                 const remainingVacation = Math.max(0, carryVal + totalAccrued - totalVacationUsed);
                 const finalOtherUsed = parseFloat(e.otherLeaveDays) || 0;
 
-                // ตรวจสอบว่าเป็นบัญชีที่ล็อกอินอยู่หรือไม่ เพื่อทำการไฮไลต์สีฟ้าอ่อน
                 const isCurrentLoggedIn = currentUser && String(currentUser.id) === String(e.id);
                 const rowHighlightClass = isCurrentLoggedIn ? 'my-row-highlight font-semibold' : 'hover:bg-slate-100/80';
 
@@ -1524,10 +1550,10 @@
             
             employees.forEach(e => {
                 const isCurrent = currentUser && String(currentUser.id) === String(e.id) ? 'selected' : '';
+                // ลบวงเล็บซ้ำซ้อน
                 sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${formatDisplayName(e)} (${e.position})</option>`;
             });
 
-            // ถ้าเป็นพนักงานทั่วไป ให้เลือกชื่อตนเองและล็อกไม่ให้กดเปลี่ยน (Admin เท่านั้นที่เลือกคนอื่นได้)
             if (!isAdmin && currentUser && currentUser.id !== 'ADMIN') {
                 sel.value = currentUser.id;
                 sel.disabled = true;
@@ -1755,24 +1781,38 @@
             showToast("ยื่นใบลาเข้าระบบเรียบร้อยแล้ว");
         }
 
-        // ================= APPROVAL CENTER & ADMIN DELETE =================
+        // ================= APPROVAL CENTER & ROLE-BASED FILTERING =================
         function renderApprovalQueue() {
             const container = document.getElementById('approval-list');
+            const subtitle = document.getElementById('approval-center-subtitle');
             if (!container) return;
             container.innerHTML = '';
 
-            if (requests.length === 0) {
+            const canManageAll = isExecutiveOrAdmin();
+            if (subtitle) {
+                subtitle.innerText = canManageAll 
+                    ? 'ตรวจสอบและพิจารณาอนุมัติคำขอลางานของพนักงานทุกคน' 
+                    : 'ประวัติการยื่นคำขอลางานของคุณ';
+            }
+
+            // กรองรายการ: ถ้าเป็น ดร. หรือ Admin ให้ดูได้หมด ถ้าเป็นพนักงานทั่วไปให้ดูเฉพาะของตัวเอง
+            let visibleRequests = requests;
+            if (!canManageAll && currentUser) {
+                visibleRequests = requests.filter(r => String(r.empId) === String(currentUser.id));
+            }
+
+            if (visibleRequests.length === 0) {
                 container.innerHTML = `
                     <div class="p-10 text-center text-slate-400 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                         <i class="fa-solid fa-inbox text-3xl mb-2 text-slate-300"></i>
                         <p class="font-medium text-slate-600 text-sm">ยังไม่มีคำขอลางานในระบบ</p>
-                        <p class="text-xs text-slate-400 mt-1">เมื่อพนักงานส่งใบลา รายการจะปรากฏที่นี่ทันที</p>
+                        <p class="text-xs text-slate-400 mt-1">${canManageAll ? 'เมื่อพนักงานส่งใบลา รายการจะปรากฏที่นี่ทันที' : 'เมื่อคุณยื่นคำขอลา ประวัติจะปรากฏที่นี่'}</p>
                     </div>
                 `;
                 return;
             }
 
-            requests.forEach(r => {
+            visibleRequests.forEach(r => {
                 const isApp = isApprovedStatus(r.status);
                 const isRej = isRejectedStatus(r.status);
                 const isPend = !isApp && !isRej;
@@ -1800,12 +1840,12 @@
                             <button type="button" onclick="openEmailModal('${r.id}')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-2 rounded-xl transition cursor-pointer">
                                 <i class="fa-solid fa-envelope mr-1"></i> ดูรายละเอียด
                             </button>
-                            ${(isAdmin && isPend) ? `
+                            ${(canManageAll && isPend) ? `
                                 <button type="button" onclick="approveLeaveRequest('${r.id}')" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer">อนุมัติ</button>
                                 <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3.5 py-2 rounded-xl transition cursor-pointer">ปฏิเสธ</button>
                             ` : ''}
-                            ${isAdmin ? `
-                                <button type="button" onclick="deleteLeaveRequest('${r.id}')" title="ลบรายการนี้ (Admin Only)" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl border border-rose-200 transition cursor-pointer">
+                            ${canManageAll ? `
+                                <button type="button" onclick="deleteLeaveRequest('${r.id}')" title="ลบรายการนี้ (Admin/ผู้บริหาร)" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl border border-rose-200 transition cursor-pointer">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             ` : ''}
@@ -1815,8 +1855,8 @@
         }
 
         async function deleteLeaveRequest(reqId) {
-            if (!isAdmin) {
-                alert("ต้องใช้สิทธิ์ผู้ดูแลระบบ (Admin) ในการลบรายการ");
+            if (!isExecutiveOrAdmin()) {
+                alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการลบรายการ");
                 return;
             }
             const conf = confirm("คุณต้องการลบรายการคำขอลานี้อย่างถาวรหรือไม่?");
@@ -1834,6 +1874,7 @@
             activeModalReqId = reqId;
 
             const isPend = !isApprovedStatus(req.status) && !isRejectedStatus(req.status);
+            const canManage = isExecutiveOrAdmin();
 
             document.getElementById('email-emp-name').innerText = req.empName;
             document.getElementById('email-detail-type').innerText = `${req.type} (${req.days} วัน)`;
@@ -1843,7 +1884,7 @@
             const btnApprove = document.getElementById('email-btn-approve');
             const btnReject = document.getElementById('email-btn-reject');
 
-            if (isAdmin && isPend) {
+            if (canManage && isPend) {
                 btnApprove.classList.remove('hidden');
                 btnReject.classList.remove('hidden');
                 btnApprove.onclick = function() { approveLeaveRequest(req.id); closeEmailModal(); };
@@ -1862,8 +1903,8 @@
         }
 
         async function approveLeaveRequest(reqId) {
-            if (!isAdmin) {
-                alert("ต้องใช้สิทธิ์ผู้ดูแลระบบ (Admin) ในการอนุมัติ");
+            if (!isExecutiveOrAdmin()) {
+                alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการอนุมัติ");
                 return;
             }
             const req = requests.find(r => r.id === reqId);
@@ -1893,8 +1934,8 @@
         }
 
         async function rejectLeaveRequest(reqId) {
-            if (!isAdmin) {
-                alert("ต้องใช้สิทธิ์ผู้ดูแลระบบ (Admin) ในการปฏิเสธ");
+            if (!isExecutiveOrAdmin()) {
+                alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการปฏิเสธ");
                 return;
             }
             const req = requests.find(r => r.id === reqId);
