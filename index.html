@@ -142,7 +142,6 @@
             </div>
         </div>
 
-        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -1418,7 +1417,7 @@
                     }
 
                     const carry = parseFloat(e.carryVacation) || 0;
-                    const remVac = Math.max(0, carry + totalAccrued - usedVac);
+                    const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
                     
                     let usedSick = 0;
                     if (e.sickMonths && Array.isArray(e.sickMonths)) {
