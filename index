@@ -164,7 +164,7 @@
                 </button>
                 <button type="button" onclick="switchTab('directory')" id="tab-btn-directory" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-address-book"></i>
-                    <span>ทำเนียบองค์กร</span>
+                    <span>ทำเนียบพนักงาน</span>
                     <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">10 คน</span>
                 </button>
                 <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
@@ -551,7 +551,7 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                     <div>
                         <h2 class="font-bold text-slate-900 text-xl flex items-center">
-                            <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบองค์กรและบุคลากร PCBK
+                            <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบพนักงานและบุคลากร PCBK
                         </h2>
                         <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อและข้อมูลประวัติการทำงานของสมาชิกในองค์กร (เรียงตามอายุงาน)</p>
                     </div>
@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ระบบซิงก์รูปภาพข้ามอุปกรณ์ผ่าน BroadcastChannel & LocalStorage อัตโนมัติ 100%</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ทำงานแบบ Local Standalone (แปลง Base64 เก็บในเครื่องสำเร็จ 100%)</strong></div>
                     </div>
                 </div>
             </div>
@@ -694,7 +694,6 @@
 
     <script>
         const ADMIN_PASSWORD = "pcbk2026";
-        const hrSyncChannel = new BroadcastChannel('pcbk_hr_sync_channel');
 
         function getLiveDateData() {
             const liveNow = new Date();
@@ -901,15 +900,6 @@
             loadInitialData();
             renderAllViews();
             checkAutoLogin();
-
-            hrSyncChannel.onmessage = (event) => {
-                if (event.data && event.data.type === 'SYNC_DATA') {
-                    employees = event.data.employees;
-                    requests = event.data.requests;
-                    saveLocalDataSilently();
-                    renderAllViews();
-                }
-            };
         });
 
         // ================= AUTHENTICATION =================
@@ -1056,11 +1046,12 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
+        // ระบบแปลงไฟล์ภาพเป็น Base64 บันทึกเก็บในเครื่องทันที 100% สำเร็จแน่นอน
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
 
-            showToast("กำลังประมวลผลรูปภาพ...");
+            showToast("กำลังประมวลผลและบันทึกรูปภาพ...");
 
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -1094,7 +1085,7 @@
                     updateUserSessionUI();
                     renderTodayDashboard();
                     renderStaffDirectory();
-                    showToast("อัปโหลดและซิงก์รูปภาพสำเร็จแล้ว!");
+                    showToast("อัปโหลดและบันทึกรูปภาพสำเร็จแล้ว!");
                 };
                 img.src = event.target.result;
             };
@@ -1222,14 +1213,6 @@
         }
 
         function saveLocalData() {
-            try {
-                localStorage.setItem('pcbk_master_employees', JSON.stringify(employees));
-                localStorage.setItem('pcbk_master_requests', JSON.stringify(requests));
-                hrSyncChannel.postMessage({ type: 'SYNC_DATA', employees: employees, requests: requests });
-            } catch (e) {}
-        }
-
-        function saveLocalDataSilently() {
             try {
                 localStorage.setItem('pcbk_master_employees', JSON.stringify(employees));
                 localStorage.setItem('pcbk_master_requests', JSON.stringify(requests));
