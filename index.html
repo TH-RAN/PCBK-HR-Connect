@@ -172,9 +172,8 @@
     <!-- Main Content Area -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- ================= TAB 1: EXECUTIVE DASHBOARD (TWO-COLUMN DESKTOP LAYOUT) ================= -->
+        <!-- ================= TAB 1: EXECUTIVE DASHBOARD ================= -->
         <section id="tab-dashboard" class="tab-content space-y-6">
-            <!-- Hero Gradient Banner -->
             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-3xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="relative z-10 space-y-1.5">
                     <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
@@ -199,7 +198,7 @@
 
             <!-- Two-Column Side-by-Side Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Left Column: KPI Cards & Today Absences -->
+                <!-- Left Column -->
                 <div class="lg:col-span-6 space-y-6">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
@@ -269,7 +268,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Monthly Bar Chart & Leave Distribution Donut -->
+                <!-- Right Column -->
                 <div class="lg:col-span-6 space-y-6">
                     <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
                         <div class="flex items-center justify-between">
@@ -464,17 +463,17 @@
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1.5">ระยะเวลาการลา *</label>
                         <div class="grid grid-cols-3 gap-3">
-                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">1.0 วัน</span>
                                 <span class="text-[10px] text-slate-500">เต็มวัน (8 ชม.)</span>
                             </label>
-                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">0.5 วัน</span>
                                 <span class="text-[10px] text-slate-500">ครึ่งวัน (4 ชม.)</span>
                             </label>
-                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
+                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
                                 <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions()" class="hidden">
                                 <span class="font-bold text-xs text-slate-800">0.25 วัน</span>
                                 <span class="text-[10px] text-slate-500">ออกธุระ (2 ชม.)</span>
@@ -692,60 +691,62 @@
             return { liveNow, yearAD, yearBE, iso, thaiText, thaiMonthsFull };
         }
 
-        // ฟังก์ชันคำนวณอายุงาน (ปี เดือน วัน) จากข้อความวันเริ่มงาน
+        // คำนวณอายุงานอัตโนมัติอย่างปลอดภัย
         function calculateWorkTenure(startDateStr) {
-            if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
-                return 'ยังไม่ได้ระบุวันเริ่มงาน';
+            try {
+                if (!startDateStr || startDateStr.trim() === '-' || startDateStr.trim() === '') {
+                    return 'ยังไม่ได้ระบุวันเริ่มงาน';
+                }
+
+                const thaiMonthMap = {
+                    "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
+                    "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
+                };
+
+                const parts = startDateStr.trim().split(/\s+/);
+                if (parts.length < 3) return startDateStr;
+
+                const day = parseInt(parts[0], 10);
+                const month = thaiMonthMap[parts[1]];
+                let year = parseInt(parts[2], 10);
+
+                if (isNaN(day) || month === undefined || isNaN(year)) return startDateStr;
+
+                if (year > 2400) {
+                    year -= 543;
+                }
+
+                const startDate = new Date(year, month, day);
+                const now = new Date();
+
+                if (startDate > now) {
+                    return 'เริ่มงานในอนาคต';
+                }
+
+                let years = now.getFullYear() - startDate.getFullYear();
+                let months = now.getMonth() - startDate.getMonth();
+                let days = now.getDate() - startDate.getDate();
+
+                if (days < 0) {
+                    months -= 1;
+                    const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                    days += prevMonthLastDay;
+                }
+
+                if (months < 0) {
+                    years -= 1;
+                    months += 12;
+                }
+
+                const res = [];
+                if (years > 0) res.push(`${years} ปี`);
+                if (months > 0) res.push(`${months} เดือน`);
+                if (days > 0 || res.length === 0) res.push(`${days} วัน`);
+
+                return res.join(' ');
+            } catch (err) {
+                return startDateStr || '-';
             }
-
-            const thaiMonthMap = {
-                "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
-                "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
-            };
-
-            const parts = startDateStr.trim().split(/\s+/);
-            if (parts.length < 3) return startDateStr;
-
-            const day = parseInt(parts[0], 10);
-            const month = thaiMonthMap[parts[1]];
-            let year = parseInt(parts[2], 10);
-
-            if (isNaN(day) || month === undefined || isNaN(year)) return startDateStr;
-
-            // แปลง พ.ศ. เป็น ค.ศ.
-            if (year > 2400) {
-                year -= 543;
-            }
-
-            const startDate = new Date(year, month, day);
-            const now = new Date();
-
-            if (startDate > now) {
-                return 'เริ่มงานในอนาคต';
-            }
-
-            let years = now.getFullYear() - startDate.getFullYear();
-            let months = now.getMonth() - startDate.getMonth();
-            let days = now.getDate() - startDate.getDate();
-
-            if (days < 0) {
-                months -= 1;
-                // หาวันที่ของเดือนก่อนหน้า
-                const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-                days += prevMonthLastDay;
-            }
-
-            if (months < 0) {
-                years -= 1;
-                months += 12;
-            }
-
-            const res = [];
-            if (years > 0) res.push(`${years} ปี`);
-            if (months > 0) res.push(`${months} เดือน`);
-            if (days > 0 || res.length === 0) res.push(`${days} วัน`);
-
-            return res.join(' ');
         }
 
         const defaultDataset = [
@@ -872,7 +873,7 @@
             } else {
                 const loginModal = document.getElementById('login-modal');
                 if (loginModal) {
-                    loginModal.style.display = 'flex';
+                    loginModal.style.setProperty('display', 'flex', 'important');
                     loginModal.classList.remove('hidden');
                 }
             }
@@ -909,10 +910,11 @@
                 localStorage.setItem('pcbk_device_auth_code', trimmed);
             }
 
+            // ซ่อนหน้าต่าง Modal ทันที 100%
             const modal = document.getElementById('login-modal');
             if (modal) {
                 modal.classList.add('hidden');
-                modal.style.display = 'none';
+                modal.style.setProperty('display', 'none', 'important');
             }
 
             updateUserSessionUI();
@@ -933,7 +935,7 @@
                 if (codeInput) codeInput.value = '';
                 const modal = document.getElementById('login-modal');
                 if (modal) {
-                    modal.style.display = 'flex';
+                    modal.style.setProperty('display', 'flex', 'important');
                     modal.classList.remove('hidden');
                 }
             }
@@ -980,7 +982,6 @@
             if (startEl) startEl.innerText = currentUser.startDate || '-';
             if (carryEl) carryEl.innerText = currentUser.carryVacation || '0';
 
-            // แสดงผลการคำนวณอายุงานอัตโนมัติ
             if (tenureEl) tenureEl.innerText = calculateWorkTenure(currentUser.startDate);
 
             if (roleChip) {
@@ -1480,7 +1481,7 @@
             } catch (err) {}
         }
 
-        // ================= FULL MATRIX RENDERING (WITH ROW HIGHLIGHT) =================
+        // ================= FULL MATRIX RENDERING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -1643,7 +1644,6 @@
             
             employees.forEach(e => {
                 const isCurrent = currentUser && String(currentUser.id) === String(e.id) ? 'selected' : '';
-                // ลบวงเล็บซ้อน
                 sel.innerHTML += `<option value="${e.id}" ${isCurrent}>${formatDisplayName(e)} (${e.position})</option>`;
             });
 
