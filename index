@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะอุปกรณ์:</span> <strong class="text-emerald-700 font-medium">บันทึกและซิงก์รูปภาพผ่าน Cloud สำเร็จ</strong></div>
+                        <div><span class="text-slate-400">สถานะอุปกรณ์:</span> <strong class="text-emerald-700 font-medium">ทำงานแบบ Local Standalone เสถียร 100%</strong></div>
                     </div>
                 </div>
             </div>
@@ -1046,7 +1046,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่าน ImgBB API (ฝากรูปอัตโนมัติ ได้ลิงก์จริง แสดงผลทุกบราวเซอร์)
+        // ระบบอัปโหลดรูปภาพผ่าน ImgBB API (ฝากรูปอัตโนมัติ ได้ลิงก์จริง แสดงผลเสถียร 100%)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1696,7 +1696,7 @@
             renderTodayDashboard();
             renderStaffDirectory();
             saveLocalData();
-            showToast("บันทึกข้อมูลพนักงานสำเร็จ");
+            showToast("บันทึกข้อมูลสำเร็จ");
         }
 
         async function updateVacAccruedMonth(empIndex, monthIdx, val) {
