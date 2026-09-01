@@ -125,7 +125,7 @@
 
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-2xl text-xs font-medium cursor-pointer hover:bg-slate-100 transition" onclick="switchTab('profile')">
-                        <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200">
+                        <img id="header-user-avatar" src="" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'">
                         <span id="header-user-name" class="text-slate-800 font-bold">กำลังโหลด...</span>
                         <span id="header-role-badge" class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">พนักงาน</span>
                     </div>
@@ -590,7 +590,7 @@
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
                         <div class="relative group">
-                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50">
+                            <img id="profile-card-avatar" src="" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback'">
                             <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
                                 <i class="fa-solid fa-camera text-xs"></i>
                             </label>
@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">เชื่อมต่อ Cloud กลางสมบูรณ์ (ทุกคนเห็นตรงกัน)</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ระบบ Standalone เสถียรและรวดเร็ว 100%</strong></div>
                     </div>
                 </div>
             </div>
@@ -693,7 +693,6 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvSNCwL3gSCq8MJcIVjq3im84mtkfo1fetZYtKZgwsAYMgVL7Z_gva8IcCrBYT7aXMLg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -884,7 +883,7 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ระบบดึงรูป: รองรับทั้งไฟล์ .jpg บน GitHub และรูปที่อัปโหลด (เพิ่ม Timestamp ป้องกันแคชเก่าค้าง)
+        // ระบบดึงรูปพนักงาน: ตรวจสอบทั้งรูปที่อัปโหลด และไฟล์ .jpg ใน GitHub
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -894,80 +893,24 @@
             if (emp && emp.avatar && emp.avatar.startsWith('http')) {
                 return emp.avatar;
             }
-            return `./${empId}.jpg?v=` + Date.now();
+            return `./${empId}.jpg`;
         }
 
+        // ระบบสำรองกรณีไฟล์รูป .jpg ไม่พบ แสดงภาพการ์ตูนผู้หญิงผิวขาวผมยาวแสกกลาง หรือผู้ชายสุภาพ
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
             imgElement.src = isFemale 
-                ? `https://api.dicebear.com/7.x/avataaars/svg?seed=sweet_woman_${empId}&backgroundColor=b6e3f4&top=longHair&hairColor=2c1b18&skinColor=ffdbb4`
+                ? `https://api.dicebear.com/7.x/avataaars/svg?seed=woman_long_hair_${empId}&backgroundColor=b6e3f4&top=longHair&hairColor=2c1b18&skinColor=ffdbb4`
                 : `https://api.dicebear.com/7.x/avataaars/svg?seed=gentleman_${empId}&backgroundColor=c0aede&top=shortHair&skinColor=ffdbb4`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            
-            // ดึงข้อมูล Cloud ทันทีและตั้งเวลาดึงซ้ำทุก 5 วินาทีเพื่อให้ 2 หน้าต่างซิงก์ข้อมูลตรงกันแบบเรียลไทม์
-            syncFromCloud();
-            setInterval(syncFromCloud, 5000);
-
+            renderAllViews();
             checkAutoLogin();
         });
-
-        // ================= CLOUD SYNC ENGINE =================
-        async function syncFromCloud() {
-            try {
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?t=" + Date.now());
-                const data = await res.json();
-                if (data && data.status === "success") {
-                    let updated = false;
-                    if (data.requests && Array.isArray(data.requests)) {
-                        if (JSON.stringify(requests) !== JSON.stringify(data.requests)) {
-                            requests = data.requests;
-                            updated = true;
-                        }
-                    }
-                    if (data.employees && Array.isArray(data.employees)) {
-                        data.employees.forEach(cloudEmp => {
-                            const localIdx = employees.findIndex(e => String(e.id) === String(cloudEmp.id));
-                            if (localIdx !== -1) {
-                                employees[localIdx].vacationUsedMonths = cloudEmp.vacationUsedMonths || employees[localIdx].vacationUsedMonths;
-                                employees[localIdx].sickMonths = cloudEmp.sickMonths || employees[localIdx].sickMonths;
-                                employees[localIdx].otherLeaveDays = cloudEmp.otherLeaveDays || employees[localIdx].otherLeaveDays;
-                            }
-                        });
-                        updated = true;
-                    }
-                    if (updated) {
-                        saveLocalData();
-                        renderAllViews();
-                    }
-                }
-            } catch (err) {
-                // เงียบไว้เพื่อไม่ให้แจ้งเตือนรบกวนหน้าจอ ใช้ข้อมูลจำลองในเครื่องต่อได้
-            }
-        }
-
-        async function saveAllToCloud() {
-            saveLocalData();
-            renderAllViews();
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify({
-                        action: "SAVE_ALL",
-                        employees: employees,
-                        requests: requests
-                    })
-                });
-            } catch (err) {
-                console.warn("Save to cloud warning:", err);
-            }
-        }
 
         // ================= AUTHENTICATION =================
         function checkAutoLogin() {
@@ -1025,7 +968,6 @@
                 const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
                 switchTab(savedTab);
 
-                syncFromCloud();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
                 console.error(err);
@@ -1120,6 +1062,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100%)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1205,7 +1148,7 @@
                     lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 }
-                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Cloud ให้อัตโนมัติ";
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกบนเครื่องให้อัตโนมัติ";
                 if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
                 if (lockBadge) {
@@ -2172,7 +2115,7 @@
 
                 await saveAllToCloud();
                 renderAllViews();
-                showToast(`อนุมัติวันลาของ ${req.empName} และซิงก์ขึ้น Cloud เรียบร้อยแล้ว`);
+                showToast(`อนุมัติวันลาของ ${req.empName} เรียบร้อยแล้ว`);
             }
         }
 
@@ -2220,7 +2163,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
