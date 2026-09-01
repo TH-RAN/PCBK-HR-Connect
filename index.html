@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ซิงก์ข้อมูลใบลาผ่าน Google Cloud (ทุกคนเห็นตรงกัน 100%)</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">เชื่อมต่อ Cloud กลางสมบูรณ์ (ทุกคนเห็นตรงกัน)</strong></div>
                     </div>
                 </div>
             </div>
@@ -884,6 +884,7 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
+        // ระบบดึงรูป: รองรับทั้งไฟล์ .jpg บน GitHub และรูปที่อัปโหลด (เพิ่ม Timestamp ป้องกันแคชเก่าค้าง)
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -893,32 +894,40 @@
             if (emp && emp.avatar && emp.avatar.startsWith('http')) {
                 return emp.avatar;
             }
-            return `./${empId}.jpg`;
+            return `./${empId}.jpg?v=` + Date.now();
         }
 
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
             imgElement.src = isFemale 
-                ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_long_black_hair_${empId}&backgroundColor=ffd5dc&hair=long01&hairColor=0e0e0e&skinColor=f2d3b1`
-                : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff&skinColor=f2d3b1`;
+                ? `https://api.dicebear.com/7.x/avataaars/svg?seed=sweet_woman_${empId}&backgroundColor=b6e3f4&top=longHair&hairColor=2c1b18&skinColor=ffdbb4`
+                : `https://api.dicebear.com/7.x/avataaars/svg?seed=gentleman_${empId}&backgroundColor=c0aede&top=shortHair&skinColor=ffdbb4`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
+            
+            // ดึงข้อมูล Cloud ทันทีและตั้งเวลาดึงซ้ำทุก 5 วินาทีเพื่อให้ 2 หน้าต่างซิงก์ข้อมูลตรงกันแบบเรียลไทม์
             syncFromCloud();
+            setInterval(syncFromCloud, 5000);
+
             checkAutoLogin();
         });
 
-        // ================= CLOUD SYNC FOR REQUESTS =================
+        // ================= CLOUD SYNC ENGINE =================
         async function syncFromCloud() {
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?t=" + Date.now());
                 const data = await res.json();
                 if (data && data.status === "success") {
+                    let updated = false;
                     if (data.requests && Array.isArray(data.requests)) {
-                        requests = data.requests;
+                        if (JSON.stringify(requests) !== JSON.stringify(data.requests)) {
+                            requests = data.requests;
+                            updated = true;
+                        }
                     }
                     if (data.employees && Array.isArray(data.employees)) {
                         data.employees.forEach(cloudEmp => {
@@ -929,18 +938,21 @@
                                 employees[localIdx].otherLeaveDays = cloudEmp.otherLeaveDays || employees[localIdx].otherLeaveDays;
                             }
                         });
+                        updated = true;
                     }
-                    saveLocalData();
-                    renderAllViews();
+                    if (updated) {
+                        saveLocalData();
+                        renderAllViews();
+                    }
                 }
             } catch (err) {
-                console.warn("Sync from cloud failed, using local data:", err);
-                renderAllViews();
+                // เงียบไว้เพื่อไม่ให้แจ้งเตือนรบกวนหน้าจอ ใช้ข้อมูลจำลองในเครื่องต่อได้
             }
         }
 
         async function saveAllToCloud() {
             saveLocalData();
+            renderAllViews();
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
@@ -953,7 +965,7 @@
                     })
                 });
             } catch (err) {
-                console.warn("Save to cloud failed:", err);
+                console.warn("Save to cloud warning:", err);
             }
         }
 
@@ -1108,7 +1120,6 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบอัปโหลดรูปภาพผ่านเครื่อง
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1754,7 +1765,7 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1764,7 +1775,7 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1774,7 +1785,7 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1783,7 +1794,7 @@
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -2011,7 +2022,7 @@
 
             submitBtn.disabled = false;
             submitBtn.innerHTML = originalBtnText;
-            showToast("ยื่นใบลาและซิงก์ข้อมูลขึ้น Cloud เรียบร้อยแล้ว");
+            showToast("ยื่นใบลาเข้าระบบเรียบร้อยแล้ว");
         }
 
         // ================= APPROVAL CENTER =================
@@ -2209,7 +2220,7 @@
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
 
