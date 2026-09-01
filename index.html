@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">เชื่อมต่อ Google Cloud Database ซิงก์รูปภาพและข้อมูลข้ามอุปกรณ์ 100%</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ทำงานแบบ Local Standalone (เสถียร 100% ไม่มี CORS Error กวนใจ)</strong></div>
                     </div>
                 </div>
             </div>
@@ -693,8 +693,8 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGY6pHY_cKgm-_cbP6duUroA3qfqI1cT3WKLj-JdS_UAYZrhc0Io9kJXySap2Brqxnxg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
+        const hrSyncChannel = new BroadcastChannel('pcbk_hr_sync_channel');
 
         function getLiveDateData() {
             const liveNow = new Date();
@@ -899,14 +899,17 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            
-            try {
-                syncFromCloud();
-            } catch(e) {
-                renderAllViews();
-            }
-
+            renderAllViews();
             checkAutoLogin();
+
+            hrSyncChannel.onmessage = (event) => {
+                if (event.data && event.data.type === 'SYNC_DATA') {
+                    employees = event.data.employees;
+                    requests = event.data.requests;
+                    saveLocalDataSilently();
+                    renderAllViews();
+                }
+            };
         });
 
         // ================= AUTHENTICATION =================
@@ -965,7 +968,6 @@
                 const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
                 switchTab(savedTab);
 
-                syncFromCloud();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
                 console.error(err);
@@ -1058,12 +1060,14 @@
             const file = e.target.files[0];
             if (!file || !currentUser) return;
 
+            showToast("กำลังประมวลผลรูปภาพ...");
+
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    const maxDim = 120;
+                    const maxDim = 150;
                     let w = img.width;
                     let h = img.height;
                     if (w > h) {
@@ -1076,7 +1080,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
 
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.70);
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
 
                     const empIdx = employees.findIndex(emp => String(emp.id) === String(currentUser.id));
                     if (empIdx !== -1) {
@@ -1085,13 +1089,12 @@
                     currentUser.avatar = compressedBase64;
 
                     localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
+                    saveLocalData();
                     
-                    saveEmployeesToCloud().then(() => {
-                        updateUserSessionUI();
-                        renderTodayDashboard();
-                        renderStaffDirectory();
-                        showToast("อัปโหลดรูปภาพและซิงก์ขึ้น Cloud สำเร็จแล้ว");
-                    });
+                    updateUserSessionUI();
+                    renderTodayDashboard();
+                    renderStaffDirectory();
+                    showToast("อัปโหลดและบันทึกรูปภาพสำเร็จแล้ว!");
                 };
                 img.src = event.target.result;
             };
@@ -1138,7 +1141,7 @@
                     lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 }
-                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ";
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกบนเครื่องให้อัตโนมัติ";
                 if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
                 if (lockBadge) {
@@ -1222,83 +1225,15 @@
             try {
                 localStorage.setItem('pcbk_master_employees', JSON.stringify(employees));
                 localStorage.setItem('pcbk_master_requests', JSON.stringify(requests));
+                hrSyncChannel.postMessage({ type: 'SYNC_DATA', employees: employees, requests: requests });
             } catch (e) {}
         }
 
-        // ================= CLOUD SYNC & AUTO HEALING =================
-        async function syncFromCloud() {
+        function saveLocalDataSilently() {
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
-                const data = await res.json();
-                
-                if (data && data.status === "success") {
-                    let needsCloudUpdate = false;
-
-                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        let cloudList = data.employees.filter(e => String(e.id) !== '1102051');
-                        cloudList.forEach((cloudEmp, idx) => {
-                            cloudEmp.seq = idx + 1;
-                            const localAvatar = localStorage.getItem(`pcbk_avatar_${cloudEmp.id}`);
-                            
-                            if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
-                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
-                            } 
-                            else if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
-                                cloudEmp.avatar = localAvatar;
-                                needsCloudUpdate = true;
-                            }
-                        });
-                        employees = cloudList;
-                    } else {
-                        needsCloudUpdate = true;
-                    }
-
-                    if (data.requests && Array.isArray(data.requests)) {
-                        requests = data.requests;
-                    }
-                    
-                    saveLocalData();
-                    renderAllViews();
-
-                    if (needsCloudUpdate) {
-                        await saveEmployeesToCloud();
-                    }
-                }
-            } catch (err) {
-                console.warn("Sync from cloud failed:", err);
-                renderAllViews();
-            }
-        }
-
-        async function saveEmployeesToCloud() {
-            saveLocalData();
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify({
-                        action: "SAVE_EMPLOYEES",
-                        employees: employees
-                    })
-                });
-            } catch (err) {}
-        }
-
-        async function saveAllToCloud() {
-            saveLocalData();
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify({
-                        action: "SAVE_ALL",
-                        employees: employees,
-                        requests: requests
-                    })
-                });
-            } catch (err) {}
+                localStorage.setItem('pcbk_master_employees', JSON.stringify(employees));
+                localStorage.setItem('pcbk_master_requests', JSON.stringify(requests));
+            } catch (e) {}
         }
 
         function renderAllViews() {
@@ -1781,8 +1716,8 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveEmployeesToCloud();
-            showToast("บันทึกข้อมูลพนักงานขึ้น Cloud เรียบร้อย");
+            saveLocalData();
+            showToast("บันทึกข้อมูลสำเร็จ");
         }
 
         async function updateVacAccruedMonth(empIndex, monthIdx, val) {
@@ -1791,8 +1726,8 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveEmployeesToCloud();
-            showToast("บันทึกยอดเพิ่มพักร้อนขึ้น Cloud เรียบร้อย");
+            saveLocalData();
+            showToast("บันทึกข้อมูลสำเร็จ");
         }
 
         async function updateVacUsedMonth(empIndex, monthIdx, val) {
@@ -1801,8 +1736,8 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveEmployeesToCloud();
-            showToast("บันทึกยอดใช้พักร้อนขึ้น Cloud เรียบร้อย");
+            saveLocalData();
+            showToast("บันทึกข้อมูลสำเร็จ");
         }
 
         async function updateSickMonth(empIndex, monthIdx, val) {
@@ -1810,8 +1745,8 @@
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
-            await saveEmployeesToCloud();
-            showToast("บันทึกยอดลาป่วยขึ้น Cloud เรียบร้อย");
+            saveLocalData();
+            showToast("บันทึกข้อมูลสำเร็จ");
         }
 
         function renderEmpSelectOptions(selectId) {
@@ -1972,7 +1907,7 @@
             return days;
         }
 
-        async function handleLeaveSubmit(e) {
+        function handleLeaveSubmit(e) {
             e.preventDefault();
             const empId = document.getElementById('form-emp-id').value;
             const emp = employees.find(x => x.id === empId);
@@ -2022,32 +1957,15 @@
                 year: d.yearBE.toString()
             };
 
-            const submitBtn = document.getElementById('btn-submit-form');
-            const originalBtnText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลเข้าระบบ...`;
-
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify({
-                        action: "SUBMIT_LEAVE",
-                        request: newReq
-                    })
-                });
-            } catch (err) {}
-
             requests.unshift(newReq);
+            saveLocalData();
             renderAllViews();
+
             document.getElementById('leave-form').reset();
             setupDynamicDates();
             toggleDurationOptions();
             toggleLeaveTypeFields();
 
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalBtnText;
             showToast("ยื่นใบลาเข้าระบบเรียบร้อยแล้ว");
         }
 
@@ -2123,7 +2041,7 @@
             });
         }
 
-        async function deleteLeaveRequest(reqId) {
+        function deleteLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการลบรายการ");
                 return;
@@ -2131,8 +2049,8 @@
             const conf = confirm("คุณต้องการลบรายการคำขอลานี้อย่างถาวรหรือไม่?");
             if (conf) {
                 requests = requests.filter(r => r.id !== reqId);
+                saveLocalData();
                 renderAllViews();
-                await saveAllToCloud();
                 showToast("ลบรายการคำขอลาเรียบร้อยแล้ว");
             }
         }
@@ -2171,7 +2089,7 @@
             activeModalReqId = null;
         }
 
-        async function approveLeaveRequest(reqId) {
+        function approveLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการอนุมัติ");
                 return;
@@ -2196,13 +2114,13 @@
                     }
                 }
 
+                saveLocalData();
                 renderAllViews();
-                await saveAllToCloud();
-                showToast(`อนุมัติวันลาของ ${req.empName} และตัดยอดลงตารางเรียบร้อยแล้ว`);
+                showToast(`อนุมัติวันลาของ ${req.empName} เรียบร้อยแล้ว`);
             }
         }
 
-        async function rejectLeaveRequest(reqId) {
+        function rejectLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการปฏิเสธ");
                 return;
@@ -2210,8 +2128,8 @@
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
+                saveLocalData();
                 renderAllViews();
-                await saveAllToCloud();
                 showToast(`ปฏิเสธคำขอลางานของ ${req.empName} แล้ว`);
             }
         }
