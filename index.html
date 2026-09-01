@@ -642,7 +642,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ทำงานแบบ Local Standalone (แปลง Base64 เก็บในเครื่องสำเร็จ 100%)</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ดึงภาพจาก GitHub อัตโนมัติ + รองรับอัปโหลดทับได้</strong></div>
                     </div>
                 </div>
             </div>
@@ -883,16 +883,18 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
+        // ระบบดึงภาพ: เช็คจากที่อัปโหลดทับในเครื่องก่อน ถ้าไม่มี จะวิ่งไปดึงไฟล์จาก GitHub ตามรหัสพนักงาน (.jpg) ทันที
         function getEmployeeAvatar(empId) {
-            const emp = employees.find(e => String(e.id) === String(empId));
-            if (emp && emp.avatar && emp.avatar.startsWith('data:image')) {
-                return emp.avatar;
-            }
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
                 return localSaved;
             }
-            return `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
+            const emp = employees.find(e => String(e.id) === String(empId));
+            if (emp && emp.avatar && emp.avatar.startsWith('http')) {
+                return emp.avatar;
+            }
+            // ดึงไฟล์ภาพจาก GitHub ตามรหัสพนักงาน (.jpg) อัตโนมัติ
+            return `./${empId}.jpg`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -1046,7 +1048,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        // ระบบแปลงไฟล์ภาพเป็น Base64 บันทึกเก็บในเครื่องทันที 100% สำเร็จแน่นอน
+        // ระบบอัปโหลดรูปภาพผ่านเครื่อง (แปลง Base64 บันทึกเก็บในเครื่องทันที 100% สำเร็จแน่นอน)
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1199,13 +1201,6 @@
                 } else {
                     requests = [];
                 }
-
-                employees.forEach(emp => {
-                    const localImg = localStorage.getItem(`pcbk_avatar_${emp.id}`);
-                    if (localImg && localImg.startsWith('data:image')) {
-                        emp.avatar = localImg;
-                    }
-                });
             } catch (e) {
                 employees = JSON.parse(JSON.stringify(defaultDataset));
                 requests = [];
