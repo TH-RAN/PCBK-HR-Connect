@@ -596,7 +596,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">เชื่อมต่อ Google Cloud Real-Time Sync สมบูรณ์ 100%</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">เชื่อมต่อ Google Cloud Real-Time Sync (JSONP) สำเร็จ</strong></div>
                     </div>
                 </div>
             </div>
@@ -647,7 +647,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwoM7Hyj4gBOHQklEcreTyywcG0YALR_ockNk5TmoaLHEoP5DWor5yj17Kk6DbmSdeQZA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0s6Gj6IcijMrPVYIcAZImOmnPjcd9pZQx3vhoe-zcnaNnWK4wwKyrNdMipO0lufWEaQ/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -753,32 +753,34 @@
                 : `https://api.dicebear.com/7.x/avataaars/svg?seed=gentleman_${empId}&backgroundColor=c0aede&top=shortHair&skinColor=ffdbb4`;
         }
 
-        window.addEventListener('DOMContentLoaded', async () => {
+        window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            await syncWithCloud();
+            syncWithCloud();
             checkAutoLogin();
         });
 
-        // ================= CLOUD SYNC ENGINE =================
-        async function syncWithCloud() {
-            try {
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?t=" + Date.now());
-                const data = await res.json();
-                if (data && data.status === "success") {
-                    if (data.requests && Array.isArray(data.requests) && data.requests.length > 0) {
-                        requests = data.requests;
-                    }
-                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        employees = data.employees;
-                    }
-                    saveLocalData();
-                    renderAllViews();
-                }
-            } catch (err) {
-                console.warn("Cloud sync warning, using local cache");
-            }
+        // ================= CLOUD SYNC ENGINE (JSONP) =================
+        function syncWithCloud() {
+            const script = document.createElement('script');
+            script.src = GOOGLE_SCRIPT_URL + "?callback=handleCloudData&t=" + Date.now();
+            script.onerror = () => { console.warn("Cloud sync failed, using local cache"); };
+            document.body.appendChild(script);
+            setTimeout(() => script.remove(), 5000);
         }
+
+        window.handleCloudData = function(data) {
+            if (data && data.status === "success") {
+                if (data.requests && Array.isArray(data.requests) && data.requests.length > 0) {
+                    requests = data.requests;
+                }
+                if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
+                    employees = data.employees;
+                }
+                saveLocalData();
+                renderAllViews();
+            }
+        };
 
         async function saveAndSyncCloud(sendEmail = false, emailData = null) {
             saveLocalData();
@@ -1268,7 +1270,7 @@
             submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> กำลังส่งข้อมูลและอีเมล...`;
 
             requests.unshift(newReq);
-            await saveAndSyncCloud(true, newReq); // ซิงก์ข้อมูลและสั่งให้ Google Apps Script ส่งเมลแจ้งเตือน
+            await saveAndSyncCloud(true, newReq);
             renderAllViews();
 
             document.getElementById('leave-form').reset();
