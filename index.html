@@ -1,698 +1,4 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Leave Connect - PCBK</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts: Prompt -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- Chart.js for Analytics -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <!-- SheetJS for Excel Import/Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        * {
-            font-family: 'Prompt', sans-serif;
-        }
-        body {
-            background-color: #f8fafc;
-        }
-        .tab-active {
-            color: #2563eb !important;
-            background-color: #ffffff !important;
-            box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.12) !important;
-            border-radius: 1rem !important;
-            font-weight: 700 !important;
-        }
-        .modal-blur {
-            backdrop-filter: blur(8px);
-        }
-        .card-hover {
-            transition: all 0.25s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.05);
-        }
-        .my-row-highlight {
-            background-color: #eff6ff !important;
-            border-left: 4px solid #3b82f6 !important;
-        }
-        ::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-    </style>
-</head>
-<body class="text-slate-800 min-h-screen flex flex-col antialiased">
-
-    <!-- ================= LOGIN OVERLAY MODAL ================= -->
-    <div id="login-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
-            <div class="flex justify-center items-center">
-                <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
-            </div>
-
-            <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">PCBK HR-Connect</h2>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">กรุณากรอกรหัสพนักงาน หรือรหัสผู้ดูแลระบบ</p>
-            </div>
-
-            <form onsubmit="handleLoginSubmit(event)" class="space-y-4 text-left">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">รหัสประจำตัวพนักงาน / Access Code</label>
-                    <div class="relative">
-                        <i class="fa-solid fa-id-card absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="login-input-code" required placeholder="เช่น 1102055 หรือ Admin Key" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white font-mono tracking-wider">
-                    </div>
-                </div>
-
-                <div id="login-error-msg" class="hidden text-rose-600 text-xs font-semibold bg-rose-50 border border-rose-200 p-2.5 rounded-xl text-center">
-                    รหัสพนักงานหรือรหัส Admin ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง
-                </div>
-
-                <div class="flex items-center justify-between text-xs">
-                    <label class="flex items-center space-x-2 text-slate-600 cursor-pointer">
-                        <input type="checkbox" id="login-remember-me" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
-                        <span>จดจำการเข้าสู่ระบบบนอุปกรณ์นี้</span>
-                    </label>
-                </div>
-
-                <button type="submit" id="btn-signin" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-2xl shadow-lg shadow-blue-200 transition duration-200 flex items-center justify-center space-x-2 cursor-pointer">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    <span>เข้าสู่ระบบ (Sign In)</span>
-                </button>
-            </form>
-
-            <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-3">
-                ระบบจัดการสถิติและการอนุมัติวันลาสำหรับบุคลากร PCBK
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= APP HEADER ================= -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-11 w-auto object-contain" onerror="this.onerror=null; this.src='./LOGO PCBK API - 1.png';">
-                    <div>
-                        <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK HR-Connect</h1>
-                        <p class="text-[11px] sm:text-xs text-slate-500">ระบบบริหารจัดการงานบุคคล วันลา และสถิติประจำปี</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-2 sm:space-x-3">
-                    <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-2xl text-xs font-medium cursor-pointer hover:bg-slate-100 transition" onclick="switchTab('profile')">
-                        <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200">
-                        <span id="header-user-name" class="text-slate-800 font-bold">กำลังโหลด...</span>
-                        <span id="header-role-badge" class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">พนักงาน</span>
-                    </div>
-
-                    <div class="hidden md:flex items-center space-x-1.5 bg-blue-50/70 border border-blue-200/80 px-3 py-1.5 rounded-2xl text-xs text-blue-900 font-medium">
-                        <i class="fa-regular fa-calendar-check text-blue-600"></i>
-                        <span id="header-realtime-date" class="font-bold">วันนี้: กำลังโหลด...</span>
-                    </div>
-
-                    <button type="button" onclick="handleLogout()" title="ออกจากระบบ / สลับบัญชี" class="w-9 h-9 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center text-xs transition border border-rose-200 cursor-pointer">
-                        <i class="fa-solid fa-power-off"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
-            <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
-                <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
-                    <i class="fa-solid fa-table-cells-large text-blue-600"></i>
-                    <span>ภาพรวม & สถิติ</span>
-                    <span id="badge-today-count" class="bg-amber-100 text-amber-900 text-[11px] px-2 py-0.5 rounded-full font-bold">0 คนลา</span>
-                </button>
-                <button type="button" onclick="switchTab('summary')" id="tab-btn-summary" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
-                    <i class="fa-solid fa-table-list"></i>
-                    <span id="tab-summary-title">ตารางสรุปวันลา</span>
-                </button>
-                <button type="button" onclick="switchTab('request-form')" id="tab-btn-request-form" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>ยื่นขอลางานออนไลน์</span>
-                </button>
-                <button type="button" onclick="switchTab('approval-center')" id="tab-btn-approval-center" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
-                    <i class="fa-regular fa-circle-check"></i>
-                    <span>ศูนย์อนุมัติคำขอ</span>
-                    <span id="badge-pending-count" class="bg-rose-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0 รอตรวจ</span>
-                </button>
-                <button type="button" onclick="switchTab('directory')" id="tab-btn-directory" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
-                    <i class="fa-solid fa-address-book"></i>
-                    <span>ทำเนียบพนักงาน</span>
-                    <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">10 คน</span>
-                </button>
-                <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
-                    <i class="fa-solid fa-user"></i>
-                    <span>ข้อมูลส่วนตัว (Profile)</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
-        <!-- ================= TAB 1: DASHBOARD ================= -->
-        <section id="tab-dashboard" class="tab-content space-y-6">
-            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-3xl p-6 sm:p-7 text-white shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="relative z-10 space-y-1.5">
-                    <div class="inline-flex items-center space-x-1.5 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span>สถานะองค์กร Real-Time ประจำวัน</span>
-                    </div>
-                    <h2 class="text-xl sm:text-2xl font-bold tracking-tight">ภาพรวมกำลังคนและการลางาน</h2>
-                    <p class="text-blue-100 text-xs sm:text-sm" id="dashboard-full-date">กำลังอัปเดตข้อมูล...</p>
-                </div>
-
-                <div class="flex items-center space-x-2.5 relative z-10">
-                    <button type="button" onclick="switchTab('request-form')" class="bg-white text-blue-700 hover:bg-blue-50 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-2xl shadow transition flex items-center space-x-1.5 cursor-pointer">
-                        <i class="fa-solid fa-file-signature"></i>
-                        <span>ยื่นขอลางาน</span>
-                    </button>
-                    <button type="button" onclick="switchTab('approval-center')" class="bg-rose-500 hover:bg-rose-600 text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-2xl shadow transition flex items-center space-x-1.5 cursor-pointer">
-                        <i class="fa-regular fa-clock"></i>
-                        <span id="hero-btn-pending-txt">มีคำขอรออนุมัติ (0)</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="lg:col-span-6 space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                            <div>
-                                <span class="text-slate-500 text-xs font-medium">พนักงานลางานวันนี้</span>
-                                <div class="text-3xl font-extrabold text-blue-900 mt-1" id="kpi-today-leave-count">0 คน</div>
-                                <p class="text-xs text-emerald-600 font-semibold mt-2 flex items-center" id="kpi-today-desc">
-                                    <i class="fa-solid fa-chart-line mr-1"></i> พร้อมปฏิบัติงาน 100%
-                                </p>
-                            </div>
-                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
-                                <i class="fa-solid fa-user-group"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                            <div>
-                                <span class="text-slate-500 text-xs font-medium" id="kpi-title-vac-used">พักร้อนใช้ไปทั้งปี</span>
-                                <div class="text-3xl font-extrabold text-amber-500 mt-1" id="kpi-total-vacation-used">0 วัน</div>
-                                <p class="text-xs text-slate-500 mt-2">เฉลี่ย <strong id="kpi-avg-vacation" class="text-slate-700">0.0</strong> วัน / พนักงาน</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg">
-                                <i class="fa-solid fa-umbrella-beach"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                            <div>
-                                <span class="text-slate-500 text-xs font-medium">สิทธิ์พักร้อนคงเหลือรวม</span>
-                                <div class="text-3xl font-extrabold text-emerald-600 mt-1" id="kpi-total-vacation-rem">0 วัน</div>
-                                <p class="text-xs text-blue-600 font-semibold mt-2">+1 วัน/เดือน (ทบสะสมข้ามปีได้)</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
-                                <i class="fa-solid fa-hourglass-half"></i>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-start">
-                            <div>
-                                <span class="text-slate-500 text-xs font-medium" id="kpi-title-sick-used">ลาป่วยสะสมทั้งปี</span>
-                                <div class="text-3xl font-extrabold text-rose-500 mt-1" id="kpi-total-sick-used">0 วัน</div>
-                                <p class="text-xs text-slate-500 mt-2">โควตา: ไม่เกิน 30 วันทำการ/ปี</p>
-                            </div>
-                            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center text-lg">
-                                <i class="fa-solid fa-heart-pulse"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                                    <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ลางานวันนี้</span>
-                                </h3>
-                                <p class="text-xs text-slate-500">ตรวจสอบผู้ที่ไม่มาปฏิบัติงานประจำวัน</p>
-                            </div>
-                            <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full font-bold" id="today-status-chip">
-                                ลางาน 0 คน
-                            </span>
-                        </div>
-
-                        <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-6 space-y-6">
-                    <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                                    <i class="fa-solid fa-chart-simple text-blue-600 mr-2"></i> สถิติการลางานรายเดือน (ม.ค. - ธ.ค.)
-                                </h3>
-                                <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน ลาป่วย และภารกิจ/ลาอื่นๆ</p>
-                            </div>
-                        </div>
-                        <div class="h-60 relative w-full">
-                            <canvas id="monthlyTrendBarChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 p-6 card-hover space-y-3">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                                    <i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> สัดส่วนประเภทการลาทั้งหมด
-                                </h3>
-                                <p class="text-xs text-slate-500">การกระจายตัวของวันลาแต่ละประเภท</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-[11px] text-slate-400 block">รวมวันลาทั้งหมด</span>
-                                <span id="grand-total-leaves-txt" class="text-slate-900 font-bold text-sm">0 วัน</span>
-                            </div>
-                        </div>
-                        <div class="h-52 relative w-full">
-                            <canvas id="leaveDistributionDonutChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 2: SUMMARY TABLE ================= -->
-        <section id="tab-summary" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                    <div>
-                        <div class="flex items-center space-x-2">
-                            <h2 class="font-bold text-slate-900 text-lg" id="summary-table-header-title">สรุปตารางวันลาของพนักงาน</h2>
-                            <span id="badge-lock-status" class="bg-slate-100 text-slate-600 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center">
-                                <i class="fa-solid fa-eye mr-1"></i> โหมดดูอย่างเดียว (View Only)
-                            </span>
-                        </div>
-                        <p class="text-xs text-slate-500 mt-0.5" id="summary-desc-text">ตรวจสอบยอดสะสมและประวัติการลาประจำปีของบุคลากรทุกคน (แถวสีฟ้าคือข้อมูลบัญชีของคุณ)</p>
-                    </div>
-
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div class="relative flex-grow sm:flex-grow-0">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                            <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ หรือตำแหน่ง..." class="w-full sm:w-56 pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <button type="button" id="btn-excel-import" onclick="triggerExcelImport()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3.5 py-2 rounded-2xl transition items-center space-x-1 shadow-xs cursor-pointer">
-                            <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
-                        </button>
-                        <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
-                        <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-2 rounded-2xl transition flex items-center space-x-1 shadow-xs cursor-pointer">
-                            <i class="fa-solid fa-download mr-1"></i> ส่งออก Excel
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner relative max-h-[650px]">
-                    <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1600px]">
-                        <thead>
-                            <tr class="bg-slate-800 text-white text-center font-bold divide-x divide-slate-700 border-b border-slate-700 sticky top-0 z-20">
-                                <th rowspan="3" class="p-2 w-10 sticky left-0 z-30 bg-slate-900 shadow-r">ลำดับ</th>
-                                <th rowspan="3" class="p-2 w-20">รหัส</th>
-                                <th rowspan="3" class="p-2 min-w-[180px] sticky left-10 z-30 bg-slate-900 shadow-r">ชื่อ - นามสกุล</th>
-                                <th rowspan="3" class="p-2 min-w-[180px]">ตำแหน่ง</th>
-                                <th rowspan="3" class="p-2">วันเกิด</th>
-                                <th rowspan="3" class="p-2">วันเริ่มงาน</th>
-                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[85px]">ทบวันพักร้อน<br><span class="text-[10px] font-normal">สะสมปีก่อน</span></th>
-                                <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน (เพิ่มเดือนละ 1 วันทบได้)</th>
-                                <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">ลาป่วย <span class="text-[10px] font-normal">(ปีละไม่เกิน 30 วันทำการ)</span></th>
-                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[75px]">ลาอื่นๆ/ภารกิจ<br>(รวมทั้งปี)</th>
-                                <th rowspan="3" class="p-2 min-w-[130px]">หมายเหตุ / สถานะ</th>
-                            </tr>
-                            <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[33px] z-10">
-                                <th colspan="24" class="p-1.5 bg-amber-50 text-amber-900">เพิ่ม (+1/ด.) & ใช้ลาประจำเดือน (ม.ค. - ธ.ค.)</th>
-                                <th rowspan="2" class="p-2 bg-amber-200 text-amber-950 font-bold min-w-[70px]">รวมเพิ่ม<br>พักร้อน</th>
-                                <th rowspan="2" class="p-2 bg-rose-200 text-rose-950 font-bold min-w-[70px]">รวมใช้<br>พักร้อน</th>
-                                <th rowspan="2" class="p-2 bg-yellow-300 text-yellow-950 font-bold min-w-[70px]">คงเหลือ<br>พักร้อน</th>
-                                <th colspan="12" class="p-1.5 bg-emerald-50 text-emerald-900">รายเดือน (ม.ค. - ธ.ค.)</th>
-                                <th rowspan="2" class="p-2 bg-emerald-200 text-emerald-950 font-bold min-w-[70px]">รวมใช้<br>ลาป่วย</th>
-                            </tr>
-                            <tr class="bg-slate-50 text-slate-600 text-[10px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[65px] z-10">
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ม.ค.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.พ.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">มี.ค.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">เม.ย.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">พ.ค.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">มิ.ย.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.ค.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ส.ค.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.ย.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ต.ค.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">พ.ย.</th>
-                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ธ.ค.</th>
-                                <th class="p-1 bg-emerald-50">ม.ค.</th>
-                                <th class="p-1 bg-emerald-50">ก.พ.</th>
-                                <th class="p-1 bg-emerald-50">มี.ค.</th>
-                                <th class="p-1 bg-emerald-50">เม.ย.</th>
-                                <th class="p-1 bg-emerald-50">พ.ค.</th>
-                                <th class="p-1 bg-emerald-50">มิ.ย.</th>
-                                <th class="p-1 bg-emerald-50">ก.ค.</th>
-                                <th class="p-1 bg-emerald-50">ส.ค.</th>
-                                <th class="p-1 bg-emerald-50">ก.ย.</th>
-                                <th class="p-1 bg-emerald-50">ต.ค.</th>
-                                <th class="p-1 bg-emerald-50">พ.ย.</th>
-                                <th class="p-1 bg-emerald-50">ธ.ค.</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summary-table-body" class="divide-y divide-slate-200"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 3: LEAVE REQUEST FORM ================= -->
-        <section id="tab-request-form" class="tab-content hidden max-w-2xl mx-auto space-y-6">
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8 space-y-6">
-                <div class="border-b border-slate-100 pb-4">
-                    <h2 class="font-bold text-slate-900 text-xl flex items-center">
-                        <i class="fa-solid fa-file-signature text-blue-600 mr-2.5"></i> แบบฟอร์มยื่นขอลางานออนไลน์
-                    </h2>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">กรอกข้อมูลการลาและตรวจสอบวันลาคงเหลือแบบเรียลไทม์</p>
-                </div>
-
-                <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-5 text-xs sm:text-sm">
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1.5">เลือกชื่อพนักงาน *</label>
-                        <select id="form-emp-id" required onchange="handleFormEmpChange()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-slate-800 disabled:bg-slate-100 disabled:text-slate-600 disabled:cursor-not-allowed">
-                            <option value="">-- เลือกชื่อพนักงาน --</option>
-                        </select>
-                    </div>
-
-                    <div id="emp-quota-status-box" class="bg-slate-50 border border-slate-200 rounded-2xl p-4 grid grid-cols-2 gap-3 text-center">
-                        <div class="bg-white p-2.5 rounded-xl border border-amber-200 shadow-xs">
-                            <span class="text-[11px] text-slate-500 block">สิทธิ์พักร้อนคงเหลือ</span>
-                            <span id="form-vacation-quota-txt" class="font-extrabold text-amber-600 text-base">0.0 วัน</span>
-                        </div>
-                        <div class="bg-white p-2.5 rounded-xl border border-rose-200 shadow-xs">
-                            <span class="text-[11px] text-slate-500 block">สิทธิ์ลาป่วยคงเหลือ</span>
-                            <span id="form-sick-quota-txt" class="font-extrabold text-rose-600 text-base">30.0 วัน</span>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1.5">ประเภทการลางาน *</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_type" value="ลาพักร้อน" required checked onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
-                                <i class="fa-solid fa-umbrella-beach text-amber-600 text-lg mb-1"></i>
-                                <span class="font-bold text-xs">1. ลาพักร้อน</span>
-                            </label>
-                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_type" value="ลาป่วย" required onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
-                                <i class="fa-solid fa-bed-pulse text-rose-600 text-lg mb-1"></i>
-                                <span class="font-bold text-xs">2. ลาป่วย</span>
-                            </label>
-                            <label class="border border-slate-200 rounded-2xl p-3.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_type" value="ลาอื่นๆ" required onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
-                                <i class="fa-solid fa-folder-open text-purple-600 text-lg mb-1"></i>
-                                <span class="font-bold text-xs">3. ลาอื่นๆ/ภารกิจ</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="wrapper-other-leave-detail" class="hidden bg-purple-50/80 border border-purple-200 p-4 rounded-2xl space-y-2 animate-fade-in">
-                        <label class="block font-bold text-purple-950 text-xs flex items-center">
-                            <i class="fa-solid fa-circle-info text-purple-600 mr-1.5"></i> ระบุประเภทภารกิจ / การลาอื่นๆ (ไม่หักวันลาพักร้อน) *
-                        </label>
-                        <input type="text" id="form-other-type-detail" placeholder="เช่น ไปอบรมสัมมนาบัญชี, ติดต่อราชการนอกสถานที่" class="w-full bg-white border border-purple-300 rounded-xl p-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-purple-500">
-                    </div>
-
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1.5">ระยะเวลาการลา *</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions()" class="hidden">
-                                <span class="font-bold text-xs text-slate-800">1.0 วัน</span>
-                                <span class="text-[10px] text-slate-500">เต็มวัน (8 ชม.)</span>
-                            </label>
-                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions()" class="hidden">
-                                <span class="font-bold text-xs text-slate-800">0.5 วัน</span>
-                                <span class="text-[10px] text-slate-500">ครึ่งวัน (4 ชม.)</span>
-                            </label>
-                            <label class="border border-slate-200 rounded-2xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50 transition">
-                                <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions()" class="hidden">
-                                <span class="font-bold text-xs text-slate-800">0.25 วัน</span>
-                                <span class="text-[10px] text-slate-500">ออกธุระ (2 ชม.)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="option-half-day" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-2">
-                        <label class="block font-semibold text-amber-900 text-xs">เลือกช่วงเวลาครึ่งวัน *</label>
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <label class="bg-white border border-amber-300 rounded-xl p-2.5 flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="half_day_period" value="ครึ่งวันเช้า (08:30 - 12:30 น.)" checked class="text-blue-600">
-                                <span>🌅 ครึ่งวันเช้า (08:30 - 12:30 น.)</span>
-                            </label>
-                            <label class="bg-white border border-amber-300 rounded-xl p-2.5 flex items-center space-x-2 cursor-pointer">
-                                <input type="radio" name="half_day_period" value="ครึ่งวันบ่าย (13:30 - 17:30 น.)" class="text-blue-600">
-                                <span>🌤️ ครึ่งวันบ่าย (13:30 - 17:30 น.)</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="option-quarter-day" class="hidden bg-purple-50 border border-purple-200 p-4 rounded-2xl space-y-2">
-                        <label class="block font-semibold text-purple-900 text-xs">ระบุช่วงเวลาลางาน 2 ชั่วโมง *</label>
-                        <div class="grid grid-cols-2 gap-3 text-xs">
-                            <div>
-                                <label class="block text-slate-600 text-[11px] mb-1">ตั้งแต่เวลา</label>
-                                <input type="time" id="quarter-start-time" value="10:00" class="w-full bg-white border border-purple-300 rounded-xl p-2.5">
-                            </div>
-                            <div>
-                                <label class="block text-slate-600 text-[11px] mb-1">ถึงเวลา</label>
-                                <input type="time" id="quarter-end-time" value="12:00" class="w-full bg-white border border-purple-300 rounded-xl p-2.5">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-semibold text-slate-700 mb-1">ตั้งแต่วันที่ *</label>
-                            <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div id="wrapper-end-date">
-                            <label class="block font-semibold text-slate-700 mb-1">ถึงวันที่ *</label>
-                            <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-
-                    <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-900 flex justify-between items-center">
-                        <span class="font-medium">จำนวนวันลาที่คำนวณได้:</span>
-                        <span id="form-day-count" class="font-extrabold text-sm text-blue-700">1 วัน</span>
-                    </div>
-
-                    <div id="leave-quota-warning" class="hidden bg-rose-50 border border-rose-300 text-rose-700 p-3.5 rounded-2xl text-xs font-bold flex items-center space-x-2">
-                        <i class="fa-solid fa-triangle-exclamation text-base"></i>
-                        <span id="leave-quota-warning-txt">ไม่สามารถลาเกินสิทธิ์วันลาคงเหลือที่กำหนดได้</span>
-                    </div>
-
-                    <div>
-                        <label class="block font-semibold text-slate-700 mb-1">เหตุผลการลา / ช่องทางติดต่อ *</label>
-                        <textarea id="form-reason" rows="3" required placeholder="เช่น ติดต่อธุระราชการ / โทร 081-xxx-xxxx / Line ID" class="w-full bg-slate-50 border border-slate-300 rounded-2xl p-3 focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"></textarea>
-                    </div>
-
-                    <button type="submit" id="btn-submit-form" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-200 transition flex items-center justify-center space-x-2 cursor-pointer">
-                        <i class="fa-solid fa-paper-plane"></i>
-                        <span>ส่งใบลาเพื่อขออนุมัติ</span>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- ================= TAB 4: APPROVAL CENTER ================= -->
-        <section id="tab-approval-center" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
-                    <div>
-                        <h2 class="font-bold text-slate-900 text-xl">ศูนย์พิจารณาอนุมัติวันลา (Approval Center)</h2>
-                        <p class="text-xs sm:text-sm text-slate-500" id="approval-center-subtitle">รายการคำขอลางาน</p>
-                    </div>
-                </div>
-
-                <div id="approval-list" class="space-y-3"></div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 5: STAFF DIRECTORY ================= -->
-        <section id="tab-directory" class="tab-content hidden space-y-6">
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8 space-y-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-                    <div>
-                        <h2 class="font-bold text-slate-900 text-xl flex items-center">
-                            <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบพนักงานและบุคลากร PCBK
-                        </h2>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อและข้อมูลประวัติการทำงานของสมาชิกในองค์กร (เรียงตามอายุงาน)</p>
-                    </div>
-
-                    <div class="flex items-center space-x-2">
-                        <div class="relative w-full sm:w-64">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                            <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส, ตำแหน่ง..." class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Executive Board -->
-                <div class="space-y-3">
-                    <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-                        <h3 class="font-bold text-slate-800 text-sm">คณะผู้บริหารระดับสูง (Executive Board)</h3>
-                    </div>
-                    <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                </div>
-
-                <!-- Staff & Operations -->
-                <div class="space-y-3 pt-2">
-                    <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
-                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
-                        <h3 class="font-bold text-slate-800 text-sm">พนักงาน</h3>
-                    </div>
-                    <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 6: MY PROFILE ================= -->
-        <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
-            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-                <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
-                    <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
-                        <div class="relative group">
-                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50">
-                            <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
-                                <i class="fa-solid fa-camera text-xs"></i>
-                            </label>
-                            <input type="file" id="profile-photo-upload" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
-                        </div>
-                        <div class="space-y-1">
-                            <div class="flex items-center justify-center sm:justify-start space-x-2">
-                                <h2 id="profile-card-name" class="text-2xl font-extrabold text-slate-900">กำลังโหลด...</h2>
-                                <span id="profile-card-role-chip" class="bg-blue-50 text-blue-700 border border-blue-200 text-xs px-2.5 py-0.5 rounded-full font-bold">พนักงาน</span>
-                            </div>
-                            <p id="profile-card-position" class="text-sm font-medium text-slate-600">Position Not Assigned</p>
-                            <p class="text-xs text-slate-400 font-mono">รหัสพนักงาน: <strong id="profile-card-id" class="text-slate-700 font-bold">-</strong></p>
-                        </div>
-                    </div>
-
-                    <button type="button" onclick="handleLogout()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold px-4 py-2.5 rounded-2xl border border-rose-200 transition cursor-pointer flex items-center space-x-1.5">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span>ออกจากระบบ</span>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-amber-50/60 border border-amber-200/80 rounded-3xl p-5 text-center">
-                        <span class="text-xs text-amber-800 font-semibold uppercase tracking-wider block">วันพักร้อนคงเหลือ</span>
-                        <div class="text-3xl font-extrabold text-amber-600 mt-1.5" id="profile-vacation-rem">0 วัน</div>
-                        <p class="text-[11px] text-amber-700/80 mt-1">+1 วัน/เดือน สะสมข้ามปีได้</p>
-                    </div>
-                    <div class="bg-rose-50/60 border border-rose-200/80 rounded-3xl p-5 text-center">
-                        <span class="text-xs text-rose-800 font-semibold uppercase tracking-wider block">พักร้อนใช้ไปทั้งปี</span>
-                        <div class="text-3xl font-extrabold text-rose-600 mt-1.5" id="profile-vacation-used">0 วัน</div>
-                        <p class="text-[11px] text-rose-700/80 mt-1">ยอดรวมที่ลาไปในปีนี้</p>
-                    </div>
-                    <div class="bg-emerald-50/60 border border-emerald-200/80 rounded-3xl p-5 text-center">
-                        <span class="text-xs text-emerald-800 font-semibold uppercase tracking-wider block">ลาป่วยใช้ไปทั้งปี</span>
-                        <div class="text-3xl font-extrabold text-emerald-600 mt-1.5" id="profile-sick-used">0 วัน</div>
-                        <p class="text-[11px] text-emerald-700/80 mt-1">โควตาปีละไม่เกิน 30 วันทำการ</p>
-                    </div>
-                </div>
-
-                <div class="border border-slate-200/80 rounded-3xl p-6 bg-slate-50/60 space-y-4 text-xs sm:text-sm">
-                    <h4 class="font-bold text-slate-800 border-b border-slate-200/80 pb-2">ข้อมูลประวัติและการทำงาน</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-600 pt-1">
-                        <div><span class="text-slate-400">วัน/เดือน/ปีเกิด:</span> <strong id="profile-card-dob" class="text-slate-800">-</strong></div>
-                        <div><span class="text-slate-400">วันเริ่มงาน:</span> <strong id="profile-card-start" class="text-slate-800">-</strong></div>
-                        <div class="sm:col-span-2 bg-blue-50/80 border border-blue-200 p-3.5 rounded-2xl flex items-center justify-between">
-                            <span class="text-blue-900 font-bold flex items-center">
-                                <i class="fa-solid fa-business-time mr-2 text-blue-600 text-base"></i> อายุงานรวมที่ PCBK:
-                            </span>
-                            <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
-                        </div>
-                        <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะอุปกรณ์:</span> <strong class="text-emerald-700 font-medium">จดจำอุปกรณ์และซิงก์ Cloud แล้ว</strong></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Modal: Detail Modal -->
-    <div id="email-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <div class="flex items-center space-x-1.5">
-                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
-                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                    <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                    <span class="text-xs text-slate-400 font-mono ml-2">[รายละเอียดคำขอลางาน]</span>
-                </div>
-                <button type="button" onclick="closeEmailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="border border-slate-200 p-4 rounded-2xl text-slate-700 space-y-2 text-xs">
-                <p>เรียน ผู้บังคับบัญชา / HR,</p>
-                <p>พนักงาน <strong id="email-emp-name" class="text-slate-900">-</strong> ได้ยื่นเรื่อง <strong id="email-detail-type" class="text-slate-900">ลาพักร้อน</strong> โดยมีรายละเอียดดังนี้:</p>
-                <ul class="list-disc list-inside space-y-1.5 bg-slate-50 p-3 rounded-xl">
-                    <li><strong>ช่วงวันลา:</strong> <span id="email-detail-dates">-</span></li>
-                    <li><strong>เหตุผล / ช่องทางติดต่อ:</strong> <span id="email-detail-reason">-</span></li>
-                </ul>
-            </div>
-
-            <div class="flex items-center justify-end space-x-2 pt-2">
-                <button type="button" id="email-btn-reject" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2.5 rounded-xl transition cursor-pointer">
-                    <i class="fa-solid fa-xmark mr-1"></i> ปฏิเสธ
-                </button>
-                <button type="button" id="email-btn-approve" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-xl shadow transition cursor-pointer">
-                    <i class="fa-solid fa-check mr-1"></i> อนุมัติ
-                </button>
-                <button type="button" onclick="closeEmailModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-xl transition cursor-pointer">
-                    ปิด
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
-        <i class="fa-solid fa-circle-check text-emerald-400"></i>
-        <span id="toast-message">ทำรายการสำเร็จ</span>
-    </div>
-
-    <script>
+<script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwV-hA5SsWJ_hH5RbHZnMduWpu9BzkXttWqbfhpl08ZZx924SwJg2te3o3ylPFQo4QVlA/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
@@ -840,9 +146,9 @@
             },
             {
                 seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
-                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
-                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
+                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 1, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 1, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
             },
             {
                 seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
@@ -884,6 +190,7 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
+        // ปรับปรุงให้ดึงรูปจาก Cloud เป็นหลัก และใช้ LocalStorage เป็นสำรอง
         function getEmployeeAvatar(empId) {
             const emp = employees.find(e => String(e.id) === String(empId));
             if (emp && emp.avatar && emp.avatar.startsWith('data:image')) {
@@ -899,7 +206,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            renderAllViews();
+            syncFromCloud(); // ดึงข้อมูลและรูปภาพล่าสุดจาก Cloud ทันทีเมื่อเปิดเว็บ
             checkAutoLogin();
         });
 
@@ -1048,6 +355,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
+        // อัปโหลดและบีบอัดภาพ พร้อมบังคับอัปเดตลง Cloud ทันที
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1079,11 +387,14 @@
                     currentUser.avatar = compressedBase64;
 
                     localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
-                    saveEmployeesToCloud();
-                    updateUserSessionUI();
-                    renderTodayDashboard();
-                    renderStaffDirectory();
-                    showToast("อัปโหลดรูปภาพและบันทึกขึ้น Cloud สำเร็จแล้ว");
+                    
+                    // บันทึกขึ้น Cloud ทันทีและรอให้เสร็จ
+                    saveEmployeesToCloud().then(() => {
+                        updateUserSessionUI();
+                        renderTodayDashboard();
+                        renderStaffDirectory();
+                        showToast("อัปโหลดรูปภาพและซิงก์ขึ้น Cloud สำเร็จแล้ว");
+                    });
                 };
                 img.src = event.target.result;
             };
@@ -1231,11 +542,15 @@
                         cloudList.forEach((cloudEmp, idx) => {
                             cloudEmp.seq = idx + 1;
                             const localAvatar = localStorage.getItem(`pcbk_avatar_${cloudEmp.id}`);
-                            if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
+                            
+                            // ถ้าใน Cloud มีรูป แต่เครื่องนี้ไม่มี ให้ดึงลงเครื่อง
+                            if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
+                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
+                            } 
+                            // ถ้าเครื่องนี้มีรูป แต่ Cloud ยังไม่มี ให้ผสานแล้วเตรียมดันขึ้น
+                            else if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
                                 cloudEmp.avatar = localAvatar;
                                 needsCloudUpdate = true;
-                            } else if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
-                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
                             }
                         });
                         employees = cloudList;
@@ -1251,10 +566,12 @@
                     renderAllViews();
 
                     if (needsCloudUpdate) {
-                        saveEmployeesToCloud();
+                        await saveEmployeesToCloud();
                     }
                 }
-            } catch (err) {}
+            } catch (err) {
+                console.warn("Sync from cloud failed:", err);
+            }
         }
 
         async function saveEmployeesToCloud() {
@@ -1441,7 +758,7 @@
             if (avgVacEl) avgVacEl.innerText = employees.length > 0 ? (grandVacationUsed / employees.length).toFixed(1) : '0';
         }
 
-        // ================= CHART.JS ANALYTICS ENGINE (REBUILT FOR 100% RELIABILITY) =================
+        // ================= CHART.JS ANALYTICS ENGINE =================
         function renderDashboardCharts() {
             try {
                 if (typeof Chart === 'undefined') return;
@@ -1473,7 +790,6 @@
                     totalOtherAll += oth;
                 });
 
-                // 1. Stacked Bar Chart
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
                 if (barCanvas) {
                     if (monthlyBarChartInstance) {
@@ -1519,7 +835,6 @@
                     });
                 }
 
-                // 2. Donut Chart
                 const donutCanvas = document.getElementById('leaveDistributionDonutChart');
                 if (donutCanvas) {
                     if (leaveDonutChartInstance) {
@@ -1831,7 +1146,7 @@
             }
             const usedVac = emp.vacationUsedMonths ? emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
             const carry = parseFloat(emp.carryVacation) || 0;
-            const vacRem = Math.max(0, carry + totalAccrued - usedVac);
+            const vacRem = Math.max(0, carry + accrued - usedVac);
 
             const usedSick = emp.sickMonths ? emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
             const sickRem = Math.max(0, 30 - usedSick);
@@ -2079,7 +1394,7 @@
                     ? '<span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-bold">อนุมัติแล้ว</span>'
                     : isRej
                     ? '<span class="bg-rose-100 text-rose-700 text-xs px-2.5 py-1 rounded-full font-bold">ไม่อนุมัติ</span>'
-                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-1 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
+                    : '<span class="bg-amber-100 text-amber-700 text-xs px-2.5 py-0.5 rounded-full font-bold animate-pulse">รออนุมัติ</span>';
 
                 container.innerHTML += `
                     <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row justify-between sm:items-center gap-4 card-hover">
@@ -2275,5 +1590,3 @@
             }, 3000);
         }
     </script>
-</body>
-</html>
