@@ -693,7 +693,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyPb1slRxBTQvAamKJKVd7N-E4hgFyhshlPOmEqsB5d1wcPF38GneGsZClr361l1OTFMA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxP5zAvkPvWCo0TRdKh7Rh-niSb3eMhyFVplpz3AuHpiUy60q4dhXrVq9xfnA9vO5Upxg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -1054,6 +1054,7 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
+        // ฟังก์ชันอัปโหลดรูปภาพแยกเก็บลงชีต Avatars โดยเฉพาะ
         function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
@@ -1086,11 +1087,21 @@
 
                     localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
                     
-                    saveEmployeesToCloud().then(() => {
+                    // ส่งข้อมูลรูปภาพแยกไปบันทึกในชีต Avatars บน Cloud
+                    fetch(GOOGLE_SCRIPT_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: { "Content-Type": "text/plain" },
+                        body: JSON.stringify({
+                            action: "SAVE_AVATAR",
+                            empId: currentUser.id,
+                            avatar: compressedBase64
+                        })
+                    }).then(() => {
                         updateUserSessionUI();
                         renderTodayDashboard();
                         renderStaffDirectory();
-                        showToast("อัปโหลดรูปภาพและซิงก์ขึ้น Cloud สำเร็จแล้ว");
+                        showToast("อัปโหลดรูปภาพและซิงก์ขึ้นชีต Avatars สำเร็จแล้ว");
                     });
                 };
                 img.src = event.target.result;
@@ -2241,7 +2252,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function exportSummaryToExcel() {
+    function exportSummaryToExcel() {
             const d = getLiveDateData();
             const dataToExport = employees.map(e => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
