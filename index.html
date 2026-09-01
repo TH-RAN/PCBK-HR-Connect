@@ -142,6 +142,7 @@
             </div>
         </div>
 
+        <!-- Navigation Sub-Header Tabs -->
         <div class="bg-slate-100/60 border-t border-slate-200/80 overflow-x-auto py-1.5">
             <div class="max-w-7xl mx-auto px-4 flex space-x-1.5 sm:space-x-2 min-w-max">
                 <button type="button" onclick="switchTab('dashboard')" id="tab-btn-dashboard" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
@@ -161,6 +162,11 @@
                     <i class="fa-regular fa-circle-check"></i>
                     <span>ศูนย์อนุมัติคำขอ</span>
                     <span id="badge-pending-count" class="bg-rose-500 text-white text-[11px] px-2 py-0.5 rounded-full font-bold">0 รอตรวจ</span>
+                </button>
+                <button type="button" onclick="switchTab('directory')" id="tab-btn-directory" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>ทำเนียบพนักงาน</span>
+                    <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">11 คน</span>
                 </button>
                 <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-user"></i>
@@ -540,7 +546,50 @@
             </div>
         </section>
 
-        <!-- ================= TAB 5: MY PROFILE ================= -->
+        <!-- ================= TAB 5: STAFF DIRECTORY ================= -->
+        <section id="tab-directory" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 sm:p-8 space-y-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <h2 class="font-bold text-slate-900 text-xl flex items-center">
+                            <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบพนักงานและบุคลากร PCBK
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อ สังกัด และข้อมูลสถานะการปฏิบัติงานของสมาชิกในองค์กร</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <div class="relative w-full sm:w-64">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                            <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส, ตำแหน่ง..." class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Executive Board -->
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                        <h3 class="font-bold text-slate-800 text-sm">คณะผู้บริหารระดับสูง (Executive Board)</h3>
+                    </div>
+                    <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Dynamic Executives -->
+                    </div>
+                </div>
+
+                <!-- Staff & Operations -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center space-x-2 border-b border-slate-100 pb-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
+                        <h3 class="font-bold text-slate-800 text-sm">ทีมงานและฝ่ายปฏิบัติการ (Personnel & Operations)</h3>
+                    </div>
+                    <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Dynamic Staff -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 6: MY PROFILE ================= -->
         <section id="tab-profile" class="tab-content hidden max-w-4xl mx-auto space-y-6">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
@@ -848,7 +897,7 @@
             } else {
                 const loginModal = document.getElementById('login-modal');
                 if (loginModal) {
-                    loginModal.style.setProperty('display', 'flex', 'important');
+                    loginModal.style.cssText = "display: flex !important;";
                     loginModal.classList.remove('hidden');
                 }
             }
@@ -857,15 +906,11 @@
         function handleLoginSubmit(e) {
             e.preventDefault();
             const codeInput = document.getElementById('login-input-code');
-            const errorBox = document.getElementById('login-error-msg');
             const code = codeInput ? codeInput.value.trim() : '';
             const rememberMe = document.getElementById('login-remember-me')?.checked || false;
 
-            if (errorBox) errorBox.classList.add('hidden');
-
-            if (performLogin(code, rememberMe)) {
-                // Done
-            } else {
+            if (!performLogin(code, rememberMe)) {
+                const errorBox = document.getElementById('login-error-msg');
                 if (errorBox) errorBox.classList.remove('hidden');
             }
         }
@@ -888,7 +933,6 @@
                 localStorage.setItem('pcbk_device_auth_code', trimmed);
             }
 
-            // ลบ Login Modal ออกจาก DOM ทันทีเพื่อป้องกันปัญหาค้าง
             const modal = document.getElementById('login-modal');
             if (modal) {
                 modal.remove();
@@ -1020,6 +1064,7 @@
                     saveEmployeesToCloud();
                     updateUserSessionUI();
                     renderTodayDashboard();
+                    renderStaffDirectory();
                     showToast("อัปโหลดรูปภาพและบันทึกขึ้น Cloud สำเร็จแล้ว");
                 };
                 img.src = event.target.result;
@@ -1080,7 +1125,7 @@
         }
 
         function switchTab(tabId) {
-            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'profile'];
+            const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'directory', 'profile'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
                 const content = document.getElementById(`tab-${id}`);
@@ -1105,6 +1150,7 @@
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
+            if (tabId === 'directory') renderStaffDirectory();
             if (tabId === 'request-form') {
                 renderEmpSelectOptions('form-emp-id');
                 handleFormEmpChange();
@@ -1199,6 +1245,7 @@
             renderTodayDashboard();
             renderSummaryTable();
             renderApprovalQueue();
+            renderStaffDirectory();
             updateBadges();
             renderProfileTab();
         }
@@ -1231,6 +1278,9 @@
             if (heroPendingTxt) {
                 heroPendingTxt.innerText = `มีคำขอรออนุมัติ (${pendingCount})`;
             }
+
+            const dirBadge = document.getElementById('badge-directory-count');
+            if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
         function renderTodayDashboard() {
@@ -1452,6 +1502,78 @@
             } catch (err) {}
         }
 
+        // ================= TAB 5: STAFF DIRECTORY RENDERING =================
+        function renderStaffDirectory() {
+            const execGrid = document.getElementById('directory-executives-grid');
+            const staffGrid = document.getElementById('directory-staff-grid');
+            if (!execGrid || !staffGrid) return;
+
+            execGrid.innerHTML = '';
+            staffGrid.innerHTML = '';
+
+            const search = document.getElementById('search-directory')?.value.toLowerCase() || '';
+
+            const filtered = employees.filter(e => {
+                return (e.name && e.name.toLowerCase().includes(search)) || 
+                       (e.id && e.id.toLowerCase().includes(search)) || 
+                       (e.position && e.position.toLowerCase().includes(search));
+            });
+
+            filtered.forEach(emp => {
+                const isExec = emp.id === '1101001' || emp.id === '1102003';
+                const avatar = getEmployeeAvatar(emp.id);
+                const tenure = calculateWorkTenure(emp.startDate);
+                const quota = getEmpRemainingQuotas(emp.id);
+
+                if (isExec) {
+                    execGrid.innerHTML += `
+                        <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-5 text-center sm:text-left">
+                            <img src="${avatar}" alt="${emp.name}" class="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md bg-white">
+                            <div class="space-y-1.5 flex-1">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                                    <h4 class="font-bold text-slate-900 text-base">${formatDisplayName(emp)}</h4>
+                                    <span class="bg-blue-600 text-white text-[10px] px-2.5 py-0.5 rounded-full font-bold self-center sm:self-auto">Executive Board</span>
+                                </div>
+                                <p class="text-xs text-blue-800 font-medium">${emp.position}</p>
+                                <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 pt-2 border-t border-blue-100">
+                                    <div>รหัส: <strong class="font-mono">${emp.id}</strong></div>
+                                    <div>เริ่มงาน: <strong>${emp.startDate}</strong></div>
+                                    <div class="col-span-2">อายุงาน: <strong class="text-blue-700">${tenure}</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    staffGrid.innerHTML += `
+                        <div class="bg-slate-50/80 border border-slate-200/80 rounded-3xl p-5 shadow-xs card-hover flex flex-col justify-between space-y-4">
+                            <div class="flex items-start space-x-3.5">
+                                <img src="${avatar}" alt="${emp.name}" class="w-14 h-14 rounded-2xl object-cover border border-slate-200 shadow-xs bg-white">
+                                <div class="space-y-0.5 flex-1">
+                                    <h4 class="font-bold text-slate-900 text-sm leading-tight">${formatDisplayName(emp)}</h4>
+                                    <p class="text-[11px] text-slate-500 font-medium">${emp.position}</p>
+                                    <span class="inline-block text-[10px] text-slate-400 font-mono">ID: ${emp.id}</span>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200/80 pt-3 space-y-1.5 text-[11px] text-slate-600">
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">วันเริ่มงาน:</span>
+                                    <strong>${emp.startDate}</strong>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-slate-400">อายุงาน PCBK:</span>
+                                    <strong class="text-blue-700">${tenure}</strong>
+                                </div>
+                                <div class="flex justify-between items-center pt-1">
+                                    <span class="text-slate-400">สิทธิ์พักร้อนคงเหลือ:</span>
+                                    <span class="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold text-[10px]">${quota.vacRem.toFixed(2)} วัน</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
+
         // ================= FULL MATRIX RENDERING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
@@ -1577,6 +1699,7 @@
             }
             renderSummaryTable();
             renderTodayDashboard();
+            renderStaffDirectory();
             await saveEmployeesToCloud();
             showToast("บันทึกข้อมูลพนักงานขึ้น Cloud เรียบร้อย");
         }
@@ -1586,6 +1709,7 @@
             employees[empIndex].vacationAccrued[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
+            renderStaffDirectory();
             await saveEmployeesToCloud();
             showToast("บันทึกยอดเพิ่มพักร้อนขึ้น Cloud เรียบร้อย");
         }
@@ -1595,6 +1719,7 @@
             employees[empIndex].vacationUsedMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
+            renderStaffDirectory();
             await saveEmployeesToCloud();
             showToast("บันทึกยอดใช้พักร้อนขึ้น Cloud เรียบร้อย");
         }
