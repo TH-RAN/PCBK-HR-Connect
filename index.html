@@ -883,7 +883,6 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // เช็ครูปภาพ: ถ้ามีอัปโหลดทับในเครื่อง -> ถ้าไม่มี ดึงไฟล์ .jpg ตามรหัสใน GitHub
         function getEmployeeAvatar(empId) {
             const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
             if (localSaved && localSaved.startsWith('data:image')) {
@@ -896,14 +895,15 @@
             return `./${empId}.jpg`;
         }
 
-        // หากหาไฟล์รูปใน GitHub ไม่เจอ จะแสดงอวาตาร์การ์ตูนน่ารัก (แยก หญิง/ชาย อัตโนมัติ)
+        // ระบบสำรอง: หากไม่มีไฟล์ภาพ .jpg ใน GitHub จะแสดงภาพการ์ตูนผู้หญิงผิวขาวผมยาวแสกกลาง หรือผู้ชายสุภาพ
         function handleImageError(imgElement, empId) {
             const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
             const isFemale = femaleIds.includes(String(empId));
-            // ใช้สไตล์การ์ตูนน่ารักสดใสของ DiceBear
+            
+            // ใช้ DiceBear style 'adventurer' หรือ 'avataaars' ที่ปรับให้เป็นผู้หญิงผิวขาวผมยาวแสกกลางเรียบร้อยน่ารัก
             imgElement.src = isFemale 
-                ? `https://api.dicebear.com/7.x/micah/svg?seed=girl_${empId}&backgroundColor=ffd5dc`
-                : `https://api.dicebear.com/7.x/micah/svg?seed=boy_${empId}&backgroundColor=d1f4ff`;
+                ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_long_black_hair_${empId}&backgroundColor=ffd5dc&hair=long01&hairColor=0e0e0e&skinColor=f2d3b1`
+                : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff&skinColor=f2d3b1`;
         }
 
         window.addEventListener('DOMContentLoaded', () => {
