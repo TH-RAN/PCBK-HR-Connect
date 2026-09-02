@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Leave Connect - PCBK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            font-family: 'Prompt', sans-serif;
+        }
+        body {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2 rounded-xl">
+                    <i class="fa-solid fa-users-rectangle text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">HR Leave Connect</h1>
+                    <p class="text-xs text-indigo-200">PCBK Management System</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="user-profile-badge" class="flex items-center space-x-2 bg-indigo-700/50 py-1.5 px-3 rounded-full border border-indigo-500/30">
+                    <img id="header-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full object-cover border border-white/40 bg-indigo-500">
+                    <span id="header-username" class="text-sm font-medium">กำลังโหลด...</span>
+                </div>
+                <button onclick="logout()" class="bg-indigo-700 hover:bg-indigo-800 text-indigo-100 text-xs px-3 py-1.5 rounded-lg transition border border-indigo-500/40">
+                    <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+        
+        <div class="flex space-x-2 border-b border-slate-200 mb-6 overflow-x-auto pb-2">
+            <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn px-4 py-2 font-medium text-sm rounded-lg transition bg-indigo-600 text-white shadow-sm whitespace-nowrap">
+                <i class="fa-solid fa-chart-pie mr-2"></i>ภาพรวม
+            </button>
+            <button onclick="switchTab('leave')" id="tab-leave" class="tab-btn px-4 py-2 font-medium text-sm rounded-lg transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
+                <i class="fa-solid fa-calendar-days mr-2"></i>ระบบขออนุมัติลา
+            </button>
+            <button onclick="switchTab('summary')" id="tab-summary" class="tab-btn px-4 py-2 font-medium text-sm rounded-lg transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
+                <i class="fa-solid fa-table-list mr-2"></i>สรุปวันลาพนักงาน
+            </button>
+            <button onclick="switchTab('directory')" id="tab-directory" class="tab-btn px-4 py-2 font-medium text-sm rounded-lg transition text-slate-600 hover:bg-slate-100 whitespace-nowrap">
+                <i class="fa-solid fa-address-book mr-2"></i>ทำเนียบบุคลากร (Employee)
+            </button>
+        </div>
+
+        <div id="content-overview" class="tab-content space-y-6">
+            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg flex flex-col md:flex-row justify-between items-center">
+                <div class="space-y-2 mb-4 md:mb-0">
+                    <h2 class="text-2xl font-bold" id="welcome-msg">สวัสดีครับ, ผู้ใช้งาน</h2>
+                    <p class="text-indigo-100 text-sm">ยินดีต้อนรับเข้าสู่ระบบจัดการทรัพยากรบุคคล PCBK HR-Connect</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md px-4 py-3 rounded-xl border border-white/20 flex items-center space-x-3">
+                    <i class="fa-regular fa-calendar-check text-2xl text-indigo-200"></i>
+                    <div>
+                        <div class="text-xs text-indigo-200">ปีงบประมาณ / ปฏิทิน</div>
+                        <div class="text-lg font-bold" id="current-year-display">2569</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center">
+                            <i class="fa-solid fa-calendar-week text-indigo-600 mr-2"></i>ปฏิทินพนักงานสัปดาห์ล่าสุด (Events)
+                        </h3>
+                        <p class="text-xs text-slate-500">บันทึกและตรวจสอบตารางงาน โน้ตประชุม หรือกิจกรรมสำคัญในสัปดาห์นี้</p>
+                    </div>
+                    <button onclick="openEventModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-2 rounded-lg transition shadow-sm">
+                        <i class="fa-solid fa-plus mr-1"></i> เพิ่มกิจกรรม/โน้ต
+                    </button>
+                </div>
+                
+                <div id="weekly-events-grid" class="grid grid-cols-1 md:grid-cols-7 gap-3 pt-2">
+                    </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-4 text-sm flex items-center">
+                        <i class="fa-solid fa-chart-bar text-indigo-600 mr-2"></i>สถิติการลาแยกตามประเภท (ปี 2569)
+                    </h3>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="leaveTypeChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-800 mb-4 text-sm flex items-center">
+                        <i class="fa-solid fa-chart-pie text-purple-600 mr-2"></i>สัดส่วนพนักงานแต่ละประเภทการลา
+                    </h3>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="leaveRatioChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-leave" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center">
+                    <i class="fa-solid fa-file-pen text-indigo-600 mr-2"></i>ฟอร์มบันทึกการขออนุมัติลา
+                </h3>
+                <form id="leave-form" onsubmit="submitLeave(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">ประเภทการลา</label>
+                            <select id="leave-type" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                                <option value="พักร้อน">พักร้อน</option>
+                                <option value="ลาป่วย">ลาป่วย</option>
+                                <option value="ลาอื่นๆ/ภารกิจ">ลาอื่นๆ/ภารกิจ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">จำนวนวัน</label>
+                            <input type="number" id="leave-days" step="0.5" min="0.5" value="1" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">เหตุผลการลา</label>
+                        <textarea id="leave-reason" rows="3" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" placeholder="ระบุเหตุผล..."></textarea>
+                    </div>
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm px-5 py-2.5 rounded-xl transition shadow-sm">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>ส่งคำขออนุมัติ
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div id="content-summary" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-lg flex items-center">
+                        <i class="fa-solid fa-table-list text-indigo-600 mr-2"></i>ตารางสรุปวันลาพนักงาน
+                    </h3>
+                    <button onclick="exportExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-2 rounded-lg transition shadow-sm">
+                        <i class="fa-solid fa-file-excel mr-1"></i> ส่งออก Excel
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                                <th class="p-3">รหัส</th>
+                                <th class="p-3">ชื่อ-นามสกุล</th>
+                                <th class="p-3">ตำแหน่ง</th>
+                                <th class="p-3 text-center">คงเหลือพักร้อน</th>
+                                <th class="p-3 text-center">รวมใช้ลาป่วย</th>
+                                <th class="p-3 text-center">ลาอื่นๆ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="content-directory" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+                <h3 class="font-bold text-slate-800 text-lg flex items-center">
+                    <i class="fa-solid fa-address-book text-indigo-600 mr-2"></i>ทำเนียบบุคลากร (Employee Directory)
+                </h3>
+                <div id="directory-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="event-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-800 text-lg">เพิ่มบันทึกกิจกรรมประจำวัน</h3>
+                <button onclick="closeEventModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">วันที่ (เลือกวันในสัปดาห์นี้)</label>
+                    <input type="date" id="event-date" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">ช่วงเวลา (เช่น 09:00 - 10:30)</label>
+                    <input type="text" id="event-time" placeholder="เช่น 13:00 - 14:00" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">รายละเอียดกิจกรรม / โน้ตประชุม</label>
+                    <textarea id="event-desc" rows="3" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500" placeholder="ระบุรายละเอียด..."></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeEventModal()" class="px-4 py-2 text-sm text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 transition">ยกเลิก</button>
+                <button onclick="saveEvent()" class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white text-xs px-4 py-3 rounded-xl shadow-lg transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message">สำเร็จ</span>
+    </div>
+
+    <script>
+        // Data Store & Global State
+        let currentUser = {
+            id: "EMP01",
+            name: "สมชาย ใจดี",
+            position: "HR Manager"
+        };
+
+        let employees = [
+            { id: "EMP01", name: "สมชาย ใจดี", position: "HR Manager", dob: "15/05/2530", startDate: "01/01/2560", carry: 5, accrued: 6, vacUsed: 2, sickUsed: 1, otherLeaveDays: 0 },
+            { id: "EMP02", name: "สมหญิง รักงาน", position: "Developer", dob: "20/08/2535", startDate: "15/03/2563", carry: 3, accrued: 6, vacUsed: 1, sickUsed: 2, otherLeaveDays: 0 },
+            { id: "EMP03", name: "วิชัย มั่นคง", position: "Accountant", dob: "10/12/2528", startDate: "01/06/2558", carry: 7, accrued: 6, vacUsed: 4, sickUsed: 0, otherLeaveDays: 1 }
+        ];
+
+        // Shared Cloud-Sync Simulation for Events & Leave Data
+        let appData = {
+            yearBE: 2569,
+            events: JSON.parse(localStorage.getItem('pcbk_cloud_events') || '[]'),
+            leaves: JSON.parse(localStorage.getItem('pcbk_cloud_leaves') || '[]')
+        };
+
+        // Helper: Get Employee Avatar via GitHub naming convention (EMPXX.jpg / .png)
+        function getEmployeeAvatar(empId) {
+            // ดึงไฟล์จาก GitHub Repository (เปลี่ยน path ตามโครงสร้างจริงของคุณได้)
+            // รองรับนามสกุลไฟล์หลัก (.jpg, .png) พร้อม fallback เป็นรูปหุ่นยนต์/โลโก้กลาง
+            return `${empId}.jpg`;
+        }
+
+        function handleImageError(imgEl, empId) {
+            // Fallback กรณีไฟล์ .jpg ไม่มี ลองสลับเป็น .png หรือ Default Avatar
+            if (!imgEl.src.endsWith('.png')) {
+                imgEl.src = `${empId}.png`;
+            } else {
+                imgEl.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // Sync cross-tab or cross-browser via storage listener
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pcbk_cloud_events' || e.key === 'pcbk_cloud_leaves') {
+                    appData.events = JSON.parse(localStorage.getItem('pcbk_cloud_events') || '[]');
+                    appData.leaves = JSON.parse(localStorage.getItem('pcbk_cloud_leaves') || '[]');
+                    renderWeeklyEvents();
+                    renderSummaryTable();
+                    renderDirectory();
+                }
+            });
+        });
+
+        function initApp() {
+            // Set User Badge
+            document.getElementById('header-username').innerText = currentUser.name;
+            document.getElementById('welcome-msg').innerText = `สวัสดีครับ, ${currentUser.name}`;
+            
+            const headerAvatar = document.getElementById('header-avatar');
+            headerAvatar.src = getEmployeeAvatar(currentUser.id);
+            headerAvatar.onerror = () => handleImageError(headerAvatar, currentUser.id);
+
+            renderWeeklyEvents();
+            renderSummaryTable();
+            renderDirectory();
+            initCharts();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+                el.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            document.getElementById(`content-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+            activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+        }
+
+        // Weekly Events Logic
+        function renderWeeklyEvents() {
+            const grid = document.getElementById('weekly-events-grid');
+            grid.innerHTML = '';
+
+            // Generate 7 days of current week
+            const today = new Date();
+            const currentDayOfWeek = today.getDay();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - currentDayOfWeek + (currentDayOfWeek === 0 ? -6 : 1)); // Start Monday
+
+            for (let i = 0; i < 7; i++) {
+                const loopDate = new Date(startOfWeek);
+                loopDate.setDate(startOfWeek.getDate() + i);
+                const dateString = loopDate.toISOString().split('T')[0];
+                const dayName = loopDate.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                // Find events for this date
+                const dayEvents = appData.events.filter(ev => ev.date === dateString);
+
+                let eventsHtml = dayEvents.length === 0 
+                    ? `<div class="text-xs text-slate-400 italic">ไม่มีกิจกรรม</div>`
+                    : dayEvents.map(ev => {
+                        const emp = employees.find(e => e.id === ev.empId) || { name: ev.empName };
+                        return `
+                            <div class="group relative bg-indigo-50 border border-indigo-100 p-2 rounded-xl text-xs space-y-1">
+                                <div class="flex items-center space-x-1.5">
+                                    <img src="${getEmployeeAvatar(ev.empId)}" onerror="handleImageError(this, '${ev.empId}')" class="w-5 h-5 rounded-full object-cover border border-indigo-200">
+                                    <span class="font-semibold text-indigo-900 truncate">${emp.name}</span>
+                                </div>
+                                <div class="text-indigo-700 font-medium"><i class="fa-regular fa-clock mr-1"></i>${ev.time}</div>
+                                <p class="text-slate-600 line-clamp-2">${ev.desc}</p>
+                            </div>
+                        `;
+                    }).join('');
+
+                const isToday = dateString === new Date().toISOString().split('T')[0];
+
+                grid.innerHTML += `
+                    <div class="bg-slate-50 border ${isToday ? 'border-indigo-400 bg-indigo-50/30' : 'border-slate-200'} rounded-xl p-3 flex flex-col space-y-2">
+                        <div class="font-bold text-xs text-slate-700 border-b pb-1 flex justify-between items-center">
+                            <span>${dayName}</span>
+                            ${isToday ? '<span class="bg-indigo-600 text-white text-[10px] px-1.5 py-0.5 rounded">วันนี้</span>' : ''}
+                        </div>
+                        <div class="space-y-2 flex-grow">
+                            ${eventsHtml}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function openEventModal() {
+            document.getElementById('event-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('event-modal').classList.remove('hidden');
+        }
+
+        function closeEventModal() {
+            document.getElementById('event-modal').classList.add('hidden');
+        }
+
+        function saveEvent() {
+            const date = document.getElementById('event-date').value;
+            const time = document.getElementById('event-time').value;
+            const desc = document.getElementById('event-desc').value;
+
+            if (!date || !time || !desc) {
+                showToast('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            const newEvent = {
+                id: 'EV_' + Date.now(),
+                empId: currentUser.id,
+                empName: currentUser.name,
+                date,
+                time,
+                desc
+            };
+
+            appData.events.push(newEvent);
+            localStorage.setItem('pcbk_cloud_events', JSON.stringify(appData.events));
+            
+            closeEventModal();
+            renderWeeklyEvents();
+            showToast('บันทึกกิจกรรมเรียบร้อยแล้ว');
+        }
+
+        // Summary Table & Directory
+        function renderSummaryTable() {
+            const tbody = document.getElementById('summary-table-body');
+            tbody.innerHTML = '';
+
+            employees.forEach(e => {
+                const remVac = (e.carry + e.accrued) - e.vacUsed;
+                const isMe = e.id === currentUser.id;
+                
+                tbody.innerHTML += `
+                    <tr class="border-b border-slate-100 ${isMe ? 'bg-red-550 bg-red-55 border-l-4 border-l-red-600 font-semibold' : 'hover:bg-slate-50'}">
+                        <td class="p-3">${e.id}</td>
+                        <td class="p-3 flex items-center space-x-2">
+                            <img src="${getEmployeeAvatar(e.id)}" onerror="handleImageError(this, '${e.id}')" class="w-6 h-6 rounded-full object-cover border">
+                            <span>${e.name}</span>
+                        </td>
+                        <td class="p-3 text-slate-600">${e.position}</td>
+                        <td class="p-3 text-center">${remVac}</td>
+                        <td class="p-3 text-center">${e.sickUsed}</td>
+                        <td class="p-3 text-center">${e.otherLeaveDays}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderDirectory() {
+            const grid = document.getElementById('directory-grid');
+            grid.innerHTML = '';
+
+            employees.forEach(e => {
+                grid.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex items-center space-x-4 shadow-sm">
+                        <img src="${getEmployeeAvatar(e.id)}" onerror="handleImageError(this, '${e.id}')" class="w-16 h-16 rounded-full object-cover border-2 border-indigo-500 shadow-sm bg-white">
+                        <div class="space-y-1">
+                            <h4 class="font-bold text-slate-800 text-sm">${e.name}</h4>
+                            <p class="text-xs text-indigo-600 font-medium">${e.position}</p>
+                            <p class="text-[11px] text-slate-400">รหัส: ${e.id} | เริ่มงาน: ${e.startDate}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function submitLeave(event) {
+            event.preventDefault();
+            const type = document.getElementById('leave-type').value;
+            const days = parseFloat(document.getElementById('leave-days').value);
+            const reason = document.getElementById('leave-reason').value;
+
+            // Update user leave count
+            const emp = employees.find(e => e.id === currentUser.id);
+            if (emp) {
+                if (type === 'พักร้อน') emp.vacUsed += days;
+                else if (type === 'ลาป่วย') emp.sickUsed += days;
+                else emp.otherLeaveDays += days;
+            }
+
+            renderSummaryTable();
+            showToast('ส่งคำขออนุมัติลาเรียบร้อยแล้ว');
+            document.getElementById('leave-form').reset();
+        }
+
+        function exportExcel() {
+            const dataToExport = employees.map(e => ({
+                "รหัสพนักงาน": e.id,
+                "ชื่อ-นามสกุล": e.name,
+                "ตำแหน่ง": e.position,
+                "คงเหลือพักร้อน": (e.carry + e.accrued) - e.vacUsed,
+                "รวมใช้ลาป่วย": e.sickUsed,
+                "ลาอื่นๆ": e.otherLeaveDays
+            }));
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "สรุปวันลา");
+            XLSX.writeFile(wb, "รายงานสรุปวันลา.xlsx");
+            showToast("ส่งออกไฟล์ Excel สำเร็จ");
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('leaveTypeChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['พักร้อน', 'ลาป่วย', 'ลาอื่นๆ'],
+                    datasets: [{
+                        label: 'จำนวนวันรวม',
+                        data: [12, 8, 3],
+                        backgroundColor: ['#6366f1', '#a855f7', '#ec4899'],
+                        borderRadius: 8
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctx2 = document.getElementById('leaveRatioChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['พักร้อน', 'ลาป่วย', 'ลาอื่นๆ'],
+                    datasets: [{
+                        data: [50, 35, 15],
+                        backgroundColor: ['#6366f1', '#a855f7', '#ec4899']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function logout() {
+            showToast('ออกจากระบบสำเร็จ');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toast-message');
+            if (!toast || !msgEl) return;
+            msgEl.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
