@@ -125,7 +125,7 @@
 
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-2xl text-xs font-medium cursor-pointer hover:bg-slate-100 transition" onclick="switchTab('profile')">
-                        <img id="header-user-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200">
+                        <img id="header-user-avatar" src="" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=user';">
                         <span id="header-user-name" class="text-slate-800 font-bold">กำลังโหลด...</span>
                         <span id="header-role-badge" class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">พนักงาน</span>
                     </div>
@@ -234,14 +234,14 @@
                         <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
                     </div>
 
-                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR -->
+                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR (Cloud Synced) -->
                     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                             <div>
                                 <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
                                     <i class="fa-solid fa-calendar-days text-indigo-600 mr-2"></i> ปฏิทินพนักงานสัปดาห์ล่าสุด (Events)
                                 </h3>
-                                <p class="text-xs text-slate-500">บันทึกและตรวจสอบตารางกิจกรรม/ประชุมประจำสัปดาห์ของคุณ</p>
+                                <p class="text-xs text-slate-500">บันทึกและตรวจสอบตารางกิจกรรม/ประชุมประจำสัปดาห์ (ซิงก์ทุกคนอัตโนมัติ)</p>
                             </div>
                             <button type="button" onclick="openAddEventModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center space-x-1.5 shadow-xs cursor-pointer self-start sm:self-auto">
                                 <i class="fa-solid fa-plus"></i>
@@ -538,7 +538,7 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
                     <div>
                         <h2 class="font-bold text-slate-900 text-xl flex items-center">
-                            <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบพนักงาน (Employee) และบุคลากร PCBK
+                            <i class="fa-solid fa-address-book text-blue-600 mr-2.5"></i> ทำเนียบบุคลากร (Employee) และบุคลากร PCBK
                         </h2>
                         <p class="text-xs sm:text-sm text-slate-500 mt-1">รายชื่อและข้อมูลประวัติการทำงานของสมาชิกในองค์กร (เรียงตามอายุงาน)</p>
                     </div>
@@ -577,7 +577,7 @@
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
                         <div class="relative group">
-                            <img id="profile-card-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=user" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50">
+                            <img id="profile-card-avatar" src="" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=user';">
                             <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
                                 <i class="fa-solid fa-camera text-xs"></i>
                             </label>
@@ -629,7 +629,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ซิงก์รูปภาพและอีเวนต์ปฏิทินผ่าน Google Cloud อัตโนมัติ 100%</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ดึงภาพจาก GitHub อัตโนมัติ (รหัสพนักงาน.jpg/png)</strong></div>
                     </div>
                 </div>
             </div>
@@ -815,67 +815,67 @@
                 seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President (รองประธานกรรมการบริหาร)", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 3, id: "1102033", name: "ภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0.25, 0, 0, 2, 0, 1, 2, 0.25, 0, 0, 0, 0],
-                sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [1, 0, 0.5, 0, 0, 0.5, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 4, id: "1104008", name: "กนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [1.5, 0, 3, 1, 0.5, 2, 1, 1, 0, 0, 0, 0],
-                sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: "", avatar: ""
+                sickMonths: [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 1, note: ""
             },
             {
                 seq: 5, id: "1103020", name: "ชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 6, id: "1103059", name: "ปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 7, id: "1102049", name: "ณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [3, 0.25, 1, 3.75, 0, 1, 3, 1, 0, 0, 0, 0],
-                sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 8, id: "1102050", name: "ภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [3, 0, 1, 2, 3, 1, 1, 1, 0, 0, 0, 0],
-                sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
                 vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 1, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 1, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 1, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                 vacationUsedMonths: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: "", avatar: ""
+                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             }
         ];
 
         let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = []; 
-        let events = []; // สำหรับเก็บข้อมูลอีเวนต์ปฏิทิน
+        let events = []; // ข้อมูลปฏิทินสัปดาห์ (ซิงก์ผ่าน Cloud)
         let activeModalReqId = null;
         let currentUser = null;
         let isAdmin = false;
@@ -906,78 +906,58 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
+        // ระบบดึงภาพพนักงานจาก GitHub โดยตรงตามรหัสพนักงาน (.jpg / .png) แบบโลโก้บริษัท
         function getEmployeeAvatar(empId) {
-            const emp = employees.find(e => String(e.id) === String(empId));
-            if (emp && emp.avatar && emp.avatar.startsWith('data:image')) {
-                return emp.avatar;
-            }
-            const localSaved = localStorage.getItem(`pcbk_avatar_${empId}`);
-            if (localSaved && localSaved.startsWith('data:image')) {
-                return localSaved;
-            }
-            const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
-            const isFemale = femaleIds.includes(String(empId));
-            return isFemale 
-                ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_${empId}&backgroundColor=ffd5dc`
-                : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff`;
+            return `./${empId}.jpg`;
         }
 
         function handleImageError(imgElement, empId) {
-            imgElement.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
+            // ถ้านามสกุล .jpg ไม่พบ ให้ลองสลับเป็น .png หรือใช้ตัวการ์ตูนกลางสำรอง
+            if (imgElement.src.endsWith('.jpg')) {
+                imgElement.src = `./${empId}.png`;
+            } else {
+                imgElement.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            syncFromCloud(); // ดึงข้อมูลและรูปภาพจาก Cloud ทันที
+            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud ทันที
             checkAutoLogin();
 
-            // ดึงข้อมูลจาก Cloud ทุกๆ 10 วินาที เพื่อให้เห็นรูปและอีเวนต์ใหม่ของเครื่องอื่นแบบเรียลไทม์
+            // ดึงข้อมูลซิงก์จาก Cloud ทุก 10 วินาที เพื่อให้เพื่อนร่วมงานเห็นอีเวนต์ตรงกันทุกเครื่อง
             setInterval(syncFromCloud, 10000);
         });
 
-        // ================= CLOUD SYNC & AUTO HEALING =================
+        // ================= CLOUD SYNC FOR EVENTS & LEAVES =================
         async function syncFromCloud() {
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 const data = await res.json();
-                
                 if (data && data.status === "success") {
-                    let needsCloudUpdate = false;
-
-                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
-                        let cloudList = data.employees.filter(e => String(e.id) !== '1102051');
-                        cloudList.forEach((cloudEmp, idx) => {
-                            cloudEmp.seq = idx + 1;
-                            const localAvatar = localStorage.getItem(`pcbk_avatar_${cloudEmp.id}`);
-                            
-                            if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
-                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
-                            } else if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
-                                cloudEmp.avatar = localAvatar;
-                                needsCloudUpdate = true;
-                            }
-                        });
-                        employees = cloudList;
-                    }
-
                     if (data.requests && Array.isArray(data.requests)) {
                         requests = data.requests;
                     }
-
                     if (data.events && Array.isArray(data.events)) {
                         events = data.events;
                     }
-                    
+                    if (data.employees && Array.isArray(data.employees)) {
+                        data.employees.forEach(cloudEmp => {
+                            const localIdx = employees.findIndex(e => String(e.id) === String(cloudEmp.id));
+                            if (localIdx !== -1) {
+                                employees[localIdx].vacationUsedMonths = cloudEmp.vacationUsedMonths || employees[localIdx].vacationUsedMonths;
+                                employees[localIdx].sickMonths = cloudEmp.sickMonths || employees[localIdx].sickMonths;
+                                employees[localIdx].otherLeaveDays = cloudEmp.otherLeaveDays || employees[localIdx].otherLeaveDays;
+                            }
+                        });
+                    }
                     saveLocalDataSilently();
                     renderAllViews();
-
-                    if (needsCloudUpdate) {
-                        await saveAllToCloud();
-                    }
                 }
             } catch (err) {
-                console.warn("Sync from cloud failed:", err);
+                console.warn("Sync from cloud failed, using local backup:", err);
+                renderAllViews();
             }
         }
 
@@ -995,7 +975,9 @@
                         events: events
                     })
                 });
-            } catch (err) {}
+            } catch (err) {
+                console.warn("Save to cloud failed:", err);
+            }
         }
 
         // ================= AUTHENTICATION =================
@@ -1149,51 +1131,9 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        async function handleProfilePhotoUpload(e) {
-            const file = e.target.files[0];
-            if (!file || !currentUser) return;
-
-            showToast("กำลังอัปโหลดและซิงก์รูปภาพ...");
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = async function() {
-                    const canvas = document.createElement('canvas');
-                    const maxDim = 150;
-                    let w = img.width;
-                    let h = img.height;
-                    if (w > h) {
-                        if (w > maxDim) { h = Math.round(h * (maxDim / w)); w = maxDim; }
-                    } else {
-                        if (h > maxDim) { w = Math.round(w * (maxDim / h)); h = maxDim; }
-                    }
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.75);
-
-                    const empIdx = employees.findIndex(emp => String(emp.id) === String(currentUser.id));
-                    if (empIdx !== -1) {
-                        employees[empIdx].avatar = compressedBase64;
-                    }
-                    currentUser.avatar = compressedBase64;
-
-                    localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
-                    
-                    // บันทึกขึ้น Cloud ทันที
-                    await saveAllToCloud();
-                    
-                    updateUserSessionUI();
-                    renderTodayDashboard();
-                    renderStaffDirectory();
-                    showToast("อัปโหลดและซิงก์รูปภาพขึ้น Cloud สำเร็จแล้ว!");
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
+        // ยกเลิกการอัปโหลดไฟล์ภาพผ่านเว็บ ป้องกันข้อมูลล้น Cloud (ใช้การดึงภาพจาก GitHub ตามชื่อไฟล์รหัสพนักงานแทน)
+        function handleProfilePhotoUpload(e) {
+            alert("ระบบได้เปลี่ยนมาใช้การดึงรูปภาพจาก GitHub โดยอัตโนมัติแล้ว กรุณาอัปโหลดภาพพนักงาน (ชื่อไฟล์เป็นรหัสพนักงาน เช่น 1102049.jpg) ไว้ที่ GitHub ครับ");
         }
 
         function setupDynamicDates() {
@@ -1297,13 +1237,6 @@
 
                 requests = masterReq ? JSON.parse(masterReq) : [];
                 events = masterEvents ? JSON.parse(masterEvents) : [];
-
-                employees.forEach(emp => {
-                    const localImg = localStorage.getItem(`pcbk_avatar_${emp.id}`);
-                    if (localImg && localImg.startsWith('data:image')) {
-                        emp.avatar = localImg;
-                    }
-                });
             } catch (e) {
                 employees = JSON.parse(JSON.stringify(defaultDataset)).filter(e => String(e.id) !== '1102051');
                 requests = [];
@@ -1362,7 +1295,7 @@
             if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
-        // ================= WEEKLY EVENTS CALENDAR =================
+        // ================= WEEKLY EVENTS CALENDAR (Cloud Synced) =================
         function openAddEventModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนเพิ่มโน้ตกิจกรรม");
