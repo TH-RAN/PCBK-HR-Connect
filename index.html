@@ -17,52 +17,6 @@
     <!-- SheetJS for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Firebase SDK (v10 Modular ผ่าน CDN) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyCTtyWKKtv4MThDprVrLnVjBdxCMzMoJ5g",
-            authDomain: "pcbk-hr-connect.firebaseapp.com",
-            projectId: "pcbk-hr-connect",
-            storageBucket: "pcbk-hr-connect.firebasestorage.app",
-            messagingSenderId: "448354582025",
-            appId: "1:448354582025:web:427ed123989d13ad0302d8",
-            measurementId: "G-PMTFY0ENVP"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.saveToFirebase = async function(employeesData, requestsData, eventsData) {
-            try {
-                await setDoc(doc(db, "pcbk_hr_database", "main_store"), {
-                    employees: employeesData,
-                    requests: requestsData,
-                    events: eventsData,
-                    updatedAt: new Date().toISOString()
-                });
-            } catch (e) {
-                console.error("Error saving to Firebase: ", e);
-            }
-        };
-
-        window.loadFromFirebase = async function() {
-            try {
-                const docSnap = await getDoc(doc(db, "pcbk_hr_database", "main_store"));
-                if (docSnap.exists()) {
-                    return docSnap.data();
-                } else {
-                    return null;
-                }
-            } catch (e) {
-                console.error("Error loading from Firebase: ", e);
-                return null;
-            }
-        };
-    </script>
-
     <style>
         * { font-family: 'Prompt', sans-serif; }
         body { background-color: #f8fafc; }
@@ -212,7 +166,7 @@
     <div id="event-detail-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 text-xs">
             <div class="flex justify-end"><button onclick="closeEventDetailModal()" class="cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button></div>
-            <img id="modal-event-avatar" class="w-20 h-20 rounded-full mx-auto object-cover border-4 border-indigo-500">
+            <img id="modal-event-avatar" class="w-20 h-20 rounded-full mx-auto object-cover border-4 border-indigo-500" onerror="handleImageError(this, '')">
             <h3 id="modal-event-name" class="font-bold text-base"></h3>
             <p id="modal-event-time" class="text-indigo-600 font-semibold"></p>
             <div class="bg-slate-50 border p-3 rounded-2xl text-left">
@@ -227,6 +181,8 @@
 
     <script>
         const ADMIN_PASSWORD = "pcbk2026";
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwK-R753aTqaM8DSYJNztwNfJhXuSM2nKKT9ZU8R3sDyUSm9U1xeynG-GgnggjdJD4R/exec";
+
         const defaultDataset = [
             { seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20 },
             { seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20 },
@@ -243,31 +199,50 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             setupDynamicDates();
-            await syncFromFirebase();
+            await loadFromAppsScript();
             checkAutoLogin();
-            setInterval(syncFromFirebase, 4000); // ซิงก์ดึงข้อมูลจาก Cloud ทุก 4 วิ
+            setInterval(loadFromAppsScript, 6000); // ซิงก์ข้อมูลอัตโนมัติทุก 6 วินาที
         });
 
-        async function syncFromFirebase() {
-            if (window.loadFromFirebase) {
-                const cloudData = await window.loadFromFirebase();
-                if (cloudData) {
-                    if (cloudData.requests) requests = cloudData.requests;
-                    if (cloudData.events) events = cloudData.events;
-                    if (cloudData.employees) employees = cloudData.employees;
+        async function loadFromAppsScript() {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=load`);
+                const data = await response.json();
+                if (data) {
+                    if (data.requests && Array.isArray(data.requests)) requests = data.requests;
+                    if (data.events && Array.isArray(data.events)) events = data.events;
+                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
+                        // ผสานข้อมูลพนักงานถ้ามีในชีต
+                    }
                     renderAllViews();
                 }
+            } catch (e) {
+                console.error("Error loading from Apps Script:", e);
             }
         }
 
-        async function saveAllToCloud() {
-            if (window.saveToFirebase) {
-                await window.saveToFirebase(employees, requests, events);
+        async function saveToAppsScript() {
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requests: requests, events: events })
+                });
+            } catch (e) {
+                console.error("Error saving to Apps Script:", e);
             }
         }
 
-        function getEmployeeAvatar(empId) { return `${empId}.jpg`; }
-        function handleImageError(img, empId) { img.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${empId}`; }
+        function getEmployeeAvatar(empId) {
+            if (empId === 'ADMIN') return 'https://api.dicebear.com/7.x/adventurer/svg?seed=admin';
+            return `${empId}.jpg`;
+        }
+
+        function handleImageError(img, empId) {
+            img.src = `https://api.dicebear.com/7.x/adventurer/svg?seed=${empId || 'default'}`;
+        }
+
         function formatDisplayName(emp) { return emp ? emp.name.replace(/^(นาย|นางสาว|นาง)\s*/g, '') : ''; }
         function isExecutiveOrAdmin() { return isAdmin || (currentUser && (currentUser.id === '1101001' || currentUser.id === '1102003')); }
 
@@ -349,7 +324,7 @@
                 endTime: document.getElementById('event-input-end').value,
                 title: document.getElementById('event-input-title').value
             });
-            await saveAllToCloud();
+            await saveToAppsScript();
             renderWeeklyEventsCalendar();
             closeEventModal();
             showToast("บันทึกกิจกรรมสำเร็จ");
@@ -409,7 +384,7 @@
                 reason: document.getElementById('form-reason').value,
                 status: 'รออนุมัติ'
             });
-            await saveAllToCloud();
+            await saveToAppsScript();
             renderApprovalQueue();
             switchTab('approval-center');
             showToast("ส่งใบลาสำเร็จ");
