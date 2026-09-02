@@ -16,6 +16,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <!-- SheetJS for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Firebase SDK (v10 Modular ผ่าน CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTtyWKKtv4MThDprVrLnVjBdxCMzMoJ5g",
+            authDomain: "pcbk-hr-connect.firebaseapp.com",
+            projectId: "pcbk-hr-connect",
+            storageBucket: "pcbk-hr-connect.firebasestorage.app",
+            messagingSenderId: "448354582025",
+            appId: "1:448354582025:web:427ed123989d13ad0302d8",
+            measurementId: "G-PMTFY0ENVP"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.saveToFirebase = async function(employeesData, requestsData, eventsData) {
+            try {
+                await setDoc(doc(db, "pcbk_hr_database", "main_store"), {
+                    employees: employeesData,
+                    requests: requestsData,
+                    events: eventsData,
+                    updatedAt: new Date().toISOString()
+                });
+                console.log("Saved to Firebase successfully");
+            } catch (e) {
+                console.error("Error saving to Firebase: ", e);
+            }
+        };
+
+        window.loadFromFirebase = async function() {
+            try {
+                const docSnap = await getDoc(doc(db, "pcbk_hr_database", "main_store"));
+                if (docSnap.exists()) {
+                    return docSnap.data();
+                } else {
+                    return null;
+                }
+            } catch (e) {
+                console.error("Error loading from Firebase: ", e);
+                return null;
+            }
+        };
+    </script>
+
     <style>
         * {
             font-family: 'Prompt', sans-serif;
@@ -731,7 +779,6 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgz6Mk2JjGJRtogSb_vImFZ9DngGH9lfj-1vVYNF2x4DICakJPOe4g0Eq7uEEn4sfs/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -892,7 +939,7 @@
 
         let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = []; 
-        let events = []; // ข้อมูลปฏิทินสัปดาห์ (ซิงก์ผ่าน Cloud)
+        let events = []; 
         let activeModalReqId = null;
         let currentUser = null;
         let isAdmin = false;
@@ -923,7 +970,6 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ดึงภาพจาก GitHub โดยตรงตามรหัสพนักงาน (เช่น 1101001.jpg)
         function getEmployeeAvatar(empId) {
             return `${empId}.jpg`;
         }
@@ -939,30 +985,25 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             setupDynamicDates();
             loadInitialData();
-            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud ทันที
+            await syncFromFirebase();
             checkAutoLogin();
 
-            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที
-            setInterval(syncFromCloud, 10000);
+            // ซิงก์ข้อมูลอัตโนมัติจาก Firebase ทุก 5 วินาที
+            setInterval(syncFromFirebase, 5000);
         });
 
-        // ================= CLOUD SYNC VIA GET PING (BYPASS CORS 100%) =================
-        async function syncFromCloud() {
-            try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
-                const data = await res.json();
-                if (data && data.status === "success") {
-                    if (data.requests && Array.isArray(data.requests)) {
-                        requests = data.requests;
-                    }
-                    if (data.events && Array.isArray(data.events)) {
-                        events = data.events;
-                    }
-                    if (data.employees && Array.isArray(data.employees)) {
-                        data.employees.forEach(cloudEmp => {
+        // ================= FIREBASE SYNC =================
+        async function syncFromFirebase() {
+            if (window.loadFromFirebase) {
+                const cloudData = await window.loadFromFirebase();
+                if (cloudData) {
+                    if (cloudData.requests && Array.isArray(cloudData.requests)) requests = cloudData.requests;
+                    if (cloudData.events && Array.isArray(cloudData.events)) events = cloudData.events;
+                    if (cloudData.employees && Array.isArray(cloudData.employees)) {
+                        cloudData.employees.forEach(cloudEmp => {
                             const localIdx = employees.findIndex(e => String(e.id) === String(cloudEmp.id));
                             if (localIdx !== -1) {
                                 employees[localIdx].vacationUsedMonths = cloudEmp.vacationUsedMonths || employees[localIdx].vacationUsedMonths;
@@ -974,26 +1015,13 @@
                     saveLocalDataSilently();
                     renderAllViews();
                 }
-            } catch (err) {
-                console.warn("Sync from cloud failed, using local backup:", err);
-                renderAllViews();
             }
         }
 
         async function saveAllToCloud() {
             saveLocalDataSilently();
-            try {
-                const payloadStr = encodeURIComponent(JSON.stringify({
-                    action: "SAVE_ALL",
-                    employees: employees,
-                    requests: requests,
-                    events: events
-                }));
-                // ใช้ Image Ping ผ่าน GET เพื่อส่งข้อมูลขึ้น Google Sheets ได้ 100% โดยไม่ติดปัญหา CORS
-                const img = new Image();
-                img.src = `${GOOGLE_SCRIPT_URL}?action=SAVE_VIA_GET&data=${payloadStr}`;
-            } catch (err) {
-                console.warn("Save to cloud failed:", err);
+            if (window.saveToFirebase) {
+                await window.saveToFirebase(employees, requests, events);
             }
         }
 
@@ -1053,7 +1081,7 @@
                 const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
                 switchTab(savedTab);
 
-                syncFromCloud();
+                syncFromFirebase();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
                 console.error(err);
@@ -1131,7 +1159,7 @@
             }
             let totalSickUsed = 0;
             if (currentUser.sickMonths && Array.isArray(currentUser.sickMonths)) {
-                totalSickUsed = currentUser.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+                totalSickUsed = currentUser.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0);
             }
             const carry = parseFloat(currentUser.carryVacation) || 0;
             const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
@@ -1179,7 +1207,7 @@
                     lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 }
-                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ";
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Firebase ให้อัตโนมัติ";
                 if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
                 if (lockBadge) {
@@ -1301,7 +1329,7 @@
             if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
-        // ================= WEEKLY EVENTS CALENDAR (Circular Avatar + Click for Details) =================
+        // ================= WEEKLY EVENTS CALENDAR =================
         function openAddEventModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนเพิ่มโน้ตกิจกรรม");
