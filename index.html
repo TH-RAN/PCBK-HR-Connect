@@ -757,7 +757,7 @@
                 "ม.ค.": 0, "ก.พ.": 1, "มี.ค.": 2, "เม.ย.": 3, "พ.ค.": 4, "มิ.ย.": 5,
                 "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
             };
-            const parts = startDateStr.trim().split(/\s+/);
+            const parts = startDateStr.trim().split(/\\s+/);
             if (parts.length < 3) return 9999999999999;
 
             const day = parseInt(parts[0], 10);
@@ -781,7 +781,7 @@
                     "ก.ค.": 6, "ส.ค.": 7, "ก.ย.": 8, "ต.ค.": 9, "พ.ย.": 10, "ธ.ค.": 11
                 };
 
-                const parts = startDateStr.trim().split(/\s+/);
+                const parts = startDateStr.trim().split(/\\s+/);
                 if (parts.length < 3) return startDateStr;
 
                 const day = parseInt(parts[0], 10);
@@ -827,52 +827,60 @@
             }
         }
 
+        function createDefaultAccrued() {
+            return;
+        }
+
+        function createEmptyMonths() {
+            return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        }
+
         const defaultDataset = [
             {
                 seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
-                vacationAccrued:,
-                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                vacationAccrued: createDefaultAccrued(),
+                vacationUsedMonths: createEmptyMonths(),
+                sickMonths: createEmptyMonths(), otherLeaveDays: 0, note: ""
             },
             {
                 seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President (รองประธานกรรมการบริหาร)", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20,
-                vacationAccrued:,
-                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                vacationAccrued: createDefaultAccrued(),
+                vacationUsedMonths: createEmptyMonths(),
+                sickMonths: createEmptyMonths(), otherLeaveDays: 0, note: ""
             },
             {
                 seq: 3, id: "1102033", name: "ภัคชนก ขุนทรง", position: "Engineer (วิศวกร)", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5,
-                vacationAccrued:,
+                vacationAccrued: createDefaultAccrued(),
                 vacationUsedMonths:,
                 sickMonths:, otherLeaveDays: 0, note: ""
             },
             {
                 seq: 4, id: "1104008", name: "กนกอร วัฒนสกุลไพศาล", position: "Accountant (สมุห์บัญชี)", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75,
-                vacationAccrued:,
+                vacationAccrued: createDefaultAccrued(),
                 vacationUsedMonths:,
                 sickMonths:, otherLeaveDays: 1, note: ""
             },
             {
                 seq: 5, id: "1103020", name: "ชัยโย สาตมาก", position: "Driver (พนักงานขับรถ)", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20,
-                vacationAccrued:,
-                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                vacationAccrued: createDefaultAccrued(),
+                vacationUsedMonths: createEmptyMonths(),
+                sickMonths: createEmptyMonths(), otherLeaveDays: 0, note: ""
             },
             {
                 seq: 6, id: "1103059", name: "ปัญญา เจริญร่าง", position: "Messenger (พนักงานรับ-ส่งเอกสาร)", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20,
-                vacationAccrued:,
-                vacationUsedMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                vacationAccrued: createDefaultAccrued(),
+                vacationUsedMonths: createEmptyMonths(),
+                sickMonths: createEmptyMonths(), otherLeaveDays: 0, note: ""
             },
             {
                 seq: 7, id: "1102049", name: "ณัฐากานต์ สุพรรณ์", position: "Engineer (วิศวกร)", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25,
-                vacationAccrued:,
+                vacationAccrued: createDefaultAccrued(),
                 vacationUsedMonths:,
                 sickMonths:, otherLeaveDays: 0, note: ""
             },
             {
                 seq: 8, id: "1102050", name: "ภาวินี ทองผาย", position: "GIS Analyst (นักวิเคราะห์งานภูมิสารสนเทศ)", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4,
-                vacationAccrued:,
+                vacationAccrued: createDefaultAccrued(),
                 vacationUsedMonths:,
                 sickMonths:, otherLeaveDays: 0, note: ""
             },
@@ -884,15 +892,15 @@
             },
             {
                 seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
-                vacationAccrued:,
+                vacationAccrued: createDefaultAccrued(),
                 vacationUsedMonths:,
-                sickMonths: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                sickMonths: createEmptyMonths(), otherLeaveDays: 0, note: ""
             }
         ];
 
         let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = []; 
-        let events = []; // ข้อมูลปฏิทินสัปดาห์ (ซิงก์ผ่าน Cloud)
+        let events = []; 
         let activeModalReqId = null;
         let currentUser = null;
         let isAdmin = false;
@@ -914,7 +922,7 @@
             if (raw.includes('ชัยศักดิ์') || raw.includes('ลลนา')) {
                 return raw;
             }
-            return raw.replace(/^(นาย|นางสาว|นาง)\s*/g, '');
+            return raw.replace(/^(นาย|นางสาว|นาง)\\s*/g, '');
         }
 
         function isExecutiveOrAdmin() {
@@ -923,7 +931,6 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ดึงภาพจาก GitHub โดยตรงตามรหัสพนักงาน (เช่น 1101001.jpg)
         function getEmployeeAvatar(empId) {
             return `${empId}.jpg`;
         }
@@ -942,17 +949,14 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud ทันที
+            syncFromCloud();
             checkAutoLogin();
 
-            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที
             setInterval(syncFromCloud, 10000);
         });
 
-        // ================= CLOUD SYNC VIA GOOGLE APPS SCRIPT =================
         async function syncFromCloud() {
             try {
-                // ป้องกัน Browser Cache ด้วยพารามิเตอร์ Timestamp
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=GET_ALL&_t=${Date.now()}`);
                 const data = await res.json();
                 if (data && data.status === "success") {
@@ -979,7 +983,6 @@
                     }
                     saveLocalDataSilently();
                     
-                    // ป้องกันการรีเฟรชตารางขณะที่ผู้ใช้กำลังพิมพ์แก้ไขตัวเลขอยู่
                     const activeTag = document.activeElement ? document.activeElement.tagName : '';
                     if (activeTag !== 'INPUT' && activeTag !== 'TEXTAREA') {
                         renderAllViews();
@@ -1002,8 +1005,6 @@
                     events: events
                 };
 
-                // ใช้ POST ส่งข้อมูล JSON ขนาดใหญ่ได้ไม่จำกัด
-                // ใช้ text/plain;charset=utf-8 เพื่อป้องกันปัญหา CORS Preflight
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
                     headers: {
@@ -1017,7 +1018,6 @@
             }
         }
 
-        // ================= AUTHENTICATION =================
         function checkAutoLogin() {
             const rememberedId = localStorage.getItem('pcbk_device_auth_code');
             if (rememberedId) {
@@ -1321,7 +1321,6 @@
             if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
-        // ================= WEEKLY EVENTS CALENDAR (Circular Avatar + Click for Details) =================
         function openAddEventModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนเพิ่มโน้ตกิจกรรม");
@@ -1531,7 +1530,6 @@
             }
         }
 
-        // ================= CHART.JS ANALYTICS ENGINE =================
         function renderDashboardCharts() {
             try {
                 if (typeof Chart === 'undefined') return;
@@ -1649,7 +1647,6 @@
             }
         }
 
-        // ================= TAB 5: STAFF DIRECTORY =================
         function renderStaffDirectory() {
             const execGrid = document.getElementById('directory-executives-grid');
             const staffGrid = document.getElementById('directory-staff-grid');
@@ -1732,7 +1729,6 @@
             });
         }
 
-        // ================= FULL MATRIX RENDERING =================
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -1751,13 +1747,13 @@
                 const empIndex = employees.findIndex(emp => emp.id === e.id);
                 
                 if (!e.vacationAccrued || e.vacationAccrued.length !== 12) {
-                    e.vacationAccrued =;
+                    e.vacationAccrued = createDefaultAccrued();
                 }
                 if (!e.vacationUsedMonths || e.vacationUsedMonths.length !== 12) {
-                    e.vacationUsedMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    e.vacationUsedMonths = createEmptyMonths();
                 }
                 if (!e.sickMonths || e.sickMonths.length !== 12) {
-                    e.sickMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                    e.sickMonths = createEmptyMonths();
                 }
 
                 let totalAccrued = 0;
@@ -2111,7 +2107,6 @@
             showToast("ยื่นใบลาและซิงก์ข้อมูลเข้าระบบเรียบร้อยแล้ว");
         }
 
-        // ================= APPROVAL CENTER =================
         function renderApprovalQueue() {
             const container = document.getElementById('approval-list');
             const subtitle = document.getElementById('approval-center-subtitle');
@@ -2246,10 +2241,10 @@
                     const monthIdx = !isNaN(leaveDate.getMonth()) ? leaveDate.getMonth() : 0;
 
                     if (req.type.includes('พักร้อน')) {
-                        if (!emp.vacationUsedMonths) emp.vacationUsedMonths = Array(12).fill(0);
+                        if (!emp.vacationUsedMonths) emp.vacationUsedMonths = createEmptyMonths();
                         emp.vacationUsedMonths[monthIdx] = (parseFloat(emp.vacationUsedMonths[monthIdx]) || 0) + parseFloat(req.days);
                     } else if (req.type.includes('ป่วย')) {
-                        if (!emp.sickMonths) emp.sickMonths = Array(12).fill(0);
+                        if (!emp.sickMonths) emp.sickMonths = createEmptyMonths();
                         emp.sickMonths[monthIdx] = (parseFloat(emp.sickMonths[monthIdx]) || 0) + parseFloat(req.days);
                     } else {
                         emp.otherLeaveDays = (parseFloat(emp.otherLeaveDays) || 0) + parseFloat(req.days);
