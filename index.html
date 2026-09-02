@@ -125,7 +125,7 @@
 
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <div id="user-profile-header-chip" class="flex items-center space-x-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-2xl text-xs font-medium cursor-pointer hover:bg-slate-100 transition" onclick="switchTab('profile')">
-                        <img id="header-user-avatar" src="" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=user';">
+                        <img id="header-user-avatar" src="" alt="avatar" class="w-6 h-6 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="handleImageError(this, currentUser ? currentUser.id : '')">
                         <span id="header-user-name" class="text-slate-800 font-bold">กำลังโหลด...</span>
                         <span id="header-role-badge" class="bg-slate-200 text-slate-700 text-[10px] px-2 py-0.5 rounded-full font-bold">พนักงาน</span>
                     </div>
@@ -164,7 +164,7 @@
                 </button>
                 <button type="button" onclick="switchTab('directory')" id="tab-btn-directory" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-address-book"></i>
-                    <span id="tab-directory-title">ทำเนียบบุคลากร</span>
+                    <span>ทำเนียบบุคลากร</span>
                     <span id="badge-directory-count" class="bg-blue-100 text-blue-800 text-[11px] px-2 py-0.5 rounded-full font-bold">9 คน</span>
                 </button>
                 <button type="button" onclick="switchTab('profile')" id="tab-btn-profile" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
@@ -234,14 +234,14 @@
                         <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
                     </div>
 
-                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR (Cloud Synced) -->
+                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR (Cloud Synced & Admin Delete) -->
                     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                             <div>
                                 <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
                                     <i class="fa-solid fa-calendar-days text-indigo-600 mr-2"></i> ปฏิทินพนักงานสัปดาห์ล่าสุด (Events)
                                 </h3>
-                                <p class="text-xs text-slate-500">บันทึกและตรวจสอบตารางกิจกรรม/ประชุมประจำสัปดาห์ (ซิงก์ทุกคนอัตโนมัติ)</p>
+                                <p class="text-xs text-slate-500">บันทึกและตรวจสอบตารางกิจกรรม/ประชุมประจำสัปดาห์</p>
                             </div>
                             <button type="button" onclick="openAddEventModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center space-x-1.5 shadow-xs cursor-pointer self-start sm:self-auto">
                                 <i class="fa-solid fa-plus"></i>
@@ -315,7 +315,7 @@
                             <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
                         </button>
                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
-                        <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-2 rounded-2xl transition flex items-center space-x-1 shadow-xs cursor-pointer">
+                        <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-2 rounded-2xl transition items-center space-x-1 shadow-xs cursor-pointer">
                             <i class="fa-solid fa-download mr-1"></i> ส่งออก Excel
                         </button>
                     </div>
@@ -577,11 +577,8 @@
                 <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 border-b border-slate-100 pb-6">
                     <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
                         <div class="relative group">
-                            <img id="profile-card-avatar" src="" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50" onerror="this.onerror=null; this.src='https://api.dicebear.com/7.x/bottts/svg?seed=user';">
-                            <label for="profile-photo-upload" class="absolute bottom-0 right-0 w-8 h-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center cursor-pointer shadow-md transition">
-                                <i class="fa-solid fa-camera text-xs"></i>
-                            </label>
-                            <input type="file" id="profile-photo-upload" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(event)">
+                            <img id="profile-card-avatar" src="" alt="Avatar" class="w-28 h-28 rounded-3xl object-cover border border-slate-200 shadow-sm bg-slate-50" onerror="handleImageError(this, currentUser ? currentUser.id : '')">
+                            <!-- ปิดอัปโหลดรูปผ่านเว็บ ให้ดึงจาก GitHub แทน -->
                         </div>
                         <div class="space-y-1">
                             <div class="flex items-center justify-center sm:justify-start space-x-2">
@@ -629,7 +626,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ดึงภาพจาก GitHub อัตโนมัติ (รหัสพนักงาน.jpg/png)</strong></div>
+                        <div><span class="text-slate-400">สถานะรูปภาพ:</span> <strong class="text-indigo-600 font-medium">ดึงไฟล์จาก GitHub อัตโนมัติ (รหัสพนักงาน.jpg/png)</strong></div>
                     </div>
                 </div>
             </div>
@@ -637,7 +634,7 @@
 
     </main>
 
-    <!-- Modal: Add Event Note Modal -->
+    <!-- Modal: Add Event Note Modal (Admin/Executive can Add & Delete) -->
     <div id="event-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative space-y-4 text-xs sm:text-sm">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -862,8 +859,8 @@
             {
                 seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
-                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 1, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 1, 0, 0, 0], otherLeaveDays: 0, note: ""
+                vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
             },
             {
                 seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
@@ -875,7 +872,7 @@
 
         let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = []; 
-        let events = []; // ข้อมูลปฏิทินสัปดาห์ (ซิงก์ผ่าน Cloud)
+        let events = []; // จัดเก็บข้อมูลปฏิทินสัปดาห์ (ซิงก์ผ่าน Cloud)
         let activeModalReqId = null;
         let currentUser = null;
         let isAdmin = false;
@@ -906,31 +903,33 @@
             return currentUser.id === '1101001' || currentUser.id === '1102003';
         }
 
-        // ระบบดึงภาพพนักงานจาก GitHub โดยตรงตามรหัสพนักงาน (.jpg / .png) แบบโลโก้บริษัท
+        // ดึงภาพจาก GitHub โดยตรงตามรหัสพนักงาน (นามสกุล .jpg หรือ .png)
         function getEmployeeAvatar(empId) {
-            return `./${empId}.jpg`;
+            return `${empId}.jpg`;
         }
 
         function handleImageError(imgElement, empId) {
-            // ถ้านามสกุล .jpg ไม่พบ ให้ลองสลับเป็น .png หรือใช้ตัวการ์ตูนกลางสำรอง
             if (imgElement.src.endsWith('.jpg')) {
-                imgElement.src = `./${empId}.png`;
+                imgElement.src = `${empId}.png`;
             } else {
-                imgElement.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${empId}`;
+                const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
+                imgElement.src = femaleIds.includes(String(empId))
+                    ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_${empId}&backgroundColor=ffd5dc`
+                    : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff`;
             }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud ทันที
+            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud
             checkAutoLogin();
 
-            // ดึงข้อมูลซิงก์จาก Cloud ทุก 10 วินาที เพื่อให้เพื่อนร่วมงานเห็นอีเวนต์ตรงกันทุกเครื่อง
+            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที เพื่อให้กิจกรรมและคำขออัปเดตตรงกันทุกเครื่อง
             setInterval(syncFromCloud, 10000);
         });
 
-        // ================= CLOUD SYNC FOR EVENTS & LEAVES =================
+        // ================= CLOUD SYNC FOR EVENTS, LEAVES & EMPLOYEES =================
         async function syncFromCloud() {
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
@@ -988,7 +987,7 @@
             } else {
                 const loginModal = document.getElementById('login-modal');
                 if (loginModal) {
-                    loginModal.style.cssText = "display: flex !important;";
+                    loginModal.style.display = 'flex';
                     loginModal.classList.remove('hidden');
                 }
             }
@@ -1000,7 +999,9 @@
             const code = codeInput ? codeInput.value.trim() : '';
             const rememberMe = document.getElementById('login-remember-me')?.checked || false;
 
-            if (!performLogin(code, rememberMe)) {
+            if (performLogin(code, rememberMe)) {
+                // Done
+            } else {
                 const errorBox = document.getElementById('login-error-msg');
                 if (errorBox) errorBox.classList.remove('hidden');
             }
@@ -1026,21 +1027,15 @@
 
             const modal = document.getElementById('login-modal');
             if (modal) {
-                modal.remove();
+                modal.classList.add('hidden');
+                modal.style.display = 'none';
             }
 
-            try {
-                updateUserSessionUI();
-                renderAllViews();
-                
-                const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
-                switchTab(savedTab);
-
-                syncFromCloud();
-                showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
-            } catch (err) {
-                console.error(err);
-            }
+            updateUserSessionUI();
+            renderAllViews();
+            switchTab('dashboard');
+            syncFromCloud();
+            showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             return true;
         }
 
@@ -1048,8 +1043,15 @@
             const conf = confirm("คุณต้องการออกจากระบบบนอุปกรณ์นี้หรือไม่?");
             if (conf) {
                 localStorage.removeItem('pcbk_device_auth_code');
-                localStorage.removeItem('pcbk_active_tab');
-                location.reload();
+                currentUser = null;
+                isAdmin = false;
+                const codeInput = document.getElementById('login-input-code');
+                if (codeInput) codeInput.value = '';
+                const modal = document.getElementById('login-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.remove('hidden');
+                }
             }
         }
 
@@ -1085,7 +1087,6 @@
             const roleChip = document.getElementById('profile-card-role-chip');
             const dobEl = document.getElementById('profile-card-dob');
             const startEl = document.getElementById('profile-card-start');
-            const tenureEl = document.getElementById('profile-card-tenure');
             const carryEl = document.getElementById('profile-card-carry');
 
             if (photoEl) {
@@ -1099,8 +1100,6 @@
             if (dobEl) dobEl.innerText = currentUser.dob || '-';
             if (startEl) startEl.innerText = currentUser.startDate || '-';
             if (carryEl) carryEl.innerText = currentUser.carryVacation || '0';
-
-            if (tenureEl) tenureEl.innerText = calculateWorkTenure(currentUser.startDate);
 
             if (roleChip) {
                 roleChip.innerText = isAdmin ? 'ผู้ดูแลระบบ (Admin)' : (isExecutiveOrAdmin() ? 'ผู้บริหาร (Executive)' : 'พนักงานประจำ');
@@ -1129,11 +1128,6 @@
             if (pVacRem) pVacRem.innerText = `${remVac} วัน`;
             if (pVacUsed) pVacUsed.innerText = `${totalVacUsed} วัน`;
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
-        }
-
-        // ยกเลิกการอัปโหลดไฟล์ภาพผ่านเว็บ ป้องกันข้อมูลล้น Cloud (ใช้การดึงภาพจาก GitHub ตามชื่อไฟล์รหัสพนักงานแทน)
-        function handleProfilePhotoUpload(e) {
-            alert("ระบบได้เปลี่ยนมาใช้การดึงรูปภาพจาก GitHub โดยอัตโนมัติแล้ว กรุณาอัปโหลดภาพพนักงาน (ชื่อไฟล์เป็นรหัสพนักงาน เช่น 1102049.jpg) ไว้ที่ GitHub ครับ");
         }
 
         function setupDynamicDates() {
@@ -1170,7 +1164,7 @@
                     lockBadge.className = "bg-emerald-100 text-emerald-800 font-semibold text-[11px] px-2.5 py-0.5 rounded-full flex items-center";
                     lockBadge.innerHTML = `<i class="fa-solid fa-pen-to-square mr-1"></i> โหมดแก้ไขข้อมูล (Admin)`;
                 }
-                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกให้อัตโนมัติ";
+                if (descTxt) descTxt.innerText = "แก้ไขตัวเลขในช่องตารางแล้วระบบจะบันทึกขึ้น Google Cloud ให้อัตโนมัติ";
                 if (btnImport) { btnImport.classList.remove('hidden'); btnImport.classList.add('flex'); }
             } else {
                 if (lockBadge) {
@@ -1183,8 +1177,6 @@
         }
 
         function switchTab(tabId) {
-            localStorage.setItem('pcbk_active_tab', tabId);
-
             const tabs = ['dashboard', 'summary', 'request-form', 'approval-center', 'directory', 'profile'];
             tabs.forEach(id => {
                 const btn = document.getElementById(`tab-btn-${id}`);
@@ -1207,7 +1199,7 @@
             if (tabId === 'dashboard') {
                 renderTodayDashboard();
                 renderWeeklyEventsCalendar();
-                setTimeout(renderDashboardCharts, 100);
+                setTimeout(renderDashboardCharts, 60);
             }
             if (tabId === 'summary') renderSummaryTable();
             if (tabId === 'approval-center') renderApprovalQueue();
@@ -1226,19 +1218,16 @@
                 const masterEvents = localStorage.getItem('pcbk_master_events');
 
                 if (masterEmp && JSON.parse(masterEmp).length > 0) {
-                    let parsed = JSON.parse(masterEmp);
-                    employees = parsed.filter(e => String(e.id) !== '1102051');
-                    employees.forEach((e, idx) => e.seq = idx + 1);
+                    employees = JSON.parse(masterEmp);
                 } else {
-                    employees = JSON.parse(JSON.stringify(defaultDataset)).filter(e => String(e.id) !== '1102051');
-                    employees.forEach((e, idx) => e.seq = idx + 1);
+                    employees = JSON.parse(JSON.stringify(defaultDataset));
                     saveLocalDataSilently();
                 }
 
                 requests = masterReq ? JSON.parse(masterReq) : [];
                 events = masterEvents ? JSON.parse(masterEvents) : [];
             } catch (e) {
-                employees = JSON.parse(JSON.stringify(defaultDataset)).filter(e => String(e.id) !== '1102051');
+                employees = JSON.parse(JSON.stringify(defaultDataset));
                 requests = [];
                 events = [];
             }
@@ -1295,7 +1284,7 @@
             if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
-        // ================= WEEKLY EVENTS CALENDAR (Cloud Synced) =================
+        // ================= WEEKLY EVENTS CALENDAR (Cloud Synced with Admin Delete) =================
         function openAddEventModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนเพิ่มโน้ตกิจกรรม");
@@ -1337,6 +1326,19 @@
             showToast("บันทึกและซิงก์โน้ตกิจกรรมสำเร็จ");
         }
 
+        async function deleteEvent(eventId) {
+            if (!isExecutiveOrAdmin()) {
+                alert("เฉพาะผู้บริหารหรือ Admin เท่านั้นที่สามารถลบกิจกรรมได้");
+                return;
+            }
+            if (confirm("คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?")) {
+                events = events.filter(ev => ev.id !== eventId);
+                await saveAllToCloud();
+                renderWeeklyEventsCalendar();
+                showToast("ลบกิจกรรมเรียบร้อยแล้ว");
+            }
+        }
+
         function renderWeeklyEventsCalendar() {
             const container = document.getElementById('weekly-events-grid');
             if (!container) return;
@@ -1351,6 +1353,7 @@
 
             const thaiDaysName = ["จันทร์", "อังคาร", "พุธ", "พฤหัสฯ", "ศุกร์", "เสาร์", "อาทิตย์"];
             const thaiMonthsShort = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            const canDeleteEvents = isExecutiveOrAdmin();
 
             for (let i = 0; i < 7; i++) {
                 const targetDate = new Date(monday);
@@ -1368,15 +1371,16 @@
 
                 dayEvents.forEach(ev => {
                     const avatar = getEmployeeAvatar(ev.empId);
+                    const deleteBtn = canDeleteEvents ? `<button onclick="deleteEvent('${ev.id}')" class="text-rose-400 hover:text-rose-600 ml-1 text-xs" title="ลบกิจกรรม"><i class="fa-solid fa-trash-can"></i></button>` : '';
+                    
                     iconsHtml += `
-                        <div class="relative group inline-block">
-                            <img src="${avatar}" alt="${ev.empName}" class="w-7 h-7 rounded-full object-cover border-2 border-indigo-500 shadow-sm cursor-pointer hover:scale-110 transition bg-white" onerror="handleImageError(this, '${ev.empId}')">
-                            <!-- Popover detail on hover -->
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-30 w-48 bg-slate-900 text-white text-[11px] p-2.5 rounded-xl shadow-xl pointer-events-none">
-                                <p class="font-bold text-indigo-300">${ev.empName}</p>
-                                <p class="text-slate-200 mt-0.5">🕒 ${ev.startTime} - ${ev.endTime} น.</p>
-                                <p class="text-slate-100 font-semibold mt-1">📌 ${ev.title}</p>
+                        <div class="relative group inline-flex items-center space-x-1.5 bg-white/80 border border-slate-200 rounded-xl p-1.5 shadow-xs">
+                            <img src="${avatar}" alt="${ev.empName}" class="w-6 h-6 rounded-full object-cover border border-indigo-500 shadow-sm bg-white" onerror="handleImageError(this, '${ev.empId}')">
+                            <div class="text-[11px] leading-tight">
+                                <span class="font-bold text-indigo-900 block">${ev.empName.split(' ')[0]}</span>
+                                <span class="text-slate-500 text-[10px]">${ev.startTime}-${ev.endTime} : ${ev.title}</span>
                             </div>
+                            ${deleteBtn}
                         </div>
                     `;
                 });
@@ -1390,7 +1394,7 @@
                             </div>
                             ${isToday ? '<span class="inline-block bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold mt-1">วันนี้</span>' : ''}
                         </div>
-                        <div class="min-h-[50px] flex flex-wrap items-center gap-1.5 py-1">
+                        <div class="min-h-[50px] flex flex-col gap-1.5 py-1">
                             ${iconsHtml.length > 0 ? iconsHtml : '<span class="text-[10px] text-slate-400 italic">ไม่มีกิจกรรม</span>'}
                         </div>
                     </div>
