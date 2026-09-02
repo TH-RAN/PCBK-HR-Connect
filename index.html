@@ -921,10 +921,10 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud
+            syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud ทันที
             checkAutoLogin();
 
-            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที
+            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที เพื่อให้กิจกรรมและคำขออัปเดตตรงกันทุกเครื่อง
             setInterval(syncFromCloud, 10000);
         });
 
