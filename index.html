@@ -254,7 +254,7 @@
                             <i class="fa-solid fa-file-excel mr-1"></i> นำเข้า Excel
                         </button>
                         <input type="file" id="excel-file-input" class="hidden" accept=".xlsx, .xls" onchange="handleExcelFileUpload(event)">
-                        <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-2 rounded-2xl transition items-center space-x-1 shadow-xs cursor-pointer">
+                        <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-700 hover:bg-slate-800 text-white text-xs font-medium px-3.5 py-2 rounded-2xl transition flex items-center space-x-1 shadow-xs cursor-pointer">
                             <i class="fa-solid fa-download mr-1"></i> ส่งออก Excel
                         </button>
                     </div>
@@ -269,11 +269,45 @@
                                 <th rowspan="3" class="p-2 min-w-[180px]">ตำแหน่ง</th>
                                 <th rowspan="3" class="p-2">วันเกิด</th>
                                 <th rowspan="3" class="p-2">วันเริ่มงาน</th>
-                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[85px]">ทบวันพักร้อน</th>
-                                <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน</th>
-                                <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">ลาป่วย</th>
-                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100">ลาอื่นๆ</th>
-                                <th rowspan="3" class="p-2 min-w-[130px]">หมายเหตุ</th>
+                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[85px]">ทบวันพักร้อน<br><span class="text-[10px] font-normal">สะสมปีก่อน</span></th>
+                                <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน (เพิ่มเดือนละ 1 วันทบได้)</th>
+                                <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">ลาป่วย <span class="text-[10px] font-normal">(ปีละไม่เกิน 30 วันทำการ)</span></th>
+                                <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[75px]">ลาอื่นๆ/ภารกิจ<br>(รวมทั้งปี)</th>
+                                <th rowspan="3" class="p-2 min-w-[130px]">หมายเหตุ / สถานะ</th>
+                            </tr>
+                            <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[33px] z-10">
+                                <th colspan="24" class="p-1.5 bg-amber-50 text-amber-900">เพิ่ม (+1/ด.) & ใช้ลาประจำเดือน (ม.ค. - ธ.ค.)</th>
+                                <th rowspan="2" class="p-2 bg-amber-200 text-amber-950 font-bold min-w-[70px]">รวมเพิ่ม<br>พักร้อน</th>
+                                <th rowspan="2" class="p-2 bg-rose-200 text-rose-950 font-bold min-w-[70px]">รวมใช้<br>พักร้อน</th>
+                                <th rowspan="2" class="p-2 bg-yellow-300 text-yellow-950 font-bold min-w-[70px]">คงเหลือ<br>พักร้อน</th>
+                                <th colspan="12" class="p-1.5 bg-emerald-50 text-emerald-900">รายเดือน (ม.ค. - ธ.ค.)</th>
+                                <th rowspan="2" class="p-2 bg-emerald-200 text-emerald-950 font-bold min-w-[70px]">รวมใช้<br>ลาป่วย</th>
+                            </tr>
+                            <tr class="bg-slate-50 text-slate-600 text-[10px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[65px] z-10">
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ม.ค.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.พ.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">มี.ค.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">เม.ย.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">พ.ค.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">มิ.ย.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.ค.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ส.ค.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ก.ย.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ต.ค.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">พ.ย.</th>
+                                <th class="p-1 bg-amber-50/50">+</th><th class="p-1 bg-amber-100/40">ธ.ค.</th>
+                                <th class="p-1 bg-emerald-50">ม.ค.</th>
+                                <th class="p-1 bg-emerald-50">ก.พ.</th>
+                                <th class="p-1 bg-emerald-50">มี.ค.</th>
+                                <th class="p-1 bg-emerald-50">เม.ย.</th>
+                                <th class="p-1 bg-emerald-50">พ.ค.</th>
+                                <th class="p-1 bg-emerald-50">มิ.ย.</th>
+                                <th class="p-1 bg-emerald-50">ก.ค.</th>
+                                <th class="p-1 bg-emerald-50">ส.ค.</th>
+                                <th class="p-1 bg-emerald-50">ก.ย.</th>
+                                <th class="p-1 bg-emerald-50">ต.ค.</th>
+                                <th class="p-1 bg-emerald-50">พ.ย.</th>
+                                <th class="p-1 bg-emerald-50">ธ.ค.</th>
                             </tr>
                         </thead>
                         <tbody id="summary-table-body" class="divide-y divide-slate-200"></tbody>
@@ -422,7 +456,20 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXslD08o671TTCJrHFZOT4A5AeDGOCX4cLqxGntRtym9QouxLM4CM6HjWOCCZm2xfU4g/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
-        let employees = [];
+        const defaultDataset = [
+            { seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 3, id: "1102033", name: "ภัคชนก ขุนทรง", position: "Engineer", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [0.25,0,0,2,0,1,2,0.25,0,0,0,0], sickMonths: [1,0,0.5,0,0,0.5,0,0,0,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 4, id: "1104008", name: "กนกอร วัฒนสกุลไพศาล", position: "Accountant", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [1.5,0,3,1,0.5,2,1,1,0,0,0,0], sickMonths: [1,0,0,0,0,0,1,0,0,0,0,0], otherLeaveDays: 1, note: "", avatar: "" },
+            { seq: 5, id: "1103020", name: "ชัยโย สาตมาก", position: "Driver", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 6, id: "1103059", name: "ปัญญา เจริญร่าง", position: "Messenger", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 7, id: "1102049", name: "ณัฐากานต์ สุพรรณ์", position: "Engineer", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [3,0.25,1,3.75,0,1,3,1,0,0,0,0], sickMonths: [0,1,1,0,1,0,0,1,0,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 8, id: "1102050", name: "ภาวินี ทองผาย", position: "GIS Analyst", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [3,0,1,2,3,1,1,1,0,0,0,0], sickMonths: [1,0,1,0,0,0,1,0,0,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5, vacationAccrued: [1,1,1,1,1,1,1,1,1,0,0,0], vacationUsedMonths: [0,0.25,1.75,2.25,0.25,0,1.25,0.5,1,0,0,0], sickMonths: [0,0,0,0,0.5,0,2,0,1,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
+            { seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [1,0,0,0,0,0,0,0,0,0,0,0], sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" }
+        ];
+
+        let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = [];
         let events = [];
         let currentUser = null;
@@ -442,19 +489,6 @@
                 if (data && data.status === "success") {
                     if (data.employees && data.employees.length > 0) {
                         employees = data.employees.filter(e => String(e.id) !== '1102051');
-                    } else {
-                        employees = [
-                            { seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 2, id: "1102003", name: "ดร.ลลนา คงสุขประเสริฐ", position: "Vice President", dob: "1 มิ.ย. 2519", startDate: "1 พ.ค. 2551", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 3, id: "1102033", name: "ภัคชนก ขุนทรง", position: "Engineer", dob: "1 ต.ค. 2536", startDate: "18 พ.ค. 2560", carryVacation: 7.5, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [0.25,0,0,2,0,1,2,0.25,0,0,0,0], sickMonths: [1,0,0.5,0,0,0.5,0,0,0,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 4, id: "1104008", name: "กนกอร วัฒนสกุลไพศาล", position: "Accountant", dob: "24 เม.ย. 2521", startDate: "17 เม.ย. 2554", carryVacation: 5.75, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [1.5,0,3,1,0.5,2,1,1,0,0,0,0], sickMonths: [1,0,0,0,0,0,1,0,0,0,0,0], otherLeaveDays: 1, note: "", avatar: "" },
-                            { seq: 5, id: "1103020", name: "ชัยโย สาตมาก", position: "Driver", dob: "8 ส.ค. 2507", startDate: "-", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 6, id: "1103059", name: "ปัญญา เจริญร่าง", position: "Messenger", dob: "24 ก.ย. 2505", startDate: "-", carryVacation: 20, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: Array(12).fill(0), sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 7, id: "1102049", name: "ณัฐากานต์ สุพรรณ์", position: "Engineer", dob: "23 เม.ย. 2539", startDate: "19 ส.ค. 2562", carryVacation: 4.25, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [3,0.25,1,3.75,0,1,3,1,0,0,0,0], sickMonths: [0,1,1,0,1,0,0,1,0,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 8, id: "1102050", name: "ภาวินี ทองผาย", position: "GIS Analyst", dob: "7 ส.ค. 2534", startDate: "2 ก.ย. 2562", carryVacation: 4, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [3,0,1,2,3,1,1,1,0,0,0,0], sickMonths: [1,0,1,0,0,0,1,0,0,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5, vacationAccrued: [1,1,1,1,1,1,1,1,1,0,0,0], vacationUsedMonths: [0,0.25,1.75,2.25,0.25,0,1.25,0.5,1,0,0,0], sickMonths: [0,0,0,0,0.5,0,2,0,1,0,0,0], otherLeaveDays: 0, note: "", avatar: "" },
-                            { seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7, vacationAccrued: [1,1,1,1,1,1,1,1,0,0,0,0], vacationUsedMonths: [1,0,0,0,0,0,0,0,0,0,0,0], sickMonths: Array(12).fill(0), otherLeaveDays: 0, note: "", avatar: "" }
-                        ];
                     }
                     requests = data.requests || [];
                     events = data.events || [];
@@ -599,6 +633,14 @@
             }
         }
 
+        function setupDynamicDates() {
+            const d = getLiveDateData();
+            const headerDateEl = document.getElementById('header-realtime-date');
+            if (headerDateEl) headerDateEl.innerText = `วันนี้: ${d.thaiText}`;
+            const dashDateEl = document.getElementById('dashboard-full-date');
+            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${d.thaiText} — ติดตามการลา สิทธิ์คงเหลือ และคำขออนุมัติแบบครบวงจร`;
+        }
+
         function getLiveDateData() {
             const liveNow = new Date();
             const yearAD = liveNow.getFullYear();
@@ -639,13 +681,14 @@
                 isAdmin = true;
                 currentUser = { id: "ADMIN", name: "ผู้ดูแลระบบ (Admin)", position: "HR Executive", isMasterAdmin: true };
             } else {
-                const found = employees.find(e => String(e.id) === String(code));
+                const found = employees.find(e => String(e.id).trim().toLowerCase() === String(code).trim().toLowerCase());
                 if (!found) return false;
                 currentUser = found;
                 isAdmin = false;
             }
             if (saveToDevice) localStorage.setItem('pcbk_device_auth_code', code);
-            document.getElementById('login-modal').remove();
+            const modal = document.getElementById('login-modal');
+            if (modal) modal.classList.add('hidden');
             updateUserSessionUI();
             renderAllViews();
             switchTab(localStorage.getItem('pcbk_active_tab') || 'dashboard');
@@ -737,7 +780,25 @@
             const todayLeaves = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && (r.status === 'Approved' || r.status === 'อนุมัติแล้ว'));
             document.getElementById('kpi-today-leave-count').innerText = `${todayLeaves.length} คน`;
         }
-        function renderSummaryTable() {}
+
+        function renderSummaryTable() {
+            const tbody = document.getElementById('summary-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            employees.forEach((e, empIndex) => {
+                let rowHtml = `
+                    <tr class="hover:bg-slate-100 transition text-slate-800">
+                        <td class="p-2 text-center font-bold">${e.seq}</td>
+                        <td class="p-2 text-center font-mono">${e.id}</td>
+                        <td class="p-2 font-bold">${e.name}</td>
+                        <td class="p-2">${e.position}</td>
+                        <td class="p-2 text-center">${e.dob || '-'}</td>
+                        <td class="p-2 text-center">${e.startDate || '-'}</td>
+                    </tr>`;
+                tbody.innerHTML += rowHtml;
+            });
+        }
+
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = msg;
