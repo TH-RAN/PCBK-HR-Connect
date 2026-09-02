@@ -234,14 +234,14 @@
                         <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
                     </div>
 
-                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR (Cloud Synced + Admin Delete) -->
+                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR (Cloud Synced + Circular Avatar + Click for Details) -->
                     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                             <div>
                                 <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
                                     <i class="fa-solid fa-calendar-days text-indigo-600 mr-2"></i> ปฏิทินพนักงานสัปดาห์ล่าสุด (Events)
                                 </h3>
-                                <p class="text-xs text-slate-500">บันทึกและตรวจสอบตารางกิจกรรม/ประชุมประจำสัปดาห์</p>
+                                <p class="text-xs text-slate-500">คลิกที่รูปโปรไฟล์พนักงานเพื่อดูรายละเอียดกิจกรรม</p>
                             </div>
                             <button type="button" onclick="openAddEventModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center space-x-1.5 shadow-xs cursor-pointer self-start sm:self-auto">
                                 <i class="fa-solid fa-plus"></i>
@@ -667,6 +667,27 @@
         </div>
     </div>
 
+    <!-- Modal: Event Detail Modal (คลิกรูปวงกลมเพื่อเปิดดูรายละเอียด) -->
+    <div id="event-detail-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative space-y-4 text-xs sm:text-sm text-center">
+            <div class="flex justify-end">
+                <button type="button" onclick="closeEventDetailModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="flex flex-col items-center space-y-3">
+                <img id="modal-event-avatar" src="" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-4 border-indigo-500 shadow-md bg-white" onerror="handleImageError(this, '')">
+                <div>
+                    <h3 id="modal-event-name" class="font-bold text-slate-900 text-base">ชื่อพนักงาน</h3>
+                    <p id="modal-event-time" class="text-xs text-indigo-600 font-semibold mt-1">🕒 09:00 - 10:00 น.</p>
+                </div>
+                <div class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl text-left space-y-1">
+                    <span class="text-[11px] text-slate-400 block font-medium">หัวข้อกิจกรรม / การประชุม:</span>
+                    <p id="modal-event-title" class="font-bold text-slate-800 text-sm">-</p>
+                </div>
+                <div id="modal-event-delete-container" class="pt-2"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal: Detail Modal -->
     <div id="email-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-fade-in space-y-4 text-xs sm:text-sm">
@@ -710,7 +731,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzZuwouC88GmsKtOgovau94xl2qTfLjMNIMZzI2hFtt7HiTdjB-V97xLs01hfP1ypXb/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgz6Mk2JjGJRtogSb_vImFZ9DngGH9lfj-1vVYNF2x4DICakJPOe4g0Eq7uEEn4sfs/exec";
         const ADMIN_PASSWORD = "pcbk2026";
 
         function getLiveDateData() {
@@ -924,11 +945,11 @@
             syncFromCloud(); // ดึงข้อมูลและอีเวนต์จาก Cloud ทันที
             checkAutoLogin();
 
-            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที เพื่อให้กิจกรรมและคำขออัปเดตตรงกันทุกเครื่อง
+            // ซิงก์ข้อมูลอัตโนมัติทุก 10 วินาที
             setInterval(syncFromCloud, 10000);
         });
 
-        // ================= CLOUD SYNC FOR EVENTS & LEAVES (BYPASS CORS VIA GET PING) =================
+        // ================= CLOUD SYNC VIA GET PING (BYPASS CORS 100%) =================
         async function syncFromCloud() {
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
@@ -968,7 +989,7 @@
                     requests: requests,
                     events: events
                 }));
-                // ใช้ Image Ping ผ่าน GET เพื่อป้องกันปัญหา CORS Error 100%
+                // ใช้ Image Ping ผ่าน GET เพื่อส่งข้อมูลขึ้น Google Sheets ได้ 100% โดยไม่ติดปัญหา CORS
                 const img = new Image();
                 img.src = `${GOOGLE_SCRIPT_URL}?action=SAVE_VIA_GET&data=${payloadStr}`;
             } catch (err) {
@@ -1280,7 +1301,7 @@
             if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
-        // ================= WEEKLY EVENTS CALENDAR (Cloud Synced + Admin Delete) =================
+        // ================= WEEKLY EVENTS CALENDAR (Circular Avatar + Click for Details) =================
         function openAddEventModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนเพิ่มโน้ตกิจกรรม");
@@ -1335,6 +1356,35 @@
             }
         }
 
+        function openEventDetailModal(eventId) {
+            const ev = events.find(e => e.id === eventId);
+            if (!ev) return;
+
+            const avatar = getEmployeeAvatar(ev.empId);
+            document.getElementById('modal-event-avatar').src = avatar;
+            document.getElementById('modal-event-name').innerText = ev.empName;
+            document.getElementById('modal-event-time').innerText = `🕒 ${ev.startTime} - ${ev.endTime} น. (${ev.date})`;
+            document.getElementById('modal-event-title').innerText = ev.title;
+
+            const deleteContainer = document.getElementById('modal-event-delete-container');
+            if (isExecutiveOrAdmin()) {
+                deleteContainer.innerHTML = `<button type="button" onclick="deleteEventFromModal('${ev.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold px-4 py-2 rounded-xl transition cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> ลบกิจกรรมนี้</button>`;
+            } else {
+                deleteContainer.innerHTML = '';
+            }
+
+            document.getElementById('event-detail-modal').classList.remove('hidden');
+        }
+
+        function closeEventDetailModal() {
+            document.getElementById('event-detail-modal').classList.add('hidden');
+        }
+
+        async function deleteEventFromModal(eventId) {
+            await deleteEvent(eventId);
+            closeEventDetailModal();
+        }
+
         function renderWeeklyEventsCalendar() {
             const container = document.getElementById('weekly-events-grid');
             if (!container) return;
@@ -1349,7 +1399,6 @@
 
             const thaiDaysName = ["จันทร์", "อังคาร", "พุธ", "พฤหัสฯ", "ศุกร์", "เสาร์", "อาทิตย์"];
             const thaiMonthsShort = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-            const canDeleteEvents = isExecutiveOrAdmin();
 
             for (let i = 0; i < 7; i++) {
                 const targetDate = new Date(monday);
@@ -1363,20 +1412,13 @@
                 const isToday = isoDate === getLiveDateData().iso;
                 const dayEvents = events.filter(ev => ev.date === isoDate);
 
-                let iconsHtml = '';
+                let avatarsHtml = '';
 
                 dayEvents.forEach(ev => {
                     const avatar = getEmployeeAvatar(ev.empId);
-                    const deleteBtn = canDeleteEvents ? `<button onclick="deleteEvent('${ev.id}')" class="text-rose-400 hover:text-rose-600 ml-1 text-xs" title="ลบกิจกรรม"><i class="fa-solid fa-trash-can"></i></button>` : '';
-                    
-                    iconsHtml += `
-                        <div class="relative group inline-flex items-center space-x-1.5 bg-white/80 border border-slate-200 rounded-xl p-1.5 shadow-xs">
-                            <img src="${avatar}" alt="${ev.empName}" class="w-6 h-6 rounded-full object-cover border border-indigo-500 shadow-sm bg-white" onerror="handleImageError(this, '${ev.empId}')">
-                            <div class="text-[11px] leading-tight">
-                                <span class="font-bold text-indigo-900 block">${ev.empName.split(' ')[0]}</span>
-                                <span class="text-slate-500 text-[10px]">${ev.startTime}-${ev.endTime} : ${ev.title}</span>
-                            </div>
-                            ${deleteBtn}
+                    avatarsHtml += `
+                        <div class="relative group inline-block cursor-pointer" onclick="openEventDetailModal('${ev.id}')" title="คลิกเพื่อดูรายละเอียด: ${ev.empName}">
+                            <img src="${avatar}" alt="${ev.empName}" class="w-9 h-9 rounded-full object-cover border-2 border-indigo-500 shadow-sm hover:scale-110 transition bg-white" onerror="handleImageError(this, '${ev.empId}')">
                         </div>
                     `;
                 });
@@ -1390,8 +1432,8 @@
                             </div>
                             ${isToday ? '<span class="inline-block bg-indigo-600 text-white text-[9px] px-2 py-0.5 rounded-full font-bold mt-1">วันนี้</span>' : ''}
                         </div>
-                        <div class="min-h-[50px] flex flex-col gap-1.5 py-1">
-                            ${iconsHtml.length > 0 ? iconsHtml : '<span class="text-[10px] text-slate-400 italic">ไม่มีกิจกรรม</span>'}
+                        <div class="min-h-[50px] flex flex-wrap items-center gap-1.5 py-1">
+                            ${avatarsHtml.length > 0 ? avatarsHtml : '<span class="text-[10px] text-slate-400 italic">ไม่มีกิจกรรม</span>'}
                         </div>
                     </div>
                 `;
