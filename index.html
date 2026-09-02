@@ -629,7 +629,7 @@
                             <strong id="profile-card-tenure" class="text-blue-700 font-extrabold text-sm sm:text-base">-</strong>
                         </div>
                         <div><span class="text-slate-400">ทบวันพักร้อนสะสมปีก่อน:</span> <strong id="profile-card-carry" class="text-slate-800">-</strong> วัน</div>
-                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ซิงก์ข้อมูลและรูปภาพข้ามอุปกรณ์ผ่าน BroadcastChannel & LocalStorage อัตโนมัติ 100%</strong></div>
+                        <div><span class="text-slate-400">สถานะระบบ:</span> <strong class="text-emerald-700 font-medium">ซิงก์รูปภาพและอีเวนต์ปฏิทินผ่าน Google Cloud อัตโนมัติ 100%</strong></div>
                     </div>
                 </div>
             </div>
@@ -714,8 +714,8 @@
     </div>
 
     <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvSNCwL3gSCq8MJcIVjq3im84mtkfo1fetZYtKZgwsAYMgVL7Z_gva8IcCrBYT7aXMLg/exec";
         const ADMIN_PASSWORD = "pcbk2026";
-        const hrSyncChannel = new BroadcastChannel('pcbk_hr_sync_channel');
 
         function getLiveDateData() {
             const liveNow = new Date();
@@ -875,7 +875,7 @@
 
         let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = []; 
-        let events = []; // จัดเก็บอีเวนต์ปฏิทินสัปดาห์
+        let events = []; // สำหรับเก็บข้อมูลอีเวนต์ปฏิทิน
         let activeModalReqId = null;
         let currentUser = null;
         let isAdmin = false;
@@ -929,19 +929,74 @@
         window.addEventListener('DOMContentLoaded', () => {
             setupDynamicDates();
             loadInitialData();
-            renderAllViews();
+            syncFromCloud(); // ดึงข้อมูลและรูปภาพจาก Cloud ทันที
             checkAutoLogin();
 
-            hrSyncChannel.onmessage = (event) => {
-                if (event.data && event.data.type === 'SYNC_DATA') {
-                    employees = event.data.employees;
-                    requests = event.data.requests;
-                    events = event.data.events || [];
+            // ดึงข้อมูลจาก Cloud ทุกๆ 10 วินาที เพื่อให้เห็นรูปและอีเวนต์ใหม่ของเครื่องอื่นแบบเรียลไทม์
+            setInterval(syncFromCloud, 10000);
+        });
+
+        // ================= CLOUD SYNC & AUTO HEALING =================
+        async function syncFromCloud() {
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL);
+                const data = await res.json();
+                
+                if (data && data.status === "success") {
+                    let needsCloudUpdate = false;
+
+                    if (data.employees && Array.isArray(data.employees) && data.employees.length > 0) {
+                        let cloudList = data.employees.filter(e => String(e.id) !== '1102051');
+                        cloudList.forEach((cloudEmp, idx) => {
+                            cloudEmp.seq = idx + 1;
+                            const localAvatar = localStorage.getItem(`pcbk_avatar_${cloudEmp.id}`);
+                            
+                            if (cloudEmp.avatar && cloudEmp.avatar.startsWith('data:image')) {
+                                localStorage.setItem(`pcbk_avatar_${cloudEmp.id}`, cloudEmp.avatar);
+                            } else if (!cloudEmp.avatar && localAvatar && localAvatar.startsWith('data:image')) {
+                                cloudEmp.avatar = localAvatar;
+                                needsCloudUpdate = true;
+                            }
+                        });
+                        employees = cloudList;
+                    }
+
+                    if (data.requests && Array.isArray(data.requests)) {
+                        requests = data.requests;
+                    }
+
+                    if (data.events && Array.isArray(data.events)) {
+                        events = data.events;
+                    }
+                    
                     saveLocalDataSilently();
                     renderAllViews();
+
+                    if (needsCloudUpdate) {
+                        await saveAllToCloud();
+                    }
                 }
-            };
-        });
+            } catch (err) {
+                console.warn("Sync from cloud failed:", err);
+            }
+        }
+
+        async function saveAllToCloud() {
+            saveLocalDataSilently();
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({
+                        action: "SAVE_ALL",
+                        employees: employees,
+                        requests: requests,
+                        events: events
+                    })
+                });
+            } catch (err) {}
+        }
 
         // ================= AUTHENTICATION =================
         function checkAutoLogin() {
@@ -999,6 +1054,7 @@
                 const savedTab = localStorage.getItem('pcbk_active_tab') || 'dashboard';
                 switchTab(savedTab);
 
+                syncFromCloud();
                 showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
             } catch (err) {
                 console.error(err);
@@ -1093,16 +1149,16 @@
             if (pSickUsed) pSickUsed.innerText = `${totalSickUsed} วัน`;
         }
 
-        function handleProfilePhotoUpload(e) {
+        async function handleProfilePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file || !currentUser) return;
 
-            showToast("กำลังประมวลผลและซิงก์รูปภาพ...");
+            showToast("กำลังอัปโหลดและซิงก์รูปภาพ...");
 
             const reader = new FileReader();
             reader.onload = function(event) {
                 const img = new Image();
-                img.onload = function() {
+                img.onload = async function() {
                     const canvas = document.createElement('canvas');
                     const maxDim = 150;
                     let w = img.width;
@@ -1126,12 +1182,14 @@
                     currentUser.avatar = compressedBase64;
 
                     localStorage.setItem(`pcbk_avatar_${currentUser.id}`, compressedBase64);
-                    saveLocalData();
+                    
+                    // บันทึกขึ้น Cloud ทันที
+                    await saveAllToCloud();
                     
                     updateUserSessionUI();
                     renderTodayDashboard();
                     renderStaffDirectory();
-                    showToast("อัปโหลดและซิงก์รูปภาพสำเร็จแล้ว!");
+                    showToast("อัปโหลดและซิงก์รูปภาพขึ้น Cloud สำเร็จแล้ว!");
                 };
                 img.src = event.target.result;
             };
@@ -1234,7 +1292,7 @@
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset)).filter(e => String(e.id) !== '1102051');
                     employees.forEach((e, idx) => e.seq = idx + 1);
-                    saveLocalData();
+                    saveLocalDataSilently();
                 }
 
                 requests = masterReq ? JSON.parse(masterReq) : [];
@@ -1251,20 +1309,6 @@
                 requests = [];
                 events = [];
             }
-        }
-
-        function saveLocalData() {
-            try {
-                localStorage.setItem('pcbk_master_employees', JSON.stringify(employees));
-                localStorage.setItem('pcbk_master_requests', JSON.stringify(requests));
-                localStorage.setItem('pcbk_master_events', JSON.stringify(events));
-                hrSyncChannel.postMessage({ 
-                    type: 'SYNC_DATA', 
-                    employees: employees, 
-                    requests: requests, 
-                    events: events 
-                });
-            } catch (e) {}
         }
 
         function saveLocalDataSilently() {
@@ -1318,7 +1362,7 @@
             if (dirBadge) dirBadge.innerText = `${employees.length} คน`;
         }
 
-        // ================= WEEKLY EVENTS CALENDAR (New Feature) =================
+        // ================= WEEKLY EVENTS CALENDAR =================
         function openAddEventModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนเพิ่มโน้ตกิจกรรม");
@@ -1334,7 +1378,7 @@
             document.getElementById('event-modal').classList.add('hidden');
         }
 
-        function handleSaveEvent(e) {
+        async function handleSaveEvent(e) {
             e.preventDefault();
             if (!currentUser) return;
 
@@ -1354,7 +1398,7 @@
             };
 
             events.push(newEvent);
-            saveLocalData();
+            await saveAllToCloud();
             renderWeeklyEventsCalendar();
             closeEventModal();
             showToast("บันทึกและซิงก์โน้ตกิจกรรมสำเร็จ");
@@ -1366,7 +1410,7 @@
             container.innerHTML = '';
 
             const today = new Date();
-            const currentDayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, ...
+            const currentDayOfWeek = today.getDay();
             const diffToMonday = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
             
             const monday = new Date(today);
@@ -1819,7 +1863,7 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1829,7 +1873,7 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1839,7 +1883,7 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -1848,7 +1892,7 @@
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
-            saveLocalData();
+            await saveAllToCloud();
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
@@ -2010,7 +2054,7 @@
             return days;
         }
 
-        function handleLeaveSubmit(e) {
+        async function handleLeaveSubmit(e) {
             e.preventDefault();
             const empId = document.getElementById('form-emp-id').value;
             const emp = employees.find(x => x.id === empId);
@@ -2061,14 +2105,13 @@
             };
 
             requests.unshift(newReq);
-            saveLocalData();
+            await saveAllToCloud();
             renderAllViews();
 
             document.getElementById('leave-form').reset();
             setupDynamicDates();
             toggleDurationOptions();
             toggleLeaveTypeFields();
-
             showToast("ยื่นใบลาและซิงก์ข้อมูลเข้าระบบเรียบร้อยแล้ว");
         }
 
@@ -2144,7 +2187,7 @@
             });
         }
 
-        function deleteLeaveRequest(reqId) {
+        async function deleteLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการลบรายการ");
                 return;
@@ -2152,7 +2195,7 @@
             const conf = confirm("คุณต้องการลบรายการคำขอลานี้อย่างถาวรหรือไม่?");
             if (conf) {
                 requests = requests.filter(r => r.id !== reqId);
-                saveLocalData();
+                await saveAllToCloud();
                 renderAllViews();
                 showToast("ลบรายการคำขอลาเรียบร้อยแล้ว");
             }
@@ -2192,7 +2235,7 @@
             activeModalReqId = null;
         }
 
-        function approveLeaveRequest(reqId) {
+        async function approveLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการอนุมัติ");
                 return;
@@ -2217,13 +2260,13 @@
                     }
                 }
 
-                saveLocalData();
+                await saveAllToCloud();
                 renderAllViews();
                 showToast(`อนุมัติวันลาของ ${req.empName} เรียบร้อยแล้ว`);
             }
         }
 
-        function rejectLeaveRequest(reqId) {
+        async function rejectLeaveRequest(reqId) {
             if (!isExecutiveOrAdmin()) {
                 alert("ต้องใช้สิทธิ์ผู้บริหารหรือผู้ดูแลระบบ (Admin) ในการปฏิเสธ");
                 return;
@@ -2231,7 +2274,7 @@
             const req = requests.find(r => r.id === reqId);
             if (req) {
                 req.status = 'ไม่อนุมัติ';
-                saveLocalData();
+                await saveAllToCloud();
                 renderAllViews();
                 showToast(`ปฏิเสธคำขอลางานของ ${req.empName} แล้ว`);
             }
