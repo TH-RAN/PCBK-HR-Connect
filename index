@@ -994,7 +994,7 @@
             if (headerDateEl) headerDateEl.innerText = `วันนี้: ${d.thaiText}`;
 
             const dashDateEl = document.getElementById('dashboard-full-date');
-            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${d.thaiText} — ติดตามการลา สิทธิ์คงเหลือ และคำขออนุมัติแบบครบวงจร`;
+            if (dashDateEl) dashDateEl.innerText = `ข้อมูล ณ วันที่ ${d.thaiText} — ติดตามการลา สิทธิ์คงเหลือ และคำขออนุมัติการลา`;
 
             const tableTitleEl = document.getElementById('summary-table-header-title');
             if (tableTitleEl) tableTitleEl.innerText = `สรุปตารางวันลาของพนักงาน (ปี ${d.yearBE})`;
