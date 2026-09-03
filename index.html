@@ -21,6 +21,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTtyWKKtv4MThDprVrLnVjBdxCMzMoJ5g",
@@ -34,6 +35,12 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // เข้าสู่ระบบแบบไม่ระบุตัวตน (Anonymous Auth) เพื่อให้สิทธิ์อ่าน-เขียน Firestore ทำงานได้ต่อเนื่อง
+        signInAnonymously(auth).catch(err => {
+            console.warn("Firebase Anonymous Auth warning:", err.message);
+        });
 
         window.saveToFirebase = async function(employeesData, requestsData, eventsData) {
             try {
@@ -44,8 +51,10 @@
                     updatedAt: new Date().toISOString()
                 });
                 console.log("Saved to Firebase successfully");
+                return true;
             } catch (e) {
                 console.error("Error saving to Firebase: ", e);
+                return false;
             }
         };
 
@@ -62,6 +71,10 @@
                 return null;
             }
         };
+
+        // แจ้งเตือนว่า Firebase SDK พร้อมใช้งาน
+        window.isFirebaseReady = true;
+        window.dispatchEvent(new CustomEvent('firebase-initialized'));
     </script>
 
     <style>
@@ -282,7 +295,7 @@
                         <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
                     </div>
 
-                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR (Cloud Synced + Circular Avatar + Click for Details) -->
+                    <!-- EMPLOYEE WEEKLY EVENTS CALENDAR -->
                     <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                             <div>
@@ -476,7 +489,7 @@
                         </div>
                     </div>
 
-                    <div id="wrapper-other-leave-detail" class="hidden bg-purple-50/80 border border-purple-200 p-4 rounded-2xl space-y-2 animate-fade-in">
+                    <div id="wrapper-other-leave-detail" class="hidden bg-purple-50/80 border border-purple-200 p-4 rounded-2xl space-y-2">
                         <label class="block font-bold text-purple-950 text-xs flex items-center">
                             <i class="fa-solid fa-circle-info text-purple-600 mr-1.5"></i> ระบุประเภทภารกิจ / การลาอื่นๆ (ไม่หักวันลาพักร้อน) *
                         </label>
@@ -715,7 +728,7 @@
         </div>
     </div>
 
-    <!-- Modal: Event Detail Modal (คลิกรูปวงกลมเพื่อเปิดดูรายละเอียด) -->
+    <!-- Modal: Event Detail Modal -->
     <div id="event-detail-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative space-y-4 text-xs sm:text-sm text-center">
             <div class="flex justify-end">
@@ -774,7 +787,7 @@
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs sm:text-sm px-4 py-3 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
-        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-message">ทำรายการสำเร็จ</span>
     </div>
 
@@ -985,14 +998,28 @@
             }
         }
 
+        // รอให้ Firebase พร้อมทำงาน
+        function waitForFirebase() {
+            return new Promise((resolve) => {
+                if (window.isFirebaseReady) {
+                    resolve();
+                } else {
+                    window.addEventListener('firebase-initialized', () => resolve(), { once: true });
+                    setTimeout(resolve, 2000); // Fallback timeout 2 วิ
+                }
+            });
+        }
+
         window.addEventListener('DOMContentLoaded', async () => {
             setupDynamicDates();
             loadInitialData();
+            checkAutoLogin(); // ให้ตรวจ Session Admin ก่อน เพื่อให้สิทธิ์ในหน้าเว็บถูกตั้งค่าตั้งแต่แรก
+            
+            await waitForFirebase();
             await syncFromFirebase();
-            checkAutoLogin();
 
-            // ซิงก์ข้อมูลอัตโนมัติจาก Firebase ทุก 5 วินาที
-            setInterval(syncFromFirebase, 5000);
+            // ซิงก์ข้อมูลอัตโนมัติจาก Firebase ทุก 6 วินาที
+            setInterval(syncFromFirebase, 6000);
         });
 
         // ================= FIREBASE SYNC =================
@@ -1003,12 +1030,22 @@
                     if (cloudData.requests && Array.isArray(cloudData.requests)) requests = cloudData.requests;
                     if (cloudData.events && Array.isArray(cloudData.events)) events = cloudData.events;
                     if (cloudData.employees && Array.isArray(cloudData.employees)) {
+                        // ซิงก์ข้อมูลพนักงานทุกฟิลด์อย่างสมบูรณ์แบบ (แก้ปัญหาค่าพักร้อนสะสม, สิทธิ์เพิ่ม, หมายเหตุ หายไป)
                         cloudData.employees.forEach(cloudEmp => {
                             const localIdx = employees.findIndex(e => String(e.id) === String(cloudEmp.id));
                             if (localIdx !== -1) {
-                                employees[localIdx].vacationUsedMonths = cloudEmp.vacationUsedMonths || employees[localIdx].vacationUsedMonths;
-                                employees[localIdx].sickMonths = cloudEmp.sickMonths || employees[localIdx].sickMonths;
-                                employees[localIdx].otherLeaveDays = cloudEmp.otherLeaveDays || employees[localIdx].otherLeaveDays;
+                                employees[localIdx] = {
+                                    ...employees[localIdx],
+                                    ...cloudEmp,
+                                    vacationAccrued: cloudEmp.vacationAccrued || employees[localIdx].vacationAccrued,
+                                    vacationUsedMonths: cloudEmp.vacationUsedMonths || employees[localIdx].vacationUsedMonths,
+                                    sickMonths: cloudEmp.sickMonths || employees[localIdx].sickMonths,
+                                    carryVacation: cloudEmp.carryVacation !== undefined ? cloudEmp.carryVacation : employees[localIdx].carryVacation,
+                                    otherLeaveDays: cloudEmp.otherLeaveDays !== undefined ? cloudEmp.otherLeaveDays : employees[localIdx].otherLeaveDays,
+                                    note: cloudEmp.note !== undefined ? cloudEmp.note : employees[localIdx].note
+                                };
+                            } else {
+                                employees.push(cloudEmp);
                             }
                         });
                     }
@@ -1021,8 +1058,10 @@
         async function saveAllToCloud() {
             saveLocalDataSilently();
             if (window.saveToFirebase) {
-                await window.saveToFirebase(employees, requests, events);
+                const success = await window.saveToFirebase(employees, requests, events);
+                return success;
             }
+            return true;
         }
 
         // ================= AUTHENTICATION =================
@@ -1866,8 +1905,12 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveAllToCloud();
-            showToast("บันทึกข้อมูลสำเร็จ");
+            const saved = await saveAllToCloud();
+            if (saved) {
+                showToast("บันทึกข้อมูลและซิงก์คลาวด์สำเร็จ");
+            } else {
+                showToast("บันทึกลงเครื่องแล้ว (คลาวด์ขัดข้อง)", false);
+            }
         }
 
         async function updateVacAccruedMonth(empIndex, monthIdx, val) {
@@ -1876,8 +1919,12 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveAllToCloud();
-            showToast("บันทึกข้อมูลสำเร็จ");
+            const saved = await saveAllToCloud();
+            if (saved) {
+                showToast("บันทึกข้อมูลและซิงก์คลาวด์สำเร็จ");
+            } else {
+                showToast("บันทึกลงเครื่องแล้ว (คลาวด์ขัดข้อง)", false);
+            }
         }
 
         async function updateVacUsedMonth(empIndex, monthIdx, val) {
@@ -1886,8 +1933,12 @@
             renderSummaryTable();
             renderTodayDashboard();
             renderStaffDirectory();
-            await saveAllToCloud();
-            showToast("บันทึกข้อมูลสำเร็จ");
+            const saved = await saveAllToCloud();
+            if (saved) {
+                showToast("บันทึกข้อมูลและซิงก์คลาวด์สำเร็จ");
+            } else {
+                showToast("บันทึกลงเครื่องแล้ว (คลาวด์ขัดข้อง)", false);
+            }
         }
 
         async function updateSickMonth(empIndex, monthIdx, val) {
@@ -1895,8 +1946,12 @@
             employees[empIndex].sickMonths[monthIdx] = parseFloat(val) || 0;
             renderSummaryTable();
             renderTodayDashboard();
-            await saveAllToCloud();
-            showToast("บันทึกข้อมูลสำเร็จ");
+            const saved = await saveAllToCloud();
+            if (saved) {
+                showToast("บันทึกข้อมูลและซิงก์คลาวด์สำเร็จ");
+            } else {
+                showToast("บันทึกลงเครื่องแล้ว (คลาวด์ขัดข้อง)", false);
+            }
         }
 
         function renderEmpSelectOptions(selectId) {
@@ -2062,7 +2117,7 @@
             const empId = document.getElementById('form-emp-id').value;
             const emp = employees.find(x => x.id === empId);
             if (!emp) {
-                showToast("กรุณาเลือกชื่อพนักงาน");
+                showToast("กรุณาเลือกชื่อพนักงาน", false);
                 return;
             }
 
@@ -2302,7 +2357,7 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     showToast("นำเข้าข้อมูลจาก Excel เรียบร้อยแล้ว");
                 } catch (err) {
-                    showToast("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel");
+                    showToast("เกิดข้อผิดพลาดในการอ่านไฟล์ Excel", false);
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -2340,11 +2395,21 @@
             showToast("ส่งออกไฟล์ Excel สำเร็จ");
         }
 
-        function showToast(msg) {
+        function showToast(msg, isSuccess = true) {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toast-message');
+            const iconEl = document.getElementById('toast-icon');
             if (!toast || !msgEl) return;
+
             msgEl.innerText = msg;
+            if (iconEl) {
+                if (isSuccess) {
+                    iconEl.className = "fa-solid fa-circle-check text-emerald-400";
+                } else {
+                    iconEl.className = "fa-solid fa-triangle-exclamation text-amber-400";
+                }
+            }
+
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
             setTimeout(() => {
