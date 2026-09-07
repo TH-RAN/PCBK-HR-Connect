@@ -216,7 +216,7 @@
                 <button type="button" onclick="switchTab('today-overview')" id="tab-btn-today-overview" class="tab-btn tab-active py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition cursor-pointer">
                     <i class="fa-solid fa-calendar-day text-blue-600"></i>
                     <span>ภาพรวมวันนี้</span>
-                    <span id="badge-today-count" class="bg-amber-100 text-amber-900 text-[11px] px-2 py-0.5 rounded-full font-bold">0 คนลา</span>
+                    <span id="badge-today-count" class="bg-amber-100 text-amber-900 text-[11px] px-2 py-0.5 rounded-full font-bold">0 รายการ</span>
                 </button>
                 <button type="button" onclick="switchTab('dashboard-stats')" id="tab-btn-dashboard-stats" class="tab-btn text-slate-600 py-2 px-4 text-xs sm:text-sm rounded-2xl flex items-center space-x-2 transition hover:text-blue-600 cursor-pointer">
                     <i class="fa-solid fa-chart-pie text-indigo-600"></i>
@@ -332,7 +332,7 @@
                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                            <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ไม่อยู่สำนักงานวันนี้</span>
+                            <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ไม่อยู่ออฟฟิศวันนี้ (07 ส.ค. 2569)</span>
                         </h3>
                         <p class="text-xs text-slate-500">รวมพนักงานที่ลาพักร้อน ลาป่วย หรือปฏิบัติงานนอกสถานที่</p>
                     </div>
@@ -816,7 +816,7 @@
         </div>
     </div>
 
-    <!-- Modal: Event Detail Modal (คลิกดูรายละเอียดจากปฏิทิน) -->
+    <!-- Modal: Event Detail Modal -->
     <div id="event-detail-modal" class="fixed inset-0 bg-slate-900/70 modal-blur z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 relative space-y-4 text-xs sm:text-sm text-center">
             <div class="flex justify-end">
@@ -993,7 +993,7 @@
             }
         }
 
-        // Default Master Dataset (10 Employees - Khun Krit included, Ms. Arthittaya excluded)
+        // Default Master Dataset (10 Employees)
         const defaultDataset = [
             {
                 seq: 1, id: "1101001", name: "ผศ.ดร.ชัยศักดิ์ ศรีผดุงธรรม", position: "President (ประธานกรรมการบริหาร)", dob: "27 มิ.ย. 2503", startDate: "-", carryVacation: 20,
@@ -1064,6 +1064,23 @@
         let currentUser = null;
         let isAdmin = false;
 
+        // Signature cache to prevent unnecessary re-rendering and flickering
+        let lastDataSignature = "";
+
+        function computeDataSignature(cloudData) {
+            if (!cloudData) return "";
+            try {
+                return JSON.stringify({
+                    emps: cloudData.employees,
+                    reqs: cloudData.requests,
+                    evts: cloudData.events,
+                    upd: cloudData.updatedAt
+                });
+            } catch (e) {
+                return "";
+            }
+        }
+
         // Calendar State
         let calendarMode = 'month'; // 'month', 'week', 'day'
         let calendarBaseDate = new Date();
@@ -1133,13 +1150,22 @@
 
             renderAllViews();
 
-            // Background fallback sync interval every 6 seconds
-            setInterval(syncFromFirebase, 6000);
+            // Background fallback sync interval (gentle 30-sec polling, onSnapshot handles instant push)
+            setInterval(syncFromFirebase, 30000);
         });
 
         // Real-time Cloud Handler
         window.handleIncomingCloudData = function(cloudData) {
             if (!cloudData) return;
+
+            // Prevent flickering: If incoming data is identical to current data, do nothing!
+            const newSig = computeDataSignature(cloudData);
+            if (newSig && newSig === lastDataSignature) {
+                const syncChip = document.getElementById('cloud-sync-status-txt');
+                if (syncChip) syncChip.innerText = "คลาวด์ซิงก์แล้ว";
+                return;
+            }
+            lastDataSignature = newSig;
             console.log("PCBK Cloud data updated:", cloudData);
             
             if (cloudData.requests && Array.isArray(cloudData.requests)) {
@@ -1199,6 +1225,7 @@
             const syncChip = document.getElementById('cloud-sync-status-txt');
             if (syncChip) syncChip.innerText = "กำลังซิงก์...";
             await waitForFirebaseReady();
+            lastDataSignature = ""; // force fresh render on manual click
             await syncFromFirebase();
             showToast("ดึงข้อมูลล่าสุดจากระบบคลาวด์สำเร็จ");
             if (syncChip) syncChip.innerText = "คลาวด์ซิงก์แล้ว";
@@ -1206,6 +1233,11 @@
 
         async function saveAllToCloud() {
             saveLocalDataSilently();
+            lastDataSignature = JSON.stringify({
+                emps: employees,
+                reqs: requests,
+                evts: events
+            });
             if (window.saveToFirebase) {
                 await window.saveToFirebase(employees, requests, events);
             }
@@ -1402,6 +1434,9 @@
 
         function setupDynamicDates() {
             const d = getLiveDateData();
+            const thaiMonthsShort = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            const dayFormatted = String(d.liveNow.getDate()).padStart(2, '0');
+            const monthFormatted = thaiMonthsShort[d.liveNow.getMonth()];
 
             const headerDateEl = document.getElementById('header-realtime-date');
             if (headerDateEl) headerDateEl.innerText = `วันนี้: ${d.thaiText}`;
@@ -1416,7 +1451,7 @@
             if (tabTitleEl) tabTitleEl.innerText = `ตารางสรุปวันลา (${d.yearBE})`;
 
             const listTitle = document.getElementById('today-leave-list-title');
-            if (listTitle) listTitle.innerText = `รายชื่อพนักงานที่ไม่อยู่สำนักงานวันนี้ (${d.thaiText})`;
+            if (listTitle) listTitle.innerText = `รายชื่อพนักงานที่ไม่อยู่ออฟฟิศวันนี้ (${dayFormatted} ${monthFormatted} ${d.yearBE})`;
 
             const formStart = document.getElementById('form-start-date');
             const formEnd = document.getElementById('form-end-date');
@@ -1481,7 +1516,7 @@
             renderInteractiveCalendar();
         }
 
-        // ฟังก์ชันคำนวณจำนวนวันทำการ (จันทร์ - ศุกร์) โดยตัดเสาร์และอาทิตย์ออก
+        // Calculate business working days (Mon - Fri)
         function countWorkingDays(startDateStr, endDateStr) {
             if (!startDateStr || !endDateStr) return 0;
             const start = new Date(startDateStr);
@@ -1495,7 +1530,7 @@
             targetEnd.setHours(0, 0, 0, 0);
 
             while (cur <= targetEnd) {
-                const dayOfWeek = cur.getDay(); // 0 = อาทิตย์, 6 = เสาร์
+                const dayOfWeek = cur.getDay(); // 0 = Sun, 6 = Sat
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) {
                     workDays++;
                 }
@@ -1512,7 +1547,6 @@
             // 1. Leave & Offsite requests (exclude rejected & exclude regular leave on weekends)
             requests.forEach(r => {
                 if (r.startDate <= isoDate && r.endDate >= isoDate && !isRejectedStatus(r.status)) {
-                    // วันเสาร์-อาทิตย์เป็นวันหยุด ไม่แสดงการลาในวันหยุดที่ไม่ทำงาน
                     if (isWeekend) return;
 
                     let cat = 'vacation'; // red
@@ -1607,7 +1641,7 @@
             const lastDay = new Date(year, month + 1, 0);
             const totalDays = lastDay.getDate();
 
-            // จัดเรียงแบบมาตรฐาน: อาทิตย์ (ซ้ายสุด) ถึง เสาร์ (ขวาสุด)
+            // Format: Sun (leftmost) to Sat (rightmost)
             const startDayIndex = firstDay.getDay(); // 0 = Sun, ..., 6 = Sat
             const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสฯ', 'ศุกร์', 'เสาร์'];
 
@@ -1676,9 +1710,9 @@
 
         function renderWeekView(container) {
             const today = new Date(calendarBaseDate);
-            const dayOfWeek = today.getDay(); // 0 = อาทิตย์, ..., 6 = เสาร์
+            const dayOfWeek = today.getDay(); // 0 = Sun
             const sunday = new Date(today);
-            sunday.setDate(today.getDate() - dayOfWeek); // ย้อนไปวันอาทิตย์ต้นสัปดาห์
+            sunday.setDate(today.getDate() - dayOfWeek);
 
             const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสฯ', 'ศุกร์', 'เสาร์'];
             const thaiMonthsShort = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -1970,39 +2004,55 @@
                     statusChip.innerText = `ไม่อยู่ ${todayLeaves.length} คน`;
                 }
                 if (listContainer) {
-                    let cardsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">`;
+                    let cardsHtml = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-left">`;
                     todayLeaves.forEach(r => {
                         const emp = employees.find(e => e.id === r.empId);
                         const pos = emp ? emp.position : 'พนักงาน';
                         const isOffsite = r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ');
                         const isSick = r.type.includes('ป่วย');
-                        const badgeColor = isOffsite ? 'bg-pink-100 text-pink-900' : isSick ? 'bg-slate-200 text-slate-800' : 'bg-rose-100 text-rose-900';
+                        const badgeColor = isOffsite ? 'bg-pink-100 text-pink-900 border border-pink-200' : isSick ? 'bg-slate-200 text-slate-800 border border-slate-300' : 'bg-rose-100 text-rose-900 border border-rose-200';
+                        const badgeTitle = isOffsite ? 'นอกสถานที่' : isSick ? 'ลาป่วย' : 'ลาพักร้อน';
                         const displayTitle = isOffsite ? getDisplayOffsiteTitle(r) : r.type;
                         const avatarSrc = getEmployeeAvatar(r.empId);
                         const nick = getEmployeeNickname(r.empId);
                         const nickBadge = nick ? `<span class="ml-1.5 bg-blue-100 text-blue-800 text-[10px] px-2 py-0.5 rounded-full font-bold">(${nick})</span>` : '';
 
                         cardsHtml += `
-                            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 space-y-2 card-hover flex flex-col justify-between">
-                                <div>
+                            <div class="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 space-y-3 card-hover shadow-xs flex flex-col justify-between">
+                                <div class="space-y-2">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-2.5">
-                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-8 h-8 rounded-full object-cover bg-blue-100 border border-slate-200" onerror="handleImageError(this, '${r.empId}')">
+                                            <img src="${avatarSrc}" alt="${r.empName}" class="w-10 h-10 rounded-2xl object-cover bg-blue-50 border border-slate-200" onerror="handleImageError(this, '${r.empId}')">
                                             <div>
                                                 <div class="flex items-center">
-                                                    <span class="font-bold text-slate-900 text-xs block leading-tight">${formatDisplayName(emp) || r.empName}</span>
+                                                    <span class="font-bold text-slate-900 text-xs sm:text-sm block leading-tight">${formatDisplayName(emp) || r.empName}</span>
                                                     ${nickBadge}
                                                 </div>
                                                 <span class="text-[10px] text-slate-400 font-mono">รหัส: ${r.empId}</span>
                                             </div>
                                         </div>
-                                        <span class="text-[10px] ${badgeColor} px-2.5 py-0.5 rounded-full font-bold truncate max-w-[120px]">${displayTitle}</span>
+                                        <span class="text-[10px] ${badgeColor} px-2.5 py-0.5 rounded-full font-bold">${badgeTitle}</span>
                                     </div>
-                                    <p class="text-[11px] text-slate-500 mt-2">${pos}</p>
-                                </div>
-                                <div class="text-[11px] text-slate-600 border-t border-slate-200 pt-2 space-y-0.5">
-                                    <div><strong>ระยะเวลา:</strong> ${r.days} วัน</div>
-                                    <div><strong>รายละเอียด:</strong> ${r.reason || '-'}</div>
+                                    <p class="text-[11px] text-slate-500 font-medium">${pos}</p>
+
+                                    <!-- กล่องรายละเอียดการลา/ภารกิจเด่นชัดใต้ตำแหน่ง -->
+                                    <div class="mt-2.5 ${isOffsite ? 'bg-pink-50/70 border-pink-200/90' : isSick ? 'bg-slate-100/70 border-slate-300' : 'bg-rose-50/70 border-rose-200/90'} border rounded-2xl p-3 space-y-1.5">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="flex items-center space-x-2 min-w-0">
+                                                <span class="w-2.5 h-2.5 rounded-full shrink-0 ${isOffsite ? 'bg-pink-500' : isSick ? 'bg-slate-500' : 'bg-rose-500'}"></span>
+                                                <span class="font-extrabold text-xs sm:text-sm ${isOffsite ? 'text-pink-950' : isSick ? 'text-slate-900' : 'text-rose-950'} truncate" title="${displayTitle}">
+                                                    ${displayTitle}
+                                                </span>
+                                            </div>
+                                            <span class="shrink-0 text-[10px] bg-white border border-slate-200/80 text-slate-700 font-bold px-2 py-0.5 rounded-full shadow-2xs">
+                                                ระยะเวลา ${r.days} วัน
+                                            </span>
+                                        </div>
+                                        <div class="text-[11px] text-slate-600 pt-0.5 border-t ${isOffsite ? 'border-pink-200/60' : isSick ? 'border-slate-200' : 'border-rose-200/60'}">
+                                            <span class="text-slate-500 font-medium">รายละเอียด / ติดต่อ:</span>
+                                            <strong class="text-slate-800 font-bold ml-1">${r.reason || '-'}</strong>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -2096,63 +2146,74 @@
 
                 totalOffsiteAll = offsiteMonthly.reduce((a, b) => a + b, 0);
 
-                // Bar Chart
+                // Bar Chart - Smooth Update without flickering
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
                 if (barCanvas) {
-                    if (monthlyBarChartInstance) monthlyBarChartInstance.destroy();
-                    const ctx = barCanvas.getContext('2d');
-                    monthlyBarChartInstance = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
-                            datasets: [
-                                { label: 'ลาพักร้อน (วัน)', data: vacMonthly, backgroundColor: '#ef4444', borderRadius: 4 },
-                                { label: 'ลาป่วย (วัน)', data: sickMonthly, backgroundColor: '#64748b', borderRadius: 4 },
-                                { label: 'ทำงานนอกสถานที่ (วัน)', data: offsiteMonthly, backgroundColor: '#ec4899', borderRadius: 4 }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
+                    if (monthlyBarChartInstance) {
+                        monthlyBarChartInstance.data.datasets[0].data = vacMonthly;
+                        monthlyBarChartInstance.data.datasets[1].data = sickMonthly;
+                        monthlyBarChartInstance.data.datasets[2].data = offsiteMonthly;
+                        monthlyBarChartInstance.update('none'); // smooth update without destroying canvas
+                    } else {
+                        const ctx = barCanvas.getContext('2d');
+                        monthlyBarChartInstance = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
+                                datasets: [
+                                    { label: 'ลาพักร้อน (วัน)', data: vacMonthly, backgroundColor: '#ef4444', borderRadius: 4 },
+                                    { label: 'ลาป่วย (วัน)', data: sickMonthly, backgroundColor: '#64748b', borderRadius: 4 },
+                                    { label: 'ทำงานนอกสถานที่ (วัน)', data: offsiteMonthly, backgroundColor: '#ec4899', borderRadius: 4 }
+                                ]
                             },
-                            scales: {
-                                x: { stacked: true, grid: { display: false } },
-                                y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' } }
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12, font: { family: 'Prompt', size: 11 } } }
+                                },
+                                scales: {
+                                    x: { stacked: true, grid: { display: false } },
+                                    y: { stacked: true, beginAtZero: true, grid: { color: '#f1f5f9' } }
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
 
-                // Donut Chart
+                // Donut Chart - Smooth Update without flickering
                 const donutCanvas = document.getElementById('leaveDistributionDonutChart');
                 if (donutCanvas) {
-                    if (leaveDonutChartInstance) leaveDonutChartInstance.destroy();
-                    const ctx = donutCanvas.getContext('2d');
                     const hasData = (totalVacAll + totalSickAll + totalOffsiteAll) > 0;
                     const chartData = hasData ? [totalVacAll, totalSickAll, totalOffsiteAll] : [1, 0, 0];
                     const chartColors = hasData ? ['#ef4444', '#64748b', '#ec4899'] : ['#e2e8f0', '#e2e8f0', '#e2e8f0'];
 
-                    leaveDonutChartInstance = new Chart(ctx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: ['ลาพักร้อน', 'ลาป่วย', 'ทำงานนอกสถานที่'],
-                            datasets: [{
-                                data: chartData,
-                                backgroundColor: chartColors,
-                                borderWidth: 3,
-                                borderColor: '#ffffff'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { family: 'Prompt', size: 11 } } }
+                    if (leaveDonutChartInstance) {
+                        leaveDonutChartInstance.data.datasets[0].data = chartData;
+                        leaveDonutChartInstance.data.datasets[0].backgroundColor = chartColors;
+                        leaveDonutChartInstance.update('none'); // smooth update without destroying canvas
+                    } else {
+                        const ctx = donutCanvas.getContext('2d');
+                        leaveDonutChartInstance = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['ลาพักร้อน', 'ลาป่วย', 'ทำงานนอกสถานที่'],
+                                datasets: [{
+                                    data: chartData,
+                                    backgroundColor: chartColors,
+                                    borderWidth: 3,
+                                    borderColor: '#ffffff'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { family: 'Prompt', size: 11 } } }
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
 
                     const grandTotalTxt = document.getElementById('grand-total-leaves-txt');
                     if (grandTotalTxt) {
@@ -2177,7 +2238,7 @@
                        (e.position && e.position.toLowerCase().includes(search));
             });
 
-            // เรียงลำดับพนักงานตามอายุงานเหมือนกับหน้าทำเนียบบุคลากร
+            // Sort by tenure consistent with Directory
             const execList = filtered.filter(e => e.id === '1101001' || e.id === '1102003');
             const staffList = filtered.filter(e => e.id !== '1101001' && e.id !== '1102003');
             staffList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
@@ -2859,9 +2920,9 @@
 
         function updateBadges() {
             const d = getLiveDateData();
-            const todayApprovedLeaves = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && isApprovedStatus(r.status));
+            const todayActiveRequests = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
             const todayBadge = document.getElementById('badge-today-count');
-            if (todayBadge) todayBadge.innerText = `${todayApprovedLeaves.length} คนลา`;
+            if (todayBadge) todayBadge.innerText = `${todayActiveRequests.length} รายการ`;
 
             let pendingCount = 0;
             if (isExecutiveOrAdmin()) {
@@ -2934,7 +2995,7 @@
             const dataToExport = sortedEmployees.map((e, idx) => {
                 const totalAccrued = e.vacationAccrued ? e.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
-                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
+                const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.min(20, Math.max(0, carry + totalAccrued - totalVacUsed));
 
