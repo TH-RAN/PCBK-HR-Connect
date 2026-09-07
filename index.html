@@ -305,17 +305,17 @@
                 <!-- Color Badges Legend -->
                 <div class="flex flex-wrap items-center gap-3 text-xs bg-slate-50 border border-slate-200/80 p-3 rounded-2xl">
                     <span class="font-bold text-slate-600 text-[11px]">สัญลักษณ์สี:</span>
-                    <span class="inline-flex items-center space-x-1.5 bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full font-medium">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                        <span>สีแดง: ลาพักร้อน</span>
+                    <span class="inline-flex items-center space-x-1.5 bg-sky-50 text-sky-700 border border-sky-200 px-2.5 py-1 rounded-full font-medium">
+                        <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                        <span>สีฟ้า: ลาพักร้อน</span>
                     </span>
                     <span class="inline-flex items-center space-x-1.5 bg-slate-100 text-slate-700 border border-slate-300 px-2.5 py-1 rounded-full font-medium">
                         <span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
                         <span>สีฟ้าหม่น: ลาป่วย</span>
                     </span>
-                    <span class="inline-flex items-center space-x-1.5 bg-pink-50 text-pink-700 border border-pink-200 px-2.5 py-1 rounded-full font-medium">
-                        <span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>
-                        <span>สีชมพู: ทำงานนอกสถานที่</span>
+                    <span class="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full font-medium">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <span>สีเขียว: ทำงานนอกสถานที่</span>
                     </span>
                     <span class="inline-flex items-center space-x-1.5 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-full font-medium">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -371,10 +371,10 @@
                 <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-center">
                     <div>
                         <span class="text-slate-500 text-xs font-semibold">ลาพักร้อนใช้ไปทั้งปี</span>
-                        <div class="text-2xl font-extrabold text-rose-600 mt-1" id="stat-vacation-total-used">0.00 วัน</div>
-                        <span class="text-[11px] text-rose-500 font-medium mt-1 block">สะสมรวมทุกคน</span>
+                        <div class="text-2xl font-extrabold text-sky-600 mt-1" id="stat-vacation-total-used">0.00 วัน</div>
+                        <span class="text-[11px] text-sky-500 font-medium mt-1 block">สะสมรวมทุกคน</span>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl">
                         <i class="fa-solid fa-umbrella-beach"></i>
                     </div>
                 </div>
@@ -393,10 +393,10 @@
                 <div class="bg-white p-5 rounded-3xl border border-slate-200/80 shadow-xs card-hover flex justify-between items-center">
                     <div>
                         <span class="text-slate-500 text-xs font-semibold">ทำงานนอกสถานที่ทั้งปี</span>
-                        <div class="text-2xl font-extrabold text-pink-600 mt-1" id="stat-offsite-total-used">0.00 วัน</div>
-                        <span class="text-[11px] text-pink-500 font-medium mt-1 block">WFH & งานภายนอก</span>
+                        <div class="text-2xl font-extrabold text-emerald-600 mt-1" id="stat-offsite-total-used">0.00 วัน</div>
+                        <span class="text-[11px] text-emerald-500 font-medium mt-1 block">WFH & งานภายนอก</span>
                     </div>
-                    <div class="w-12 h-12 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center text-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
                         <i class="fa-solid fa-briefcase"></i>
                     </div>
                 </div>
@@ -410,7 +410,7 @@
                             <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
                                 <i class="fa-solid fa-chart-simple text-blue-600 mr-2"></i> สถิติการลางานและปฏิบัติงานรายเดือน (ม.ค. - ธ.ค.)
                             </h3>
-                            <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน (แดง), ลาป่วย (ฟ้าหม่น) และทำงานนอกสถานที่ (ชมพู)</p>
+                            <p class="text-xs text-slate-500">เปรียบเทียบการลาพักร้อน (ฟ้า), ลาป่วย (ฟ้าหม่น) และทำงานนอกสถานที่ (เขียว)</p>
                         </div>
                     </div>
                     <div class="h-64 relative w-full">
@@ -1549,10 +1549,10 @@
                 if (r.startDate <= isoDate && r.endDate >= isoDate && !isRejectedStatus(r.status)) {
                     if (isWeekend) return;
 
-                    let cat = 'vacation'; // red
-                    let badgeColor = 'bg-rose-500';
-                    let borderColor = 'border-rose-500';
-                    let bgLight = 'bg-rose-50 text-rose-700';
+                    let cat = 'vacation'; // sky blue
+                    let badgeColor = 'bg-sky-500';
+                    let borderColor = 'border-sky-500';
+                    let bgLight = 'bg-sky-50 text-sky-700';
 
                     if (r.type.includes('ป่วย')) {
                         cat = 'sick'; // slate blue
@@ -1560,10 +1560,10 @@
                         borderColor = 'border-slate-500';
                         bgLight = 'bg-slate-100 text-slate-700';
                     } else if (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ')) {
-                        cat = 'offsite'; // pink
-                        badgeColor = 'bg-pink-500';
-                        borderColor = 'border-pink-500';
-                        bgLight = 'bg-pink-50 text-pink-700';
+                        cat = 'offsite'; // emerald green
+                        badgeColor = 'bg-emerald-500';
+                        borderColor = 'border-emerald-500';
+                        bgLight = 'bg-emerald-50 text-emerald-700';
                     }
 
                     items.push({
@@ -1747,7 +1747,7 @@
                             <img src="${avatar}" alt="${item.empName}" class="w-7 h-7 rounded-full object-cover border ${item.borderColor} bg-white shrink-0" onerror="handleImageError(this, '${item.empId}')">
                             <div class="overflow-hidden text-left flex-1 min-w-0">
                                 <div class="font-bold text-slate-800 text-[11px] truncate">${nameWithNick}</div>
-                                <div class="text-[10px] ${item.category === 'offsite' ? 'text-pink-600 font-semibold' : 'text-slate-500'} truncate" title="${displayTitle}">${displayTitle}</div>
+                                <div class="text-[10px] ${item.category === 'offsite' ? 'text-emerald-600 font-semibold' : (item.category === 'vacation' ? 'text-sky-600 font-semibold' : 'text-slate-500')} truncate" title="${displayTitle}">${displayTitle}</div>
                             </div>
                         </div>
                     `;
@@ -1927,14 +1927,18 @@
                 const req = requests.find(r => r.id === itemId);
                 if (!req) return;
 
+                const isOffsite = req.type.includes('นอกสถานที่') || req.type.includes('ลาอื่นๆ');
+                const isSick = req.type.includes('ป่วย');
+                const badgeColorClass = isOffsite ? 'bg-emerald-500' : (isSick ? 'bg-slate-500' : 'bg-sky-500');
+                const borderColorClass = isOffsite ? 'border-emerald-500' : (isSick ? 'border-slate-500' : 'border-sky-500');
+
                 avatarImg.src = getEmployeeAvatar(req.empId);
-                avatarImg.className = "w-20 h-20 rounded-full object-cover border-4 border-blue-500 shadow-md bg-white";
+                avatarImg.className = `w-20 h-20 rounded-full object-cover border-4 ${borderColorClass} shadow-md bg-white`;
                 nameEl.innerText = formatNameWithNickname(req.empName, req.empId);
                 timeEl.innerText = `📅 ${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
-                titleEl.innerText = req.type.includes('นอกสถานที่') ? getDisplayOffsiteTitle(req) : req.type;
+                titleEl.innerText = isOffsite ? getDisplayOffsiteTitle(req) : req.type;
                 typeLabel.innerText = "ประเภทคำขอ / สถานที่:";
-                colorBadge.className = "absolute bottom-0 right-0 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[10px] text-white " + 
-                    (req.type.includes('พักร้อน') ? 'bg-rose-500' : req.type.includes('ป่วย') ? 'bg-slate-500' : 'bg-pink-500');
+                colorBadge.className = `absolute bottom-0 right-0 w-6 h-6 rounded-full border-2 border-white flex items-center justify-center text-[10px] text-white ${badgeColorClass}`;
 
                 let actions = '';
                 if (isExecutiveOrAdmin() && !isApprovedStatus(req.status)) {
@@ -2010,7 +2014,7 @@
                         const pos = emp ? emp.position : 'พนักงาน';
                         const isOffsite = r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ');
                         const isSick = r.type.includes('ป่วย');
-                        const badgeColor = isOffsite ? 'bg-pink-100 text-pink-900 border border-pink-200' : isSick ? 'bg-slate-200 text-slate-800 border border-slate-300' : 'bg-rose-100 text-rose-900 border border-rose-200';
+                        const badgeColor = isOffsite ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' : isSick ? 'bg-slate-200 text-slate-800 border border-slate-300' : 'bg-sky-100 text-sky-900 border border-sky-200';
                         const badgeTitle = isOffsite ? 'นอกสถานที่' : isSick ? 'ลาป่วย' : 'ลาพักร้อน';
                         const displayTitle = isOffsite ? getDisplayOffsiteTitle(r) : r.type;
                         const avatarSrc = getEmployeeAvatar(r.empId);
@@ -2036,11 +2040,11 @@
                                     <p class="text-[11px] text-slate-500 font-medium">${pos}</p>
 
                                     <!-- กล่องรายละเอียดการลา/ภารกิจเด่นชัดใต้ตำแหน่ง -->
-                                    <div class="mt-2.5 ${isOffsite ? 'bg-pink-50/70 border-pink-200/90' : isSick ? 'bg-slate-100/70 border-slate-300' : 'bg-rose-50/70 border-rose-200/90'} border rounded-2xl p-3 space-y-1.5">
+                                    <div class="mt-2.5 ${isOffsite ? 'bg-emerald-50/70 border-emerald-200/90' : isSick ? 'bg-slate-100/70 border-slate-300' : 'bg-sky-50/70 border-sky-200/90'} border rounded-2xl p-3 space-y-1.5">
                                         <div class="flex items-center justify-between gap-2">
                                             <div class="flex items-center space-x-2 min-w-0">
-                                                <span class="w-2.5 h-2.5 rounded-full shrink-0 ${isOffsite ? 'bg-pink-500' : isSick ? 'bg-slate-500' : 'bg-rose-500'}"></span>
-                                                <span class="font-extrabold text-xs sm:text-sm ${isOffsite ? 'text-pink-950' : isSick ? 'text-slate-900' : 'text-rose-950'} truncate" title="${displayTitle}">
+                                                <span class="w-2.5 h-2.5 rounded-full shrink-0 ${isOffsite ? 'bg-emerald-500' : isSick ? 'bg-slate-500' : 'bg-sky-500'}"></span>
+                                                <span class="font-extrabold text-xs sm:text-sm ${isOffsite ? 'text-emerald-950' : isSick ? 'text-slate-900' : 'text-sky-950'} truncate" title="${displayTitle}">
                                                     ${displayTitle}
                                                 </span>
                                             </div>
@@ -2048,7 +2052,7 @@
                                                 ระยะเวลา ${r.days} วัน
                                             </span>
                                         </div>
-                                        <div class="text-[11px] text-slate-600 pt-0.5 border-t ${isOffsite ? 'border-pink-200/60' : isSick ? 'border-slate-200' : 'border-rose-200/60'}">
+                                        <div class="text-[11px] text-slate-600 pt-0.5 border-t ${isOffsite ? 'border-emerald-200/60' : isSick ? 'border-slate-200' : 'border-sky-200/60'}">
                                             <span class="text-slate-500 font-medium">รายละเอียด / ติดต่อ:</span>
                                             <strong class="text-slate-800 font-bold ml-1">${r.reason || '-'}</strong>
                                         </div>
@@ -2161,9 +2165,9 @@
                             data: {
                                 labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
                                 datasets: [
-                                    { label: 'ลาพักร้อน (วัน)', data: vacMonthly, backgroundColor: '#ef4444', borderRadius: 4 },
+                                    { label: 'ลาพักร้อน (วัน)', data: vacMonthly, backgroundColor: '#0284c7', borderRadius: 4 },
                                     { label: 'ลาป่วย (วัน)', data: sickMonthly, backgroundColor: '#64748b', borderRadius: 4 },
-                                    { label: 'ทำงานนอกสถานที่ (วัน)', data: offsiteMonthly, backgroundColor: '#ec4899', borderRadius: 4 }
+                                    { label: 'ทำงานนอกสถานที่ (วัน)', data: offsiteMonthly, backgroundColor: '#10b981', borderRadius: 4 }
                                 ]
                             },
                             options: {
@@ -2186,7 +2190,7 @@
                 if (donutCanvas) {
                     const hasData = (totalVacAll + totalSickAll + totalOffsiteAll) > 0;
                     const chartData = hasData ? [totalVacAll, totalSickAll, totalOffsiteAll] : [1, 0, 0];
-                    const chartColors = hasData ? ['#ef4444', '#64748b', '#ec4899'] : ['#e2e8f0', '#e2e8f0', '#e2e8f0'];
+                    const chartColors = hasData ? ['#0284c7', '#64748b', '#10b981'] : ['#e2e8f0', '#e2e8f0', '#e2e8f0'];
 
                     if (leaveDonutChartInstance) {
                         leaveDonutChartInstance.data.datasets[0].data = chartData;
