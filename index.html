@@ -1027,11 +1027,26 @@
             if (window.loadFromFirebase) {
                 const cloudData = await window.loadFromFirebase();
                 if (cloudData) {
-                    if (cloudData.requests && Array.isArray(cloudData.requests)) requests = cloudData.requests;
-                    if (cloudData.events && Array.isArray(cloudData.events)) events = cloudData.events;
+                    if (cloudData.requests && Array.isArray(cloudData.requests)) {
+                        requests = cloudData.requests.filter(r => !r.empName || !r.empName.includes('อาทิตยา'));
+                    }
+                    if (cloudData.events && Array.isArray(cloudData.events)) {
+                        events = cloudData.events.filter(ev => !ev.empName || !ev.empName.includes('อาทิตยา'));
+                    }
                     if (cloudData.employees && Array.isArray(cloudData.employees)) {
-                        // ซิงก์ข้อมูลพนักงานทุกฟิลด์อย่างสมบูรณ์แบบ (แก้ปัญหาค่าพักร้อนสะสม, สิทธิ์เพิ่ม, หมายเหตุ หายไป)
-                        cloudData.employees.forEach(cloudEmp => {
+                        let hadAthitaya = false;
+                        const cleanedCloudEmployees = cloudData.employees.filter(cloudEmp => {
+                            if (cloudEmp.name && cloudEmp.name.includes('อาทิตยา')) {
+                                hadAthitaya = true;
+                                return false;
+                            }
+                            return true;
+                        });
+
+                        // ลบชื่อคุณอาทิตยาออกจากหน่วยความจำ Local
+                        employees = employees.filter(e => !e.name || !e.name.includes('อาทิตยา'));
+
+                        cleanedCloudEmployees.forEach(cloudEmp => {
                             const localIdx = employees.findIndex(e => String(e.id) === String(cloudEmp.id));
                             if (localIdx !== -1) {
                                 employees[localIdx] = {
@@ -1048,6 +1063,16 @@
                                 employees.push(cloudEmp);
                             }
                         });
+
+                        // จัดลำดับ seq ของพนักงานใหม่
+                        employees.forEach((emp, idx) => {
+                            emp.seq = idx + 1;
+                        });
+
+                        // หากตรวจพบและตัดชื่อคุณอาทิตยาออก ให้บันทึกทับขึ้น Cloud ทันทีเพื่อลบอย่างถาวร
+                        if (hadAthitaya) {
+                            await saveAllToCloud();
+                        }
                     }
                     saveLocalDataSilently();
                     renderAllViews();
@@ -1201,7 +1226,7 @@
                 totalSickUsed = currentUser.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0);
             }
             const carry = parseFloat(currentUser.carryVacation) || 0;
-            const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
+            const remVac = Math.min(20, Math.max(0, carry + totalAccrued - totalVacUsed));
 
             const pVacRem = document.getElementById('profile-vacation-rem');
             const pVacUsed = document.getElementById('profile-vacation-used');
@@ -1302,16 +1327,18 @@
                 const masterEvents = localStorage.getItem('pcbk_master_events');
 
                 if (masterEmp && JSON.parse(masterEmp).length > 0) {
-                    employees = JSON.parse(masterEmp);
+                    employees = JSON.parse(masterEmp).filter(e => !e.name || !e.name.includes('อาทิตยา'));
+                    employees.forEach((emp, idx) => { emp.seq = idx + 1; });
                 } else {
-                    employees = JSON.parse(JSON.stringify(defaultDataset));
+                    employees = JSON.parse(JSON.stringify(defaultDataset)).filter(e => !e.name || !e.name.includes('อาทิตยา'));
+                    employees.forEach((emp, idx) => { emp.seq = idx + 1; });
                     saveLocalDataSilently();
                 }
 
-                requests = masterReq ? JSON.parse(masterReq) : [];
-                events = masterEvents ? JSON.parse(masterEvents) : [];
+                requests = masterReq ? JSON.parse(masterReq).filter(r => !r.empName || !r.empName.includes('อาทิตยา')) : [];
+                events = masterEvents ? JSON.parse(masterEvents).filter(ev => !ev.empName || !ev.empName.includes('อาทิตยา')) : [];
             } catch (e) {
-                employees = JSON.parse(JSON.stringify(defaultDataset));
+                employees = JSON.parse(JSON.stringify(defaultDataset)).filter(e => !e.name || !e.name.includes('อาทิตยา'));
                 requests = [];
                 events = [];
             }
@@ -1818,7 +1845,7 @@
                 }
 
                 const carryVal = parseFloat(e.carryVacation) || 0;
-                const remainingVacation = Math.max(0, carryVal + totalAccrued - totalVacationUsed);
+                const remainingVacation = Math.min(20, Math.max(0, carryVal + totalAccrued - totalVacationUsed));
                 const finalOtherUsed = parseFloat(e.otherLeaveDays) || 0;
 
                 const isCurrentLoggedIn = currentUser && String(currentUser.id) === String(e.id);
@@ -1982,7 +2009,7 @@
             }
             const usedVac = emp.vacationUsedMonths ? emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
             const carry = parseFloat(emp.carryVacation) || 0;
-            const vacRem = Math.max(0, carry + accrued - usedVac);
+            const vacRem = Math.min(20, Math.max(0, carry + accrued - usedVac));
 
             const usedSick = emp.sickMonths ? emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0) : 0;
             const sickRem = Math.max(0, 30 - usedSick);
@@ -2370,7 +2397,7 @@
                 const totalVacUsed = e.vacationUsedMonths ? e.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0) : 0;
                 const totalSickUsed = e.sickMonths ? e.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0) : 0;
                 const carry = parseFloat(e.carryVacation) || 0;
-                const remVac = Math.max(0, carry + totalAccrued - totalVacUsed);
+                const remVac = Math.min(20, Math.max(0, carry + totalAccrued - totalVacUsed));
 
                 return {
                     "ลำดับ": e.seq,
