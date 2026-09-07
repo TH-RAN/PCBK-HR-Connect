@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCBK HR-Connect - ระบบบริหารจัดการวันลาและสถิติกำลังคน</title>
+    <title>HR Connect - ระบบบริหารจัดการวันลาและสถิติกำลังคน</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -144,7 +144,7 @@
             </div>
 
             <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">PCBK HR-Connect</h2>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900">HR Connect</h2>
                 <p class="text-xs sm:text-sm text-slate-500 mt-1">กรุณากรอกรหัสพนักงาน หรือรหัสผู้ดูแลระบบ</p>
             </div>
 
@@ -186,7 +186,7 @@
                 <div class="flex items-center space-x-3">
                     <img src="./LOGO%20PCBK%20API%20-%201.png" alt="PCBK Logo" class="h-11 w-auto object-contain" onerror="this.onerror=null; this.src='https://placehold.co/120x40/2563eb/ffffff?text=PCBK';">
                     <div>
-                        <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">PCBK HR-Connect</h1>
+                        <h1 class="font-bold text-base sm:text-lg leading-tight text-slate-900">HR Connect</h1>
                         <p class="text-[11px] sm:text-xs text-slate-500">ระบบบริหารจัดการงานบุคคล วันลา และสถิติประจำปี</p>
                     </div>
                 </div>
@@ -274,13 +274,29 @@
                 </div>
             </div>
 
+            <!-- Today's Leave Summary Cards -->
+            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
+                            <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ไม่อยู่ออฟฟิศวันนี้ (07 ส.ค. 2569)</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">รวมพนักงานที่ลาพักร้อน ลาป่วย หรือปฏิบัติงานนอกสถานที่</p>
+                    </div>
+                    <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full font-bold" id="today-status-chip">
+                        ไม่อยู่ 0 คน
+                    </span>
+                </div>
+                <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
+            </div>
+
             <!-- Calendar Section -->
             <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-5">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                     <div>
                         <div class="flex items-center space-x-3">
                             <h3 class="font-bold text-slate-900 text-base sm:text-lg flex items-center">
-                                <i class="fa-solid fa-calendar-days text-indigo-600 mr-2"></i> ปฏิทินกำลังคนและกิจกรรม
+                                <i class="fa-solid fa-calendar-days text-indigo-600 mr-2"></i> ปฏิทินพนักงานและกิจกรรมต่าง ๆ
                             </h3>
                             <span id="calendar-view-indicator-text" class="text-xs bg-slate-100 text-slate-700 font-bold px-3 py-1 rounded-full">มุมมองรายเดือน</span>
                         </div>
@@ -325,22 +341,6 @@
 
                 <!-- Calendar Content Container -->
                 <div id="calendar-content-box" class="min-h-[420px] transition-all"></div>
-            </div>
-
-            <!-- Today's Leave Summary Cards -->
-            <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center">
-                            <i class="fa-solid fa-user-tag text-blue-600 mr-2"></i> <span id="today-leave-list-title">รายชื่อพนักงานที่ไม่อยู่ออฟฟิศวันนี้ (07 ส.ค. 2569)</span>
-                        </h3>
-                        <p class="text-xs text-slate-500">รวมพนักงานที่ลาพักร้อน ลาป่วย หรือปฏิบัติงานนอกสถานที่</p>
-                    </div>
-                    <span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-3 py-1 rounded-full font-bold" id="today-status-chip">
-                        ไม่อยู่ 0 คน
-                    </span>
-                </div>
-                <div id="today-leave-list-container" class="py-2 text-center space-y-2"></div>
             </div>
         </section>
 
