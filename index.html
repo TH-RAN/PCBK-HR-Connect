@@ -394,9 +394,9 @@
                         <span id="day-view-date-subtitle" class="font-semibold">วันจันทร์ 7 กันยายน 2569</span>
                     </div>
                     
-                    <div class="overflow-x-auto border border-slate-200 rounded-2xl bg-slate-50/40 p-2">
-                        <div id="day-timeline-container" class="relative min-w-[700px] divide-y divide-slate-200">
-                            <!-- Populated dynamically with time slots -->
+                    <div class="overflow-x-auto border border-slate-200 rounded-3xl bg-white p-3 shadow-inner">
+                        <div id="day-timeline-container" class="relative min-w-[700px]">
+                            <!-- Populated dynamically with Google Calendar-style continuous time slots -->
                         </div>
                     </div>
                 </div>
@@ -1688,6 +1688,30 @@
                     typeName = 'ทำงานนอกสถานที่';
                 }
 
+                // วิเคราะห์ช่วงเวลาจริงจากการลาเพื่อใช้ทอดยาวในโหมด Day View
+                let reqStartTime = '08:30';
+                let reqEndTime = '17:30';
+                let durationLabel = `${r.days} วัน`;
+
+                if (r.reason) {
+                    if (r.reason.includes('ครึ่งวันเช้า')) {
+                        reqStartTime = '08:30';
+                        reqEndTime = '12:30';
+                        durationLabel = '0.5 วัน (เช้า)';
+                    } else if (r.reason.includes('ครึ่งวันบ่าย')) {
+                        reqStartTime = '13:30';
+                        reqEndTime = '17:30';
+                        durationLabel = '0.5 วัน (บ่าย)';
+                    } else {
+                        const timeMatch = r.reason.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+                        if (timeMatch) {
+                            reqStartTime = timeMatch[1].padStart(5, '0');
+                            reqEndTime = timeMatch[2].padStart(5, '0');
+                            durationLabel = '2 ชม.';
+                        }
+                    }
+                }
+
                 return {
                     id: r.id,
                     type: 'request',
@@ -1699,16 +1723,18 @@
                     empId: r.empId,
                     empName: r.empName,
                     title: isPending ? `${typeName} (รออนุมัติ)` : typeName,
-                    timeText: `${r.days} วัน (${r.startDate} ถึง ${r.endDate})`,
+                    timeText: `${durationLabel} (${reqStartTime} - ${reqEndTime} น.)`,
                     details: r.reason || '-',
-                    startTime: '08:30',
-                    endTime: '17:30',
+                    startTime: reqStartTime,
+                    endTime: reqEndTime,
                     raw: r
                 };
             });
 
             // Events for this exact date
             const matchingEvents = events.filter(ev => ev.date === isoDateStr).map(ev => {
+                const sTime = ev.startTime || '09:00';
+                const eTime = ev.endTime || '10:00';
                 return {
                     id: ev.id,
                     type: 'event',
@@ -1720,10 +1746,10 @@
                     empId: ev.empId,
                     empName: ev.empName,
                     title: 'โน้ตกิจกรรม / ประชุม',
-                    timeText: `${ev.startTime} - ${ev.endTime} น.`,
+                    timeText: `${sTime} - ${eTime} น.`,
                     details: ev.title,
-                    startTime: ev.startTime || '09:00',
-                    endTime: ev.endTime || '10:00',
+                    startTime: sTime,
+                    endTime: eTime,
                     raw: ev
                 };
             });
@@ -1879,7 +1905,7 @@
             }
         }
 
-        // RENDER DAY TIMELINE VIEW (Hour-by-hour 08:00 - 18:00)
+        // RENDER DAY TIMELINE VIEW (Google Calendar-style Continuous Spanning Block Layout)
         function renderDayTimelineView(targetDate) {
             const container = document.getElementById('day-timeline-container');
             if (!container) return;
@@ -1889,48 +1915,201 @@
             const isoDate = `${yearAD}-${String(targetDate.getMonth() + 1).padStart(2, '0')}-${String(targetDate.getDate()).padStart(2, '0')}`;
             const items = getItemsForDate(isoDate);
 
-            // Hours 08:00 to 18:00
-            for (let hour = 8; hour <= 18; hour++) {
-                const hourStr = `${String(hour).padStart(2, '0')}:00`;
-                const nextHourStr = `${String(hour + 1).padStart(2, '0')}:00`;
+            const HOUR_HEIGHT = 68; // ความสูงแต่ละชั่วโมง (พิกเซล)
+            const START_HOUR = 8;   // 08:00 น.
+            const END_HOUR = 18;    // 18:00 น.
+            const TOTAL_HOURS = END_HOUR - START_HOUR; // 10 ชั่วโมง
+            const TOTAL_HEIGHT = TOTAL_HOURS * HOUR_HEIGHT; // 680px
 
-                // Filter items active in this hour slot
-                const slotItems = items.filter(item => {
-                    const startH = parseInt(item.startTime.split(':')[0], 10) || 8;
-                    const endH = parseInt(item.endTime.split(':')[0], 10) || 17;
-                    return hour >= startH && hour < endH;
+            // ฟังก์ชันแปลงเวลา HH:MM เป็นจำนวนนาทีนับจาก 00:00
+            function timeToMinutes(timeStr) {
+                if (!timeStr) return START_HOUR * 60;
+                const parts = timeStr.split(':');
+                const h = parseInt(parts[0], 10) || 0;
+                const m = parseInt(parts[1], 10) || 0;
+                return (h * 60) + m;
+            }
+
+            // เตรียมข้อมูลความครอบคลุมของแต่ละกิจกรรม
+            const parsedItems = items.map(item => {
+                let startMin = timeToMinutes(item.startTime);
+                let endMin = timeToMinutes(item.endTime);
+
+                // หากเวลาสิ้นสุดน้อยกว่าหรือเท่ากับเวลาเริ่ม ให้ขยายขั้นต่ำ 30 นาที
+                if (endMin <= startMin) endMin = startMin + 30;
+
+                // ตรึงขอบเขตให้อยู่ระหว่าง 08:00 - 18:00 น.
+                const clampedStart = Math.max(START_HOUR * 60, startMin);
+                const clampedEnd = Math.min(END_HOUR * 60, endMin);
+                const durationMinutes = Math.max(25, clampedEnd - clampedStart);
+
+                const topPx = ((clampedStart - (START_HOUR * 60)) / 60) * HOUR_HEIGHT;
+                const heightPx = Math.max(34, (durationMinutes / 60) * HOUR_HEIGHT - 3);
+
+                return {
+                    ...item,
+                    startMin: clampedStart,
+                    endMin: clampedEnd,
+                    topPx,
+                    heightPx,
+                    colIndex: 0,
+                    totalCols: 1
+                };
+            });
+
+            // อัลกอริทึมคำนวณคอลัมน์คู่ขนานสำหรับกิจกรรมที่มีเวลาซ้อนทับกัน (เหมือน Google Calendar)
+            parsedItems.sort((a, b) => a.startMin - b.startMin || (b.endMin - b.startMin) - (a.endMin - a.startMin));
+
+            // จัดกลุ่มกิจกรรมที่เกี่ยวเนื่องซ้อนทับกัน (Clusters)
+            const clusters = [];
+            let currentCluster = [];
+            let clusterEnd = 0;
+
+            parsedItems.forEach(item => {
+                if (currentCluster.length === 0) {
+                    currentCluster.push(item);
+                    clusterEnd = item.endMin;
+                } else if (item.startMin < clusterEnd) {
+                    currentCluster.push(item);
+                    if (item.endMin > clusterEnd) clusterEnd = item.endMin;
+                } else {
+                    clusters.push(currentCluster);
+                    currentCluster = [item];
+                    clusterEnd = item.endMin;
+                }
+            });
+            if (currentCluster.length > 0) clusters.push(currentCluster);
+
+            // คำนวณตำแหน่งคอลัมน์ในแต่ละ Cluster
+            clusters.forEach(cluster => {
+                const columns = []; // เก็บเวลาสิ้นสุดของกิจกรรมล่าสุดในแต่ละคอลัมน์
+                cluster.forEach(item => {
+                    let placed = false;
+                    for (let c = 0; c < columns.length; c++) {
+                        if (columns[c] <= item.startMin) {
+                            item.colIndex = c;
+                            columns[c] = item.endMin;
+                            placed = true;
+                            break;
+                        }
+                    }
+                    if (!placed) {
+                        item.colIndex = columns.length;
+                        columns.push(item.endMin);
+                    }
                 });
-
-                let blocksHtml = '';
-                slotItems.forEach(item => {
-                    const avatar = getEmployeeAvatar(item.empId);
-                    blocksHtml += `
-                        <div class="bg-white border-l-4 ${item.category === 'vacation' ? 'border-l-red-500 bg-red-50/40 text-red-950' : item.category === 'sick' ? 'border-l-slate-500 bg-slate-100 text-slate-900' : item.category === 'offsite' ? 'border-l-pink-500 bg-pink-50/40 text-pink-950' : 'border-l-amber-500 bg-amber-50/40 text-amber-950'} border border-slate-200 rounded-xl p-2.5 shadow-2xs flex items-center space-x-3 cursor-pointer hover:shadow-md transition" onclick="openCalendarItemModal('${encodeURIComponent(JSON.stringify(item))}')">
-                            <img src="${avatar}" alt="${item.empName}" class="w-9 h-9 rounded-full object-cover border border-slate-200 bg-white" onerror="handleImageError(this, '${item.empId}')">
-                            <div class="min-w-0 flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-bold text-xs">${item.empName}</span>
-                                    <span class="text-[10px] px-2 py-0.2 rounded-full font-bold bg-white/80 border border-slate-200">${item.title}</span>
-                                    <span class="text-[10px] text-slate-500">🕒 ${item.startTime} - ${item.endTime} น.</span>
-                                </div>
-                                <p class="text-[11px] text-slate-600 truncate mt-0.5">${item.details}</p>
-                            </div>
-                        </div>
-                    `;
+                const totalCols = columns.length;
+                cluster.forEach(item => {
+                    item.totalCols = totalCols;
                 });
+            });
 
-                container.innerHTML += `
-                    <div class="flex items-start py-2.5 px-3 hover:bg-slate-50/80 transition">
-                        <div class="w-20 text-xs font-mono font-bold text-slate-400 pt-1 flex items-center space-x-1">
-                            <i class="fa-regular fa-clock text-[10px]"></i>
-                            <span>${hourStr}</span>
-                        </div>
-                        <div class="flex-1 space-y-1.5 pl-4 border-l border-slate-200 min-h-[36px]">
-                            ${blocksHtml.length > 0 ? blocksHtml : '<span class="text-[11px] text-slate-300 italic">ว่าง / ปฏิบัติงานปกติ</span>'}
-                        </div>
+            // สร้างเส้นตารางเวลาและ Grid พื้นหลัง (Background Time Grid)
+            let gridHtml = `
+                <div class="relative flex" style="height: ${TOTAL_HEIGHT}px;">
+                    <!-- ฝั่งซ้าย: แสดงตัวเลขเวลา (Time Gutter) -->
+                    <div class="w-16 sm:w-20 shrink-0 border-r border-slate-200/80 select-none pr-3">
+            `;
+
+            for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+                const hourFormatted = `${String(hour).padStart(2, '0')}:00`;
+                gridHtml += `
+                    <div class="text-right text-[11px] font-mono font-bold text-slate-400 relative" style="height: ${HOUR_HEIGHT}px;">
+                        <span class="-top-2.5 relative block">${hourFormatted}</span>
                     </div>
                 `;
             }
+
+            gridHtml += `
+                    </div>
+
+                    <!-- ฝั่งขวา: ช่องตารางและพื้นที่วางบล็อกกิจกรรม (Timeline Grid Canvas) -->
+                    <div class="flex-1 relative">
+            `;
+
+            // ตีเส้นขีดบอกชั่วโมงและครึ่งชั่วโมง
+            for (let hour = START_HOUR; hour < END_HOUR; hour++) {
+                gridHtml += `
+                    <div class="border-t border-slate-100 relative group" style="height: ${HOUR_HEIGHT}px;">
+                        <!-- เส้นประครึ่งชั่วโมง (Half-hour line) -->
+                        <div class="border-b border-dashed border-slate-100/90 w-full absolute" style="top: ${HOUR_HEIGHT / 2}px;"></div>
+                    </div>
+                `;
+            }
+            // เส้นปิดล่างสุด 18:00
+            gridHtml += `<div class="border-t border-slate-200 w-full absolute bottom-0"></div>`;
+
+            // บล็อกกิจกรรมลากยาวต่อเนื่อง (Spanning Blocks)
+            parsedItems.forEach(item => {
+                const avatar = getEmployeeAvatar(item.empId);
+                const colWidthPct = 100 / item.totalCols;
+                const colLeftPct = item.colIndex * colWidthPct;
+
+                // ชุดสีสไตล์ Google Calendar ตามประเภทกิจกรรม
+                let cardStyle = "bg-red-50/95 border-l-4 border-l-red-500 border-red-200 text-red-950";
+                let badgeStyle = "bg-red-100 text-red-700 border-red-200";
+
+                if (item.category === 'sick') {
+                    cardStyle = "bg-slate-100/95 border-l-4 border-l-slate-500 border-slate-200 text-slate-900";
+                    badgeStyle = "bg-slate-200 text-slate-700 border-slate-300";
+                } else if (item.category === 'offsite') {
+                    cardStyle = "bg-pink-50/95 border-l-4 border-l-pink-500 border-pink-200 text-pink-950";
+                    badgeStyle = "bg-pink-100 text-pink-700 border-pink-200";
+                } else if (item.category === 'note') {
+                    cardStyle = "bg-amber-50/95 border-l-4 border-l-amber-500 border-amber-200 text-amber-950";
+                    badgeStyle = "bg-amber-100 text-amber-800 border-amber-200";
+                }
+
+                const isSmallHeight = item.heightPx < 50;
+
+                gridHtml += `
+                    <div onclick="openCalendarItemModal('${encodeURIComponent(JSON.stringify(item))}')"
+                         title="${item.empName}: ${item.title} (${item.timeText})"
+                         class="absolute z-10 border rounded-2xl p-2 sm:p-2.5 shadow-xs cursor-pointer hover:shadow-lg hover:z-30 hover:scale-[1.01] transition-all duration-150 overflow-hidden flex flex-col justify-between ${cardStyle}"
+                         style="top: ${item.topPx}px; height: ${item.heightPx}px; left: calc(${colLeftPct}% + 4px); width: calc(${colWidthPct}% - 8px);">
+                        
+                        <div class="flex items-center space-x-2 min-w-0">
+                            <img src="${avatar}" alt="${item.empName}" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-white shrink-0 shadow-2xs bg-white" onerror="handleImageError(this, '${item.empId}')">
+                            <div class="min-w-0 flex-1 leading-tight">
+                                <div class="flex items-center space-x-1.5 flex-wrap">
+                                    <span class="font-bold text-xs truncate">${item.empName}</span>
+                                    <span class="text-[9px] px-1.5 py-0.2 rounded-full font-bold border ${badgeStyle}">${item.title}</span>
+                                </div>
+                                <span class="text-[10px] font-mono opacity-80 block mt-0.5">🕒 ${item.startTime} - ${item.endTime} น.</span>
+                            </div>
+                        </div>
+
+                        ${!isSmallHeight ? `
+                            <p class="text-[11px] opacity-90 truncate mt-1 bg-white/60 px-2 py-0.5 rounded-lg border border-black/5">
+                                ${item.details}
+                            </p>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            // เส้นบอกเวลาปัจจุบันแบบเรียลไทม์ (Live Red Current Time Indicator) หากเลือกดูวันปัจจุบัน
+            const liveNow = new Date();
+            const liveTodayIso = getLiveDateData().iso;
+            if (isoDate === liveTodayIso) {
+                const nowMinutes = (liveNow.getHours() * 60) + liveNow.getMinutes();
+                if (nowMinutes >= START_HOUR * 60 && nowMinutes <= END_HOUR * 60) {
+                    const nowTopPx = ((nowMinutes - (START_HOUR * 60)) / 60) * HOUR_HEIGHT;
+                    gridHtml += `
+                        <div class="absolute w-full z-20 pointer-events-none flex items-center" style="top: ${nowTopPx}px;">
+                            <div class="w-3 h-3 rounded-full bg-rose-500 -ml-1.5 shadow-sm"></div>
+                            <div class="flex-1 border-t-2 border-rose-500 border-dashed shadow-xs"></div>
+                        </div>
+                    `;
+                }
+            }
+
+            gridHtml += `
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = gridHtml;
         }
 
         // CALENDAR MODAL POPOVER DETAILS
