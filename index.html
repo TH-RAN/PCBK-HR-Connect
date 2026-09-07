@@ -2865,6 +2865,9 @@
         function renderProfileTab() {
             if (!currentUser) return;
 
+            // ดึงข้อมูลพนักงานตัวล่าสุดจากตาราง employees เสมอเพื่อให้สะท้อนข้อมูลเรียลไทม์
+            const liveEmp = employees.find(e => String(e.id) === String(currentUser.id)) || currentUser;
+
             const photoEl = document.getElementById('profile-card-avatar');
             const nameEl = document.getElementById('profile-card-name');
             const posEl = document.getElementById('profile-card-position');
@@ -2876,17 +2879,17 @@
             const tenureEl = document.getElementById('profile-card-tenure');
 
             if (photoEl) {
-                photoEl.src = getEmployeeAvatar(currentUser.id);
-                photoEl.onerror = function() { handleImageError(this, currentUser.id); };
+                photoEl.src = getEmployeeAvatar(liveEmp.id);
+                photoEl.onerror = function() { handleImageError(this, liveEmp.id); };
             }
 
-            if (nameEl) nameEl.innerText = formatDisplayName(currentUser);
-            if (posEl) posEl.innerText = currentUser.position;
-            if (idEl) idEl.innerText = currentUser.id;
-            if (dobEl) dobEl.innerText = currentUser.dob || '-';
-            if (startEl) startEl.innerText = currentUser.startDate || '-';
-            if (carryEl) carryEl.innerText = currentUser.carryVacation !== undefined ? currentUser.carryVacation : '0';
-            if (tenureEl) tenureEl.innerText = calculateWorkTenure(currentUser.startDate);
+            if (nameEl) nameEl.innerText = formatDisplayName(liveEmp);
+            if (posEl) posEl.innerText = liveEmp.position;
+            if (idEl) idEl.innerText = liveEmp.id;
+            if (dobEl) dobEl.innerText = liveEmp.dob || '-';
+            if (startEl) startEl.innerText = liveEmp.startDate || '-';
+            if (carryEl) carryEl.innerText = liveEmp.carryVacation !== undefined ? liveEmp.carryVacation : '0';
+            if (tenureEl) tenureEl.innerText = calculateWorkTenure(liveEmp.startDate);
 
             if (roleChip) {
                 roleChip.innerText = isAdmin ? 'ผู้ดูแลระบบ (Admin)' : (isExecutiveOrAdmin() ? 'ผู้บริหาร (Executive)' : 'พนักงานประจำ');
@@ -2894,19 +2897,19 @@
             }
 
             let totalAccrued = 0;
-            if (currentUser.vacationAccrued && Array.isArray(currentUser.vacationAccrued)) {
-                totalAccrued = currentUser.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+            if (liveEmp.vacationAccrued && Array.isArray(liveEmp.vacationAccrued)) {
+                totalAccrued = liveEmp.vacationAccrued.reduce((s, v) => s + (parseFloat(v) || 0), 0);
             }
             let totalVacUsed = 0;
-            if (currentUser.vacationUsedMonths && Array.isArray(currentUser.vacationUsedMonths)) {
-                totalVacUsed = currentUser.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
+            if (liveEmp.vacationUsedMonths && Array.isArray(liveEmp.vacationUsedMonths)) {
+                totalVacUsed = liveEmp.vacationUsedMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
             }
             let totalSickUsed = 0;
-            if (currentUser.sickMonths && Array.isArray(currentUser.sickMonths)) {
-                totalSickUsed = currentUser.sickMonths.reduce((s, v) => s + (parseFloat(s) || 0), 0);
+            if (liveEmp.sickMonths && Array.isArray(liveEmp.sickMonths)) {
+                totalSickUsed = liveEmp.sickMonths.reduce((s, v) => s + (parseFloat(v) || 0), 0);
             }
 
-            const carry = parseFloat(currentUser.carryVacation) || 0;
+            const carry = parseFloat(liveEmp.carryVacation) || 0;
             const remVac = Math.min(20, Math.max(0, carry + totalAccrued - totalVacUsed));
 
             const pVacRem = document.getElementById('profile-vacation-rem');
