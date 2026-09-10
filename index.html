@@ -150,11 +150,6 @@
             color: #ffffff !important;
         }
 
-        /* Gauge Arc styling */
-        .gauge-svg {
-            transform: rotate(-180deg);
-        }
-
         /* Soft Press */
         .pressable {
             transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
@@ -376,10 +371,14 @@
                             
                             <!-- MAIN PROFILE BENTO CARD (Matched Exactly with Reference) -->
                             <div class="bento-card p-6 space-y-4">
-                                <!-- Big Photo -->
-                                <div class="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-100 relative shadow-inner">
-                                    <img id="bento-profile-avatar" src="" alt="Profile" class="w-full h-full object-cover object-top" onerror="handleImageError(this, displayEmp ? displayEmp.id : '')">
-                                    <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-extrabold text-blue-600 font-mono shadow-xs" id="bento-profile-nick">
+                                <!-- Circular Photo Container (Not Zoomed) -->
+                                <div class="relative flex flex-col items-center justify-center pt-2 pb-2">
+                                    <div class="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-1.5 bg-gradient-to-tr from-blue-500/20 via-sky-400/20 to-indigo-500/20 shadow-md">
+                                        <div class="w-full h-full rounded-full overflow-hidden bg-slate-100 border-2 border-white shadow-inner flex items-center justify-center">
+                                            <img id="bento-profile-avatar" src="" alt="Profile" class="w-full h-full object-cover object-center" onerror="handleImageError(this, displayEmp ? displayEmp.id : '')">
+                                        </div>
+                                    </div>
+                                    <div class="absolute top-1 right-0 bg-blue-50 border border-blue-200/80 px-3 py-1 rounded-full text-[11px] font-extrabold text-blue-600 font-mono shadow-xs" id="bento-profile-nick">
                                         NICK
                                     </div>
                                 </div>
@@ -468,15 +467,17 @@
                                         <span class="text-[10px] text-slate-400 block text-left">อัตราการมาปฏิบัติงาน</span>
                                     </div>
 
-                                    <!-- Gauge Semicircle -->
-                                    <div class="relative w-36 h-20 mx-auto overflow-hidden flex items-end justify-center">
-                                        <svg class="w-36 h-36 gauge-svg" viewBox="0 0 100 100">
-                                            <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" stroke-width="10" stroke-dasharray="125 125" stroke-dashoffset="0" />
-                                            <circle id="gauge-progress-circle" cx="50" cy="50" r="40" fill="none" stroke="#2cc56f" stroke-width="10" stroke-dasharray="125 125" stroke-dashoffset="30" stroke-linecap="round" />
+                                    <!-- Gauge Semicircle (Fixed & Clean Proportional Arc) -->
+                                    <div class="relative w-44 h-24 mx-auto flex items-end justify-center">
+                                        <svg class="w-44 h-24" viewBox="0 0 100 58">
+                                            <!-- Background Arc Track -->
+                                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round" />
+                                            <!-- Progress Arc Track -->
+                                            <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="9" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="25.13" style="transition: stroke-dashoffset 0.8s ease;" />
                                         </svg>
-                                        <div class="absolute bottom-1 text-center">
-                                            <div class="text-2xl font-black text-slate-900 leading-none" id="gauge-percent-txt">92%</div>
-                                            <span class="text-[9px] text-slate-400 font-bold uppercase">Ready</span>
+                                        <div class="absolute bottom-1 inset-x-0 flex flex-col items-center justify-center pointer-events-none">
+                                            <div class="text-2xl font-black text-slate-900 leading-none" id="gauge-percent-txt">80%</div>
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Ready</span>
                                         </div>
                                     </div>
 
@@ -1634,15 +1635,16 @@
             const offsitePct = 100 - inOfficePct;
 
             const gaugePctTxt = document.getElementById('gauge-percent-txt');
-            const gaugeCircle = document.getElementById('gauge-progress-circle');
+            const gaugeArc = document.getElementById('gauge-progress-arc');
             const gaugeInOffice = document.getElementById('gauge-in-office-pct');
             const gaugeOffsite = document.getElementById('gauge-offsite-pct');
 
             if (gaugePctTxt) gaugePctTxt.innerText = `${inOfficePct}%`;
-            if (gaugeCircle) {
-                // stroke-dashoffset: 125 = 0%, 0 = 100%
-                const offset = 125 - (125 * (inOfficePct / 100));
-                gaugeCircle.setAttribute('stroke-dashoffset', offset);
+            if (gaugeArc) {
+                // Semicircle arc length = PI * 40 ≈ 125.66
+                const totalLength = 125.66;
+                const offset = totalLength * (1 - (inOfficePct / 100));
+                gaugeArc.style.strokeDashoffset = Math.max(0, Math.min(totalLength, offset));
             }
             if (gaugeInOffice) gaugeInOffice.innerText = `${inOfficePct}%`;
             if (gaugeOffsite) gaugeOffsite.innerText = `${offsitePct}%`;
