@@ -219,7 +219,6 @@
             background: #ffffff;
         }
 
-        /* Seamless Infinite Marquee Scroll (Slow & Smooth Continuous Loop) */
         .marquee-wrapper {
             overflow: hidden;
             white-space: nowrap;
@@ -1111,8 +1110,9 @@
         const ADMIN_PASSWORD = "pcbk2026";
 
         const EMPLOYEE_NICKNAMES = {
-            "1101001": "MAC",
-            "1102003": "ICE",
+            "1101001": "",       /* ดร.ชัยศักดิ์ ไม่มีชื่อเล่นตามที่ขอ */
+            "1102003": "MAC",    /* ดร.ลลนา (MAC) ตามที่ขอ */
+            "1102033": "ICE",    /* คุณภัคชนก (ICE) ตามที่ขอ */
             "1104008": "KAI",
             "1103020": "CHAIYO",
             "1103059": "PANYA",
@@ -1200,7 +1200,7 @@
             }
         ];
 
-        const defaultRequests = [
+        let defaultRequests = [
             {
                 id: "REQ-1001",
                 empId: "1102055",
@@ -1212,30 +1212,6 @@
                 reason: "ประสานงานโครงการ DEDE นอกสถานที่",
                 status: "อนุมัติแล้ว",
                 createdAt: "2026-09-08"
-            },
-            {
-                id: "REQ-1002",
-                empId: "1102055",
-                empName: "รัญชน์ ทองยอดเกรื่อง",
-                type: "ลาพักร้อน",
-                startDate: "2026-09-07",
-                endDate: "2026-09-08",
-                days: 2,
-                reason: "ติดต่อธุระส่วนตัว",
-                status: "อนุมัติแล้ว",
-                createdAt: "2026-09-05"
-            },
-            {
-                id: "REQ-1003",
-                empId: "1104008",
-                empName: "กนกอร วัฒนสกุลไพศาล",
-                type: "ทำงานนอกสถานที่ (กรมพัฒนาพลังงานฯ / ธนาคาร)",
-                startDate: "2026-09-10",
-                endDate: "2026-09-10",
-                days: 1,
-                reason: "นำส่งเอกสารบัญชีและประสานงานธุรกรรม",
-                status: "อนุมัติแล้ว",
-                createdAt: "2026-09-09"
             }
         ];
 
@@ -1544,10 +1520,6 @@
                         const existing = employees.find(e => String(e.id) === String(d.id));
                         if (!existing) {
                             employees.push(JSON.parse(JSON.stringify(d)));
-                        } else {
-                            if (d.otherLeaveDays && (!existing.otherLeaveDays || existing.otherLeaveDays === 0)) {
-                                existing.otherLeaveDays = d.otherLeaveDays;
-                            }
                         }
                     });
                 } else {
@@ -1562,19 +1534,6 @@
                 }
                 if (!requests || requests.length === 0) {
                     requests = JSON.parse(JSON.stringify(defaultRequests));
-                } else {
-                    defaultRequests.forEach(defReq => {
-                        const existingIdx = requests.findIndex(r => r.id === defReq.id);
-                        if (existingIdx === -1) {
-                            requests.push(JSON.parse(JSON.stringify(defReq)));
-                        } else {
-                            requests[existingIdx].startDate = defReq.startDate;
-                            requests[existingIdx].endDate = defReq.endDate;
-                            requests[existingIdx].days = defReq.days;
-                            requests[existingIdx].type = defReq.type;
-                            requests[existingIdx].status = defReq.status;
-                        }
-                    });
                 }
                 events = masterEvents ? JSON.parse(masterEvents) : [];
             } catch (e) {
@@ -2267,7 +2226,6 @@
                 const dateParts = item.date.split('-');
                 const dayMonth = `${parseInt(dateParts[2])} ${getLiveDateData().thaiMonthsShort[parseInt(dateParts[1]) - 1]}`;
 
-                // Check if title is long to trigger infinite loop seamless marquee
                 const isLong = item.title.length > 18;
                 let titleContent = `<span class="font-bold text-slate-800 text-xs block truncate">${item.title}</span>`;
                 if (isLong) {
@@ -2798,12 +2756,16 @@
                 const isCurrentLoggedIn = currentUser && String(currentUser.id) === String(e.id);
                 const rowClass = isCurrentLoggedIn ? 'my-row-highlight font-semibold' : 'hover:bg-slate-50';
 
+                // Display name in summary table with nicknames updated according to user request
+                const nick = getEmployeeNickname(e.id);
+                const displayNameWithNick = nick ? `${e.name} (${nick})` : e.name;
+
                 let rowHtml = `
                     <tr class="${rowClass} transition text-slate-800 divide-x divide-slate-200">
                         <td class="p-2 text-center font-bold text-slate-500 sticky left-0 z-10 bg-white">${displayIndex + 1}</td>
                         <td class="p-2 text-center font-mono text-slate-600">${e.id}</td>
                         <td class="p-2 font-bold text-slate-900 sticky left-10 z-10 bg-white shadow-r">
-                            ${e.name}
+                            ${displayNameWithNick}
                             ${isCurrentLoggedIn ? '<span class="ml-1.5 bg-rose-200 text-rose-900 text-[9px] px-1 rounded font-bold">คุณ</span>' : ''}
                         </td>
                         <td class="p-2 text-slate-600 text-[11px]">${e.position}</td>
@@ -2905,7 +2867,9 @@
             if (!sel) return;
             sel.innerHTML = '<option value="">-- เลือกชื่อพนักงาน --</option>';
             employees.forEach(e => {
-                sel.innerHTML += `<option value="${e.id}">${formatDisplayName(e)} (${e.position})</option>`;
+                const nick = getEmployeeNickname(e.id);
+                const displayName = nick ? `${formatDisplayName(e)} (${nick})` : formatDisplayName(e);
+                sel.innerHTML += `<option value="${e.id}">${displayName} (${e.position})</option>`;
             });
             if (!isAdmin && currentUser && currentUser.id !== 'ADMIN') {
                 sel.value = currentUser.id;
@@ -2991,10 +2955,13 @@
             }
 
             const d = getLiveDateData();
+            const nick = getEmployeeNickname(emp.id);
+            const displayNameWithNick = nick ? `${formatDisplayName(emp)} (${nick})` : formatDisplayName(emp);
+
             const newReq = {
                 id: `REQ-${Date.now().toString().slice(-4)}`,
                 empId: emp.id,
-                empName: formatDisplayName(emp),
+                empName: displayNameWithNick,
                 type, startDate, endDate, days, reason,
                 status: 'รออนุมัติ',
                 createdAt: d.iso
@@ -3140,10 +3107,6 @@
             });
         }
 
-        function filterDirectory(group) {
-            switchTab('directory');
-        }
-
         function renderDashboardCharts() {
             try {
                 if (typeof Chart === 'undefined') return;
@@ -3230,10 +3193,13 @@
                 const carry = parseFloat(e.carryVacation) || 0;
                 const remVac = Math.min(20, Math.max(0, carry + totalAccrued - totalVacUsed));
 
+                const nick = getEmployeeNickname(e.id);
+                const displayNameWithNick = nick ? `${e.name} (${nick})` : e.name;
+
                 return {
                     "ลำดับ": e.seq,
                     "รหัสพนักงาน": e.id,
-                    "ชื่อ-นามสกุล": e.name,
+                    "ชื่อ-นามสกุล": displayNameWithNick,
                     "ตำแหน่ง": e.position,
                     "วันเกิด": e.dob,
                     "วันเริ่มงาน": e.startDate,
