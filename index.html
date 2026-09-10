@@ -202,6 +202,18 @@
         .bubble-anim-3 { animation: spongeFloat3 4.6s ease-in-out infinite 1.2s; }
         .bubble-anim-4 { animation: spongeFloat4 5.4s ease-in-out infinite 1.8s; }
 
+        /* Mini Sponge Float for Today's Out Cards */
+        @keyframes miniFloat1 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3.5px); }
+        }
+        @keyframes miniFloat2 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4.5px); }
+        }
+        .mini-sponge-float-1 { animation: miniFloat1 3.4s ease-in-out infinite; }
+        .mini-sponge-float-2 { animation: miniFloat2 4.0s ease-in-out infinite 0.6s; }
+
         .sponge-bubble-card {
             background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(14px);
@@ -2222,7 +2234,7 @@
                 return;
             }
 
-            outToday.forEach(r => {
+            outToday.forEach((r, idx) => {
                 const emp = employees.find(e => e.id === r.empId);
                 const nick = getEmployeeNickname(r.empId);
                 const isOffsite = r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ');
@@ -2235,8 +2247,11 @@
                     title = (m && m[1]) ? m[1].trim() : (r.reason || 'นอกสถานที่');
                 }
 
+                const animClass = (idx % 2 === 0) ? 'mini-sponge-float-1' : 'mini-sponge-float-2';
+                const formattedDays = formatLeaveNumber(r.days);
+
                 container.innerHTML += `
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-center justify-between hover:bg-slate-100/60 transition">
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-center justify-between hover:bg-slate-100/60 transition shadow-2xs ${animClass}">
                         <div class="flex items-center space-x-2.5 min-w-0">
                             <img src="${getEmployeeAvatar(r.empId)}" alt="${r.empName}" class="w-8 h-8 rounded-xl object-cover border border-slate-200 bg-white shrink-0" onerror="handleImageError(this, '${r.empId}')">
                             <div class="truncate leading-tight">
@@ -2244,7 +2259,7 @@
                                 <span class="text-[10px] text-slate-500 truncate block">${title}</span>
                             </div>
                         </div>
-                        <span class="text-[10px] ${badgeColor} border px-2 py-0.5 rounded-md font-bold shrink-0">${r.days} ว.</span>
+                        <span class="text-[10px] ${badgeColor} border px-2.5 py-0.5 rounded-md font-bold shrink-0">${formattedDays} วัน</span>
                     </div>
                 `;
             });
