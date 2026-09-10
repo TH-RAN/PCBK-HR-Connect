@@ -178,6 +178,44 @@
             background-color: #fff1f2 !important;
             border-left: 4px solid #f43f5e !important;
         }
+
+        /* Floating Bubble Keyframes & Styles for Admin Hub */
+        @keyframes spongeFloat1 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1.5deg); }
+        }
+        @keyframes spongeFloat2 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-16px) rotate(-2deg); }
+        }
+        @keyframes spongeFloat3 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        @keyframes spongeFloat4 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-14px) rotate(-1.5deg); }
+        }
+
+        .bubble-anim-1 { animation: spongeFloat1 4.2s ease-in-out infinite; }
+        .bubble-anim-2 { animation: spongeFloat2 5.0s ease-in-out infinite 0.6s; }
+        .bubble-anim-3 { animation: spongeFloat3 4.6s ease-in-out infinite 1.2s; }
+        .bubble-anim-4 { animation: spongeFloat4 5.4s ease-in-out infinite 1.8s; }
+
+        .sponge-bubble-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(14px);
+            border-radius: 28px;
+            border: 1.5px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 10px 30px -8px rgba(37, 99, 235, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+        .sponge-bubble-card:hover {
+            transform: translateY(-8px) scale(1.04) !important;
+            box-shadow: 0 20px 35px -10px rgba(47, 102, 238, 0.2), 0 0 0 2px rgba(47, 102, 238, 0.3);
+            background: #ffffff;
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen p-2 sm:p-4 lg:p-6 flex items-center justify-center antialiased">
@@ -224,7 +262,7 @@
                     <i class="fa-solid fa-shield-halved text-slate-400"></i>
                     <span>PCBK Personnel Management Platform</span>
                 </div>
-                <span class="text-[10px] text-slate-400 font-mono font-medium">version 260910.1.0.1</span>
+                <span class="text-[10px] text-slate-400 font-mono font-medium">version 260910.5.0.3</span>
             </div>
         </div>
     </div>
@@ -347,6 +385,59 @@
                 <!-- ***************** TAB 1: BENTO DASHBOARD (HOME) ***************** -->
                 <section id="tab-dashboard" class="tab-view space-y-6">
                     
+                    <!-- ADMIN FLOATING BUBBLE OVERVIEW (Displayed for Admin when in Hub mode) -->
+                    <div id="admin-bubble-hub" class="hidden space-y-5">
+                        <!-- Hub Header (Compact Status Bar) -->
+                        <div class="flex justify-center sm:justify-end">
+                            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 rounded-2xl p-2.5 sm:px-6 sm:py-3 text-white shadow-md shadow-blue-500/15 flex items-center space-x-3 text-xs border border-white/20">
+                                <div class="px-3 py-1 text-center">
+                                    <span class="block text-[10.5px] text-white/80 font-medium">ทั้งหมด</span>
+                                    <strong class="text-sm sm:text-base font-extrabold tracking-tight" id="hub-stat-total">10 ท่าน</strong>
+                                </div>
+                                <div class="h-6 w-px bg-white/25"></div>
+                                <div class="px-3 py-1 text-center">
+                                    <span class="block text-[10.5px] text-white/80 font-medium">อยู่ออฟฟิศ</span>
+                                    <strong class="text-sm sm:text-base font-extrabold text-emerald-300 tracking-tight" id="hub-stat-inoffice">0 ท่าน</strong>
+                                </div>
+                                <div class="h-6 w-px bg-white/25"></div>
+                                <div class="px-3 py-1 text-center">
+                                    <span class="block text-[10.5px] text-white/80 font-medium">ไม่อยู่ออฟฟิศ</span>
+                                    <strong class="text-sm sm:text-base font-extrabold text-rose-300 tracking-tight" id="hub-stat-out">0 ท่าน</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Asymmetrical Floating Sponge Grid Container -->
+                        <div class="relative py-4 px-2">
+                            <!-- Background Floating Soft Glows -->
+                            <div class="absolute top-10 left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
+                            <div class="absolute bottom-10 right-12 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
+                            <div class="absolute top-1/2 left-1/3 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                            <!-- 3 Asymmetrical Staggered Columns -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
+                                <!-- Column 1 (Offset Top) -->
+                                <div class="space-y-6 pt-0 sm:pt-4" id="bubble-col-1"></div>
+                                <!-- Column 2 (Offset Higher & Staggered) -->
+                                <div class="space-y-6 -mt-0 sm:-mt-3" id="bubble-col-2"></div>
+                                <!-- Column 3 (Offset Down & Asymmetrical) -->
+                                <div class="space-y-6 pt-0 sm:pt-8" id="bubble-col-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ADMIN BACK NAVIGATION BAR (Shown in detail mode for Admin) -->
+                    <div id="admin-back-bar" class="hidden items-center justify-between bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs">
+                        <button type="button" onclick="returnToAdminBubbleHub()" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-extrabold text-xs px-4 py-2 rounded-xl transition cursor-pointer pressable border border-slate-200/80">
+                            <i class="fa-solid fa-arrow-left text-blue-600"></i>
+                            <span>กลับไปหน้ารวมพนักงาน (ไอคอนฟองน้ำ)</span>
+                        </button>
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="text-slate-400 font-medium">กำลังดูข้อมูลของ:</span>
+                            <span id="admin-current-inspect-name" class="font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">-</span>
+                        </div>
+                    </div>
+
                     <!-- Top Notification banner for Executive if pending requests exist -->
                     <div id="exec-approval-banner" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white rounded-2xl p-4 shadow-sm items-center justify-between">
                         <div class="flex items-center space-x-3">
@@ -364,7 +455,7 @@
                     </div>
 
                     <!-- BENTO GRID CONTAINER -->
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div id="bento-main-container" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                         
                         <!-- COLUMN 1: Profile Card + 4 Stat Bento Tiles (lg:col-span-4) -->
                         <div class="lg:col-span-4 space-y-5">
@@ -457,14 +548,24 @@
                         <!-- COLUMN 2: Middle Column (Activity Gauge, Working Format, Today Out List, Banner) (lg:col-span-5) -->
                         <div class="lg:col-span-5 space-y-5">
                             
-                            <!-- ROW: Weekly Activity Gauge + Working Format -->
+                            <!-- ROW: Weekly Activity Gauge + Working Format (Personalized for Current Employee) -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 
-                                <!-- Weekly Activity Gauge Card (68% Style) -->
+                                <!-- Weekly Activity Gauge Card (Personalized for Current Employee) -->
                                 <div class="bento-card p-5 space-y-3 text-center flex flex-col justify-between">
                                     <div>
-                                        <span class="text-xs font-bold text-slate-800 block text-left">Weekly Attendance</span>
-                                        <span class="text-[10px] text-slate-400 block text-left">อัตราการมาปฏิบัติงาน</span>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-slate-800 block text-left">Weekly Attendance</span>
+                                            <div class="flex items-center space-x-1">
+                                                <div id="gauge-emp-switcher-badge" class="hidden">
+                                                    <select id="gauge-inspect-select" onchange="handleInspectEmployeeChange(this.value)" class="bg-blue-50 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded-full border border-blue-200 focus:outline-none cursor-pointer">
+                                                        <!-- Populated dynamically for Admin/Exec -->
+                                                    </select>
+                                                </div>
+                                                <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold">สัปดาห์นี้</span>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] text-slate-400 block text-left" id="attendance-card-subtitle">อัตราการมาปฏิบัติงานรายบุคคล</span>
                                     </div>
 
                                     <!-- Gauge Semicircle (Fixed & Clean Proportional Arc) -->
@@ -473,50 +574,62 @@
                                             <!-- Background Arc Track -->
                                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round" />
                                             <!-- Progress Arc Track -->
-                                            <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="9" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="25.13" style="transition: stroke-dashoffset 0.8s ease;" />
+                                            <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="9" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="0" style="transition: stroke-dashoffset 0.8s ease;" />
                                         </svg>
                                         <div class="absolute bottom-1 inset-x-0 flex flex-col items-center justify-center pointer-events-none">
-                                            <div class="text-2xl font-black text-slate-900 leading-none" id="gauge-percent-txt">80%</div>
-                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Ready</span>
+                                            <div class="text-2xl font-black text-slate-900 leading-none" id="gauge-percent-txt">100%</div>
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1" id="gauge-status-txt">Ready</span>
                                         </div>
                                     </div>
 
-                                    <!-- Mini Breakdown under gauge -->
+                                    <!-- Mini Breakdown under gauge (Now includes leave days & 100% week total) -->
                                     <div class="space-y-1.5 text-[11px] pt-1 border-t border-slate-100">
                                         <div class="flex items-center justify-between text-slate-600">
                                             <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>ประจำสำนักงาน</span>
-                                            <strong id="gauge-in-office-pct">80%</strong>
+                                            <strong id="gauge-in-office-pct">0 วัน (0%)</strong>
                                         </div>
                                         <div class="flex items-center justify-between text-slate-600">
                                             <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-blue-500 mr-1.5"></span>WFH / นอกสถานที่</span>
-                                            <strong id="gauge-offsite-pct">12%</strong>
+                                            <strong id="gauge-offsite-pct">3 วัน (60%)</strong>
+                                        </div>
+                                        <div class="flex items-center justify-between text-slate-600">
+                                            <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></span>ลาพักร้อน / ลาป่วย</span>
+                                            <strong id="gauge-leave-pct" class="text-rose-600">2 วัน (40%)</strong>
+                                        </div>
+                                        <div class="flex items-center justify-between pt-1 border-t border-dashed border-slate-200 text-slate-400 text-[10px]">
+                                            <span>รวมทั้งสัปดาห์ (จ.-ศ.)</span>
+                                            <strong id="gauge-total-week-txt" class="text-slate-700 font-bold">5 วันทำการ (100%)</strong>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Working Format Card (Remote vs Hybrid / Office) -->
+                                <!-- Working Format Card (Personalized for Current Employee) -->
                                 <div class="bento-card p-5 space-y-3 flex flex-col justify-between">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-xs font-bold text-slate-800">Working format</span>
+                                        <div>
+                                            <span class="text-xs font-bold text-slate-800 block">Working format</span>
+                                            <span class="text-[10px] text-slate-400 block">สัดส่วนสถานที่ทำงาน</span>
+                                        </div>
                                         <button type="button" onclick="switchTab('calendar-view')" class="text-[11px] text-blue-600 font-bold hover:underline">Details</button>
                                     </div>
 
-                                    <div class="grid grid-cols-2 gap-2.5 my-auto">
-                                        <!-- Remote/Offsite Pill -->
-                                        <div class="bg-[#2cc56f] text-white rounded-2xl p-3 flex flex-col justify-between h-28 text-left">
-                                            <div class="text-2xl font-black" id="workformat-offsite-txt">15%</div>
+                                    <!-- Dynamic Vertical Bar Chart Container -->
+                                    <div class="flex items-end gap-3 my-auto h-40 pb-0.5">
+                                        <!-- Remote/Offsite Bar Pillar -->
+                                        <div id="workformat-offsite-bar" class="flex-1 bg-[#2cc56f] text-white rounded-2xl p-3 flex flex-col justify-between text-left shadow-sm transition-all duration-700 ease-out" style="height: 105px;">
+                                            <div class="text-2xl font-black" id="workformat-offsite-txt">0%</div>
                                             <div>
                                                 <span class="text-[11px] font-bold block leading-tight">Remote</span>
-                                                <span class="text-[9px] text-white/80">WFH & DEDE</span>
+                                                <span class="text-[9px] text-white/80" id="workformat-offsite-days">0 วันสะสม</span>
                                             </div>
                                         </div>
 
-                                        <!-- Office/Company Pill -->
-                                        <div class="bg-[#2f66ee] text-white rounded-2xl p-3 flex flex-col justify-between h-28 text-left">
-                                            <div class="text-2xl font-black" id="workformat-office-txt">85%</div>
+                                        <!-- Office/Company Bar Pillar -->
+                                        <div id="workformat-office-bar" class="flex-1 bg-[#2f66ee] text-white rounded-2xl p-3 flex flex-col justify-between text-left shadow-sm transition-all duration-700 ease-out" style="height: 156px;">
+                                            <div class="text-2xl font-black" id="workformat-office-txt">100%</div>
                                             <div>
                                                 <span class="text-[11px] font-bold block leading-tight">In-Office</span>
-                                                <span class="text-[9px] text-white/80">ประจำอาคาร</span>
+                                                <span class="text-[9px] text-white/80" id="workformat-office-days">ประจำการที่ออฟฟิศ</span>
                                             </div>
                                         </div>
                                     </div>
@@ -847,6 +960,51 @@
 
                 <!-- ***************** TAB 7: ANALYTICS & STATS ***************** -->
                 <section id="tab-analytics" class="tab-view hidden space-y-5">
+                    <!-- Top Company-Wide Overview Cards (Moved from Home) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bento-card p-5 flex items-center space-x-4 text-left">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-building-user"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-bold text-slate-400 block uppercase">ประจำสำนักงานวันนี้</span>
+                                <div class="flex items-baseline space-x-2">
+                                    <h3 class="text-2xl font-extrabold text-slate-900" id="analytics-in-office-count">0 คน</h3>
+                                    <span class="text-xs font-bold text-blue-600" id="analytics-in-office-pct">(0%)</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500">พร้อมปฏิบัติงานในสำนักงาน</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-card p-5 flex items-center space-x-4 text-left">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-laptop-house"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-bold text-slate-400 block uppercase">WFH / ปฏิบัติงานภายนอก</span>
+                                <div class="flex items-baseline space-x-2">
+                                    <h3 class="text-2xl font-extrabold text-slate-900" id="analytics-remote-count">0 คน</h3>
+                                    <span class="text-xs font-bold text-emerald-600" id="analytics-remote-pct">(0%)</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500">Work at DEDE / WFH</span>
+                            </div>
+                        </div>
+
+                        <div class="bento-card p-5 flex items-center space-x-4 text-left">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shrink-0">
+                                <i class="fa-solid fa-umbrella-beach"></i>
+                            </div>
+                            <div>
+                                <span class="text-[11px] font-bold text-slate-400 block uppercase">ลางานวันนี้ (Leave)</span>
+                                <div class="flex items-baseline space-x-2">
+                                    <h3 class="text-2xl font-extrabold text-slate-900" id="analytics-leave-count">0 คน</h3>
+                                    <span class="text-xs font-bold text-rose-600" id="analytics-leave-pct">(0%)</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500">พักร้อน / ลาป่วย</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
                         <div class="lg:col-span-7 bento-card p-6 space-y-4 text-left">
                             <h3 class="font-bold text-slate-900 text-sm flex items-center">
@@ -1073,7 +1231,7 @@
                 seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
                 vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 0, note: ""
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 4, note: ""
             },
             {
                 seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
@@ -1083,12 +1241,52 @@
             }
         ];
 
+        const defaultRequests = [
+            {
+                id: "REQ-1001",
+                empId: "1102055",
+                empName: "รัญชน์ ทองยอดเกรื่อง",
+                type: "ทำงานนอกสถานที่ (Work at DEDE office)",
+                startDate: "2026-09-09",
+                endDate: "2026-09-11",
+                days: 3,
+                reason: "ประสานงานโครงการ DEDE นอกสถานที่",
+                status: "อนุมัติแล้ว",
+                createdAt: "2026-09-08"
+            },
+            {
+                id: "REQ-1002",
+                empId: "1102055",
+                empName: "รัญชน์ ทองยอดเกรื่อง",
+                type: "ลาพักร้อน",
+                startDate: "2026-09-07",
+                endDate: "2026-09-08",
+                days: 2,
+                reason: "ติดต่อธุระส่วนตัว",
+                status: "อนุมัติแล้ว",
+                createdAt: "2026-09-05"
+            },
+            {
+                id: "REQ-1003",
+                empId: "1104008",
+                empName: "กนกอร วัฒนสกุลไพศาล",
+                type: "ทำงานนอกสถานที่ (กรมพัฒนาพลังงานฯ / ธนาคาร)",
+                startDate: "2026-09-10",
+                endDate: "2026-09-10",
+                days: 1,
+                reason: "นำส่งเอกสารบัญชีและประสานงานธุรกรรม",
+                status: "อนุมัติแล้ว",
+                createdAt: "2026-09-09"
+            }
+        ];
+
         let employees = JSON.parse(JSON.stringify(defaultDataset));
         let requests = [];
         let events = [];
         let currentUser = null;
         let displayEmp = null; // The employee currently showcased on the profile card (for Admin/Exec switching)
         let isAdmin = false;
+        let adminViewMode = 'hub'; // 'hub' = floating sponges overview, 'detail' = individual bento card
 
         let calendarMode = 'month';
         let calendarBaseDate = new Date();
@@ -1389,15 +1587,47 @@
                 if (masterEmp && JSON.parse(masterEmp).length > 0) {
                     employees = JSON.parse(masterEmp);
                     defaultDataset.forEach(d => {
-                        if (!employees.some(e => String(e.id) === String(d.id))) employees.push(JSON.parse(JSON.stringify(d)));
+                        const existing = employees.find(e => String(e.id) === String(d.id));
+                        if (!existing) {
+                            employees.push(JSON.parse(JSON.stringify(d)));
+                        } else {
+                            // Synchronize otherLeaveDays if currently 0 or missing
+                            if (d.otherLeaveDays && (!existing.otherLeaveDays || existing.otherLeaveDays === 0)) {
+                                existing.otherLeaveDays = d.otherLeaveDays;
+                            }
+                        }
                     });
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset));
                 }
-                requests = masterReq ? JSON.parse(masterReq) : [];
+                if (masterReq) {
+                    try {
+                        requests = JSON.parse(masterReq);
+                    } catch (e) {
+                        requests = [];
+                    }
+                }
+                if (!requests || requests.length === 0) {
+                    requests = JSON.parse(JSON.stringify(defaultRequests));
+                } else {
+                    defaultRequests.forEach(defReq => {
+                        const existingIdx = requests.findIndex(r => r.id === defReq.id);
+                        if (existingIdx === -1) {
+                            requests.push(JSON.parse(JSON.stringify(defReq)));
+                        } else {
+                            // Ensure demonstration dates and status stay synchronized for this week
+                            requests[existingIdx].startDate = defReq.startDate;
+                            requests[existingIdx].endDate = defReq.endDate;
+                            requests[existingIdx].days = defReq.days;
+                            requests[existingIdx].type = defReq.type;
+                            requests[existingIdx].status = defReq.status;
+                        }
+                    });
+                }
                 events = masterEvents ? JSON.parse(masterEvents) : [];
             } catch (e) {
                 employees = JSON.parse(JSON.stringify(defaultDataset));
+                requests = JSON.parse(JSON.stringify(defaultRequests));
             }
         }
 
@@ -1434,13 +1664,16 @@
             if (trimmed === ADMIN_PASSWORD) {
                 isAdmin = true;
                 currentUser = { id: "ADMIN", name: "ผู้ดูแลระบบ (Admin)", position: "HR Executive", isMasterAdmin: true };
-                displayEmp = employees[0]; // Admin defaults to President or first user
+                // Default Admin to Hub mode
+                adminViewMode = 'hub';
+                displayEmp = employees.find(e => String(e.id) === "1102055") || employees[0];
             } else {
                 const found = employees.find(e => String(e.id).trim().toLowerCase() === trimmed.toLowerCase());
                 if (!found) return false;
                 currentUser = found;
                 displayEmp = found;
                 isAdmin = false;
+                adminViewMode = 'detail';
             }
 
             if (remember) localStorage.setItem('pcbk_device_auth_code', trimmed);
@@ -1462,21 +1695,32 @@
             const isBoss = isExecutiveOrAdmin();
             const switcherWrapper = document.getElementById('exec-switcher-wrapper');
             const inspectSelect = document.getElementById('exec-inspect-select');
+            const gaugeBadge = document.getElementById('gauge-emp-switcher-badge');
+            const gaugeSelect = document.getElementById('gauge-inspect-select');
 
-            // Top Bar Executive Switcher
+            // Top Bar & Gauge Inline Executive Switcher
             if (isBoss) {
-                if (switcherWrapper) switcherWrapper.classList.remove('hidden');
-                if (switcherWrapper) switcherWrapper.classList.add('flex');
-                if (inspectSelect) {
-                    inspectSelect.innerHTML = '';
+                if (switcherWrapper) {
+                    switcherWrapper.classList.remove('hidden');
+                    switcherWrapper.classList.add('flex');
+                }
+                if (gaugeBadge) gaugeBadge.classList.remove('hidden');
+
+                const populateOptions = (selEl) => {
+                    if (!selEl) return;
+                    selEl.innerHTML = '';
                     employees.forEach(e => {
                         const nick = getEmployeeNickname(e.id);
                         const isSel = (displayEmp && displayEmp.id === e.id) ? 'selected' : '';
-                        inspectSelect.innerHTML += `<option value="${e.id}" ${isSel}>${formatDisplayName(e)} ${nick ? `(${nick})` : ''}</option>`;
+                        selEl.innerHTML += `<option value="${e.id}" ${isSel}>${formatDisplayName(e)} ${nick ? `(${nick})` : ''}</option>`;
                     });
-                }
+                };
+
+                populateOptions(inspectSelect);
+                populateOptions(gaugeSelect);
             } else {
                 if (switcherWrapper) switcherWrapper.classList.add('hidden');
+                if (gaugeBadge) gaugeBadge.classList.add('hidden');
             }
 
             // Summary Table edit badge
@@ -1487,11 +1731,210 @@
             }
         }
 
+        // ================= ADMIN FLOATING SPONGE / BUBBLE LOGIC =================
+        function renderAdminBubbleHub() {
+            const hubContainer = document.getElementById('admin-bubble-hub');
+            const bentoContainer = document.getElementById('bento-main-container');
+            const backBar = document.getElementById('admin-back-bar');
+            if (!hubContainer || !bentoContainer) return;
+
+            if (!isAdmin) {
+                hubContainer.classList.add('hidden');
+                bentoContainer.classList.remove('hidden');
+                if (backBar) backBar.classList.add('hidden');
+                return;
+            }
+
+            if (adminViewMode === 'hub') {
+                hubContainer.classList.remove('hidden');
+                bentoContainer.classList.add('hidden');
+                if (backBar) backBar.classList.add('hidden');
+
+                const col1 = document.getElementById('bubble-col-1');
+                const col2 = document.getElementById('bubble-col-2');
+                const col3 = document.getElementById('bubble-col-3');
+                if (!col1 || !col2 || !col3) return;
+
+                col1.innerHTML = '';
+                col2.innerHTML = '';
+                col3.innerHTML = '';
+
+                const d = getLiveDateData();
+                let inOfficeCount = 0;
+                let outCount = 0;
+
+                // Separate employees into:
+                // 1. Those who have activity today (leaves, offsite, or events)
+                // 2. High executives (ผศ.ดร.ชัยศักดิ์ & ดร.ลลนา) who don't have activity today
+                // 3. Normal staff who don't have activity today
+                const activeTodayList = [];
+                const normalExecList = [];
+                const normalStaffList = [];
+
+                employees.forEach(emp => {
+                    const outReq = requests.find(r => String(r.empId) === String(emp.id) && r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
+                    const hasEventToday = events.some(ev => String(ev.empId) === String(emp.id) && ev.date === d.iso);
+
+                    if (outReq || hasEventToday) {
+                        activeTodayList.push(emp);
+                    } else if (emp.id === '1101001' || emp.id === '1102003') {
+                        normalExecList.push(emp);
+                    } else {
+                        normalStaffList.push(emp);
+                    }
+                });
+
+                // Sort active group by tenure
+                activeTodayList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
+                // Normal executives: ผศ.ดร.ชัยศักดิ์ (1101001) first, followed by ดร.ลลนา (1102003)
+                normalExecList.sort((a, b) => (a.id === '1101001' ? -1 : 1));
+                // Normal staff sorted by tenure (oldest tenure first)
+                normalStaffList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
+
+                // Combined list: Active today first -> Executives (no activity) -> Other staff sorted by tenure
+                const allSorted = [...activeTodayList, ...normalExecList, ...normalStaffList];
+
+                // Distribute into 3 columns asymmetrically with floating bubble animations
+                allSorted.forEach((emp, index) => {
+                    const nick = getEmployeeNickname(emp.id);
+                    const quotas = getEmpRemainingQuotas(emp.id);
+                    const tenure = calculateWorkTenure(emp.startDate);
+
+                    // Check attendance status today
+                    const outReq = requests.find(r => String(r.empId) === String(emp.id) && r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
+                    let statusDot = 'bg-emerald-500';
+                    let statusLabel = 'ประจำสำนักงาน';
+                    let statusBadgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+
+                    if (outReq) {
+                        outCount++;
+                        if (outReq.type.includes('นอกสถานที่') || outReq.type.includes('WFH') || outReq.type.includes('DEDE')) {
+                            statusDot = 'bg-blue-500';
+                            statusLabel = 'นอกสถานที่ / WFH';
+                            statusBadgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+                        } else {
+                            statusDot = 'bg-rose-500';
+                            statusLabel = outReq.type;
+                            statusBadgeClass = 'bg-rose-50 text-rose-700 border-rose-200';
+                        }
+                    } else {
+                        inOfficeCount++;
+                    }
+
+                    // Alternate float animation classes (1 to 4)
+                    const animClass = `bubble-anim-${(index % 4) + 1}`;
+
+                    // Bubble card HTML
+                    const bubbleHtml = `
+                        <div class="sponge-bubble-card p-5 ${animClass} relative overflow-hidden group" onclick="selectEmployeeFromHub('${emp.id}')">
+                            <!-- Top Ambient Accent -->
+                            <div class="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-bl from-blue-400/15 via-indigo-300/10 to-transparent rounded-full pointer-events-none group-hover:scale-150 transition duration-500"></div>
+
+                            <div class="flex items-start space-x-3.5 relative z-10">
+                                <!-- Large Avatar with Live Status Dot -->
+                                <div class="relative shrink-0">
+                                    <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-blue-500/30 to-indigo-500/20 shadow-sm">
+                                        <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-full object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
+                                    </div>
+                                    <span class="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full ${statusDot} border-2 border-white shadow-xs"></span>
+                                </div>
+
+                                <!-- Info -->
+                                <div class="min-w-0 flex-1 leading-snug text-left">
+                                    <div class="flex items-center justify-between gap-1">
+                                        <h4 class="font-extrabold text-slate-900 text-sm truncate group-hover:text-blue-600 transition">${formatDisplayName(emp)}</h4>
+                                        <span class="text-[10px] font-black font-mono text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full shrink-0 shadow-2xs">${nick ? `@${nick}` : 'PCBK'}</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 truncate mt-0.5 font-medium">${emp.position}</p>
+                                    <span class="inline-block mt-1.5 text-[9.5px] font-bold px-2.5 py-0.5 rounded-full border ${statusBadgeClass}">${statusLabel}</span>
+                                </div>
+                            </div>
+
+                            <!-- Bottom Quick Meta Bar -->
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 relative z-10">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 block font-medium">พักร้อนคงเหลือ</span>
+                                    <strong class="text-emerald-600 font-extrabold">${quotas.vacRem.toFixed(1)} วัน</strong>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] text-slate-400 block font-medium">อายุงาน</span>
+                                    <strong class="text-slate-700 font-bold">${tenure}</strong>
+                                </div>
+                                <div class="w-7 h-7 rounded-full bg-slate-50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 text-xs transition shrink-0 ml-1">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Push into 3 columns: Column 1 (4 items), Column 2 (3 items), Column 3 (3 items)
+                    if (index % 3 === 0) col1.innerHTML += bubbleHtml;
+                    else if (index % 3 === 1) col2.innerHTML += bubbleHtml;
+                    else col3.innerHTML += bubbleHtml;
+                });
+
+                // Update stat pills
+                const totalEl = document.getElementById('hub-stat-total');
+                const inOffEl = document.getElementById('hub-stat-inoffice');
+                const outEl = document.getElementById('hub-stat-out');
+                if (totalEl) totalEl.innerText = `${employees.length} ท่าน`;
+                if (inOffEl) inOffEl.innerText = `${inOfficeCount} ท่าน`;
+                if (outEl) outEl.innerText = `${outCount} ท่าน`;
+
+            } else {
+                hubContainer.classList.add('hidden');
+                bentoContainer.classList.remove('hidden');
+                if (backBar) {
+                    backBar.classList.remove('hidden');
+                    backBar.classList.add('flex');
+                    const inspectNameEl = document.getElementById('admin-current-inspect-name');
+                    if (inspectNameEl && displayEmp) {
+                        const nick = getEmployeeNickname(displayEmp.id);
+                        inspectNameEl.innerText = `${formatDisplayName(displayEmp)} ${nick ? `(${nick})` : ''}`;
+                    }
+                }
+            }
+        }
+
+        function selectEmployeeFromHub(empId) {
+            const emp = employees.find(e => String(e.id) === String(empId));
+            if (emp) {
+                displayEmp = emp;
+                adminViewMode = 'detail';
+                renderAdminBubbleHub();
+                renderBentoProfileCard();
+                renderBentoStats();
+                showToast(`เปิดข้อมูลเต็มของ: ${formatDisplayName(emp)}`);
+            }
+        }
+
+        function returnToAdminBubbleHub() {
+            if (!isAdmin) return;
+            adminViewMode = 'hub';
+            renderAdminBubbleHub();
+            showToast("กลับสู่หน้ารวมไอคอนบุคลากร");
+        }
+
         function handleInspectEmployeeChange(empId) {
             const emp = employees.find(e => String(e.id) === String(empId));
             if (emp) {
                 displayEmp = emp;
+                adminViewMode = 'detail';
+                // Sync dropdowns
+                const topSel = document.getElementById('exec-inspect-select');
+                if (topSel) topSel.value = emp.id;
+                const gaugeSel = document.getElementById('gauge-inspect-select');
+                if (gaugeSel) gaugeSel.value = emp.id;
+
+                // Update subtitle to clearly show whose attendance is shown
+                const subTitle = document.getElementById('attendance-card-subtitle');
+                const nick = getEmployeeNickname(emp.id);
+                if (subTitle) subTitle.innerText = `ข้อมูลของ: ${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}`;
+
+                // Re-render both Profile and Bento Stats
+                renderAdminBubbleHub();
                 renderBentoProfileCard();
+                renderBentoStats();
                 showToast(`แสดงข้อมูลของ: ${formatDisplayName(emp)}`);
             }
         }
@@ -1523,6 +1966,7 @@
         }
 
         function renderAllViews() {
+            renderAdminBubbleHub();
             renderBentoProfileCard();
             renderBentoStats();
             renderBentoTodayOut();
@@ -1626,33 +2070,104 @@
 
         function renderBentoStats() {
             const d = getLiveDateData();
-            // Count who is out today
-            const outToday = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
-            const totalEmps = employees.length || 10;
-            const inOfficeCount = totalEmps - outToday.length;
+            const emp = displayEmp || currentUser || employees[0];
+            if (!emp) return;
 
-            const inOfficePct = Math.round((inOfficeCount / totalEmps) * 100);
-            const offsitePct = 100 - inOfficePct;
+            // 1. Calculate Current Week Attendance (Mon - Fri: 5 working days) for this specific employee
+            const currentDayOfWeek = d.liveNow.getDay(); // 0: Sun, 1: Mon, ..., 6: Sat
+            const mondayOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+            const mondayDate = new Date(d.liveNow);
+            mondayDate.setDate(d.liveNow.getDate() + mondayOffset);
+            mondayDate.setHours(0, 0, 0, 0);
+
+            let weekLeaveDays = 0;
+            let weekOffsiteDays = 0;
+
+            // Iterate 5 days of this week (Mon to Fri)
+            for (let i = 0; i < 5; i++) {
+                const dayCheck = new Date(mondayDate);
+                dayCheck.setDate(mondayDate.getDate() + i);
+                const dayIso = `${dayCheck.getFullYear()}-${String(dayCheck.getMonth() + 1).padStart(2, '0')}-${String(dayCheck.getDate()).padStart(2, '0')}`;
+
+                const req = requests.find(r => String(r.empId) === String(emp.id) && r.startDate <= dayIso && r.endDate >= dayIso && !isRejectedStatus(r.status));
+                if (req) {
+                    const daysVal = parseFloat(req.days) || 1;
+                    const dayWeight = (daysVal < 1 && req.startDate === req.endDate) ? daysVal : 1;
+                    if (req.type.includes('นอกสถานที่') || req.type.includes('ลาอื่นๆ') || req.type.includes('WFH') || req.type.includes('DEDE')) {
+                        weekOffsiteDays += dayWeight;
+                    } else {
+                        weekLeaveDays += dayWeight;
+                    }
+                }
+            }
+
+            const weekInOfficeDays = Math.max(0, 5 - weekLeaveDays - weekOffsiteDays);
+            const workingDaysTotal = weekInOfficeDays + weekOffsiteDays;
+            const attendancePct = Math.round(( workingDaysTotal / 5 ) * 100);
+
+            const inOfficePct = Math.round((weekInOfficeDays / 5) * 100);
+            const offsitePct = Math.round((weekOffsiteDays / 5) * 100);
+            const leavePct = Math.round((weekLeaveDays / 5) * 100);
 
             const gaugePctTxt = document.getElementById('gauge-percent-txt');
             const gaugeArc = document.getElementById('gauge-progress-arc');
+            const gaugeStatusTxt = document.getElementById('gauge-status-txt');
             const gaugeInOffice = document.getElementById('gauge-in-office-pct');
             const gaugeOffsite = document.getElementById('gauge-offsite-pct');
+            const gaugeLeave = document.getElementById('gauge-leave-pct');
+            const gaugeTotalWeek = document.getElementById('gauge-total-week-txt');
 
-            if (gaugePctTxt) gaugePctTxt.innerText = `${inOfficePct}%`;
+            if (gaugePctTxt) gaugePctTxt.innerText = `${attendancePct}%`;
+            if (gaugeStatusTxt) gaugeStatusTxt.innerText = `ปฏิบัติงาน ${workingDaysTotal}/5 วัน`;
             if (gaugeArc) {
                 // Semicircle arc length = PI * 40 ≈ 125.66
                 const totalLength = 125.66;
-                const offset = totalLength * (1 - (inOfficePct / 100));
+                const offset = totalLength * (1 - (attendancePct / 100));
                 gaugeArc.style.strokeDashoffset = Math.max(0, Math.min(totalLength, offset));
             }
-            if (gaugeInOffice) gaugeInOffice.innerText = `${inOfficePct}%`;
-            if (gaugeOffsite) gaugeOffsite.innerText = `${offsitePct}%`;
+            if (gaugeInOffice) gaugeInOffice.innerText = `${weekInOfficeDays} วัน (${inOfficePct}%)`;
+            if (gaugeOffsite) gaugeOffsite.innerText = `${weekOffsiteDays} วัน (${offsitePct}%)`;
+            if (gaugeLeave) gaugeLeave.innerText = `${weekLeaveDays} วัน (${leavePct}%)`;
+            if (gaugeTotalWeek) gaugeTotalWeek.innerText = `5 วันทำการ (100%)`;
+
+            // 2. Calculate Working format (Remote vs In-Office) for this specific employee
+            let offsiteFromRequests = 0;
+            requests.forEach(r => {
+                if (String(r.empId) === String(emp.id) && (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && !isRejectedStatus(r.status)) {
+                    offsiteFromRequests += (parseFloat(r.days) || 0);
+                }
+            });
+            const tableOffsite = parseFloat(emp.otherLeaveDays) || 0;
+            const totalOffsiteRecorded = Math.max(tableOffsite, offsiteFromRequests);
+
+            // Benchmark monthly working days ≈ 20 days
+            const benchmarkWorkDays = 20;
+            const remoteRatio = Math.min(100, Math.round((totalOffsiteRecorded / benchmarkWorkDays) * 100));
+            const officeRatio = 100 - remoteRatio;
 
             const wfOffice = document.getElementById('workformat-office-txt');
             const wfOffsite = document.getElementById('workformat-offsite-txt');
-            if (wfOffice) wfOffice.innerText = `${inOfficePct}%`;
-            if (wfOffsite) wfOffsite.innerText = `${offsitePct}%`;
+            const wfOfficeDays = document.getElementById('workformat-office-days');
+            const wfOffsiteDays = document.getElementById('workformat-offsite-days');
+            const wfOffsiteBar = document.getElementById('workformat-offsite-bar');
+            const wfOfficeBar = document.getElementById('workformat-office-bar');
+
+            if (wfOffice) wfOffice.innerText = `${officeRatio}%`;
+            if (wfOffsite) wfOffsite.innerText = `${remoteRatio}%`;
+            if (wfOfficeDays) wfOfficeDays.innerText = `ประจำการที่ออฟฟิศ`;
+            if (wfOffsiteDays) wfOffsiteDays.innerText = `${totalOffsiteRecorded} วันสะสม`;
+
+            // Dynamic Bar Chart Height Calculation (Min: 92px, Max: 156px)
+            const minBarHeight = 92;
+            const maxBarHeight = 156;
+            if (wfOffsiteBar) {
+                const calculatedOffsiteHeight = Math.round(minBarHeight + (maxBarHeight - minBarHeight) * (remoteRatio / 100));
+                wfOffsiteBar.style.height = `${calculatedOffsiteHeight}px`;
+            }
+            if (wfOfficeBar) {
+                const calculatedOfficeHeight = Math.round(minBarHeight + (maxBarHeight - minBarHeight) * (officeRatio / 100));
+                wfOfficeBar.style.height = `${calculatedOfficeHeight}px`;
+            }
 
             // Avatars pile in banner
             const pile = document.getElementById('banner-avatars-pile');
@@ -1662,6 +2177,44 @@
                     pile.innerHTML += `<img src="${getEmployeeAvatar(e.id)}" alt="${e.name}" class="w-7 h-7 rounded-full border-2 border-white object-cover bg-white" onerror="handleImageError(this, '${e.id}')">`;
                 });
             }
+
+            // 3. Update Company-Wide Analytics Overview (For Dashboard & Stats tab)
+            updateCompanyAnalyticsOverview(d);
+        }
+
+        function updateCompanyAnalyticsOverview(d) {
+            const outToday = requests.filter(r => r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
+            const totalEmps = employees.length || 10;
+            
+            let leaveCount = 0;
+            let remoteCount = 0;
+
+            outToday.forEach(r => {
+                if (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ')) {
+                    remoteCount++;
+                } else {
+                    leaveCount++;
+                }
+            });
+
+            const inOfficeCount = Math.max(0, totalEmps - leaveCount - remoteCount);
+            const inOfficePct = Math.round((inOfficeCount / totalEmps) * 100);
+            const remotePct = Math.round((remoteCount / totalEmps) * 100);
+            const leavePct = Math.round((leaveCount / totalEmps) * 100);
+
+            const elInOfficeCount = document.getElementById('analytics-in-office-count');
+            const elInOfficePct = document.getElementById('analytics-in-office-pct');
+            const elRemoteCount = document.getElementById('analytics-remote-count');
+            const elRemotePct = document.getElementById('analytics-remote-pct');
+            const elLeaveCount = document.getElementById('analytics-leave-count');
+            const elLeavePct = document.getElementById('analytics-leave-pct');
+
+            if (elInOfficeCount) elInOfficeCount.innerText = `${inOfficeCount} คน`;
+            if (elInOfficePct) elInOfficePct.innerText = `(${inOfficePct}%)`;
+            if (elRemoteCount) elRemoteCount.innerText = `${remoteCount} คน`;
+            if (elRemotePct) elRemotePct.innerText = `(${remotePct}%)`;
+            if (elLeaveCount) elLeaveCount.innerText = `${leaveCount} คน`;
+            if (elLeavePct) elLeavePct.innerText = `(${leavePct}%)`;
         }
 
         function renderBentoTodayOut() {
@@ -2018,8 +2571,209 @@
                 }
                 html += `</div></div>`;
                 container.innerHTML = html;
-            } else {
-                container.innerHTML = `<div class="p-12 text-center text-slate-400">เลือกดูมุมมองรายสัปดาห์หรือรายวันจากตัวควบคุม</div>`;
+            } else if (calendarMode === 'week') {
+                // Sunday (0) to Saturday (6)
+                const startOfWeek = new Date(calendarBaseDate);
+                startOfWeek.setDate(calendarBaseDate.getDate() - calendarBaseDate.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+                const startThai = `${startOfWeek.getDate()} ${d.thaiMonthsShort[startOfWeek.getMonth()]}`;
+                const endThai = `${endOfWeek.getDate()} ${d.thaiMonthsShort[endOfWeek.getMonth()]} ${endOfWeek.getFullYear() + 543}`;
+
+                const thaiDayNames = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+
+                let html = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between font-bold text-slate-800 text-sm">
+                            <span class="flex items-center"><i class="fa-solid fa-calendar-week mr-2 text-blue-600"></i> สัปดาห์: ${startThai} – ${endThai}</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
+                `;
+
+                for (let i = 0; i < 7; i++) {
+                    const dayDate = new Date(startOfWeek);
+                    dayDate.setDate(startOfWeek.getDate() + i);
+                    const dayIso = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, '0')}-${String(dayDate.getDate()).padStart(2, '0')}`;
+                    const isToday = dayIso === d.iso;
+                    const isWk = (i === 0 || i === 6);
+                    const items = getItemsForDate(dayIso);
+
+                    let itemsHtml = '';
+                    if (items.length === 0) {
+                        itemsHtml = `<div class="text-[10px] text-slate-400 italic py-6 text-center">${isWk ? 'วันหยุดสุดสัปดาห์' : 'ไม่มีกิจกรรม / ลางาน'}</div>`;
+                    } else {
+                        items.forEach(it => {
+                            const nick = getEmployeeNickname(it.empId);
+                            const displayName = nick ? `${it.empName} (${nick})` : it.empName;
+                            itemsHtml += `
+                                <div onclick="openItemDetailModal('${it.id}', ${it.isRequest})" class="p-2 rounded-xl ${it.bgLight} border ${it.borderColor} space-y-1 cursor-pointer hover:shadow-xs hover:scale-[1.02] transition">
+                                    <div class="flex items-center space-x-1.5">
+                                        <img src="${getEmployeeAvatar(it.empId)}" alt="${it.empName}" class="w-5 h-5 rounded-full object-cover shrink-0 bg-white" onerror="handleImageError(this, '${it.empId}')">
+                                        <span class="font-bold text-[10.5px] truncate">${displayName}</span>
+                                    </div>
+                                    <div class="text-[10px] font-medium leading-tight truncate">
+                                        ${it.isRequest ? it.title : `🕒 ${it.startTime} - ${it.title}`}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    }
+
+                    html += `
+                        <div class="rounded-2xl p-3 border flex flex-col ${isToday ? 'border-blue-500 bg-blue-50/20 shadow-xs' : (isWk ? 'bg-slate-100/70 border-slate-200' : 'bg-white border-slate-200/80')} min-h-[260px]">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                                <div>
+                                    <span class="block text-[10px] font-bold ${isWk ? 'text-rose-500' : 'text-slate-400'}">${thaiDayNames[i]}</span>
+                                    <span class="text-sm font-extrabold ${isToday ? 'text-blue-600' : 'text-slate-800'}">${dayDate.getDate()}</span>
+                                </div>
+                                ${isToday ? '<span class="text-[9px] bg-blue-600 text-white font-bold px-1.5 py-0.5 rounded-full">วันนี้</span>' : (isWk ? '<span class="text-[9px] bg-slate-200 text-slate-600 font-bold px-1.5 py-0.5 rounded-full">หยุด</span>' : '')}
+                            </div>
+                            <div class="space-y-1.5 flex-1 overflow-y-auto pr-0.5">
+                                ${itemsHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                html += `</div></div>`;
+                container.innerHTML = html;
+            } else if (calendarMode === 'day') {
+                const targetIso = `${calendarBaseDate.getFullYear()}-${String(calendarBaseDate.getMonth() + 1).padStart(2, '0')}-${String(calendarBaseDate.getDate()).padStart(2, '0')}`;
+                const isToday = targetIso === d.iso;
+                const thaiDayFullNames = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+                const dayIndex = calendarBaseDate.getDay();
+                const isWk = (dayIndex === 0 || dayIndex === 6);
+                const fullDayTitle = `${thaiDayFullNames[dayIndex]}ที่ ${calendarBaseDate.getDate()} ${d.thaiMonthsFull[calendarBaseDate.getMonth()]} พ.ศ. ${calendarBaseDate.getFullYear() + 543}`;
+                const items = getItemsForDate(targetIso);
+
+                let leavesList = items.filter(it => it.isRequest);
+                let eventsList = items.filter(it => !it.isRequest);
+
+                let dayHtml = `
+                    <div class="space-y-5">
+                        <!-- Top Day Header & Status Banner -->
+                        <div class="bg-gradient-to-r ${isToday ? 'from-blue-600 to-indigo-600' : 'from-slate-800 to-slate-900'} rounded-2xl p-5 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+                            <div class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="text-base sm:text-lg font-extrabold tracking-tight">${fullDayTitle}</h3>
+                                    ${isToday ? '<span class="bg-white/20 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full backdrop-blur-md">วันนี้</span>' : ''}
+                                    ${isWk ? '<span class="bg-rose-500/80 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">วันหยุดบริษัท</span>' : ''}
+                                </div>
+                                <p class="text-xs text-white/80">สรุปการลางาน การทำงานนอกสถานที่ และกิจกรรมนัดหมายประจำวัน</p>
+                            </div>
+                            <div class="flex items-center space-x-2 shrink-0">
+                                <button type="button" onclick="openAddEventModal()" class="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5 cursor-pointer">
+                                    <i class="fa-solid fa-plus text-blue-600"></i>
+                                    <span>เพิ่มกิจกรรมวันนี้</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2 Columns: Leaves & Offsite vs Schedule & Meetings -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                            
+                            <!-- Left: Leaves & Remote Work -->
+                            <div class="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
+                                    <h4 class="font-extrabold text-xs text-slate-800 flex items-center">
+                                        <i class="fa-solid fa-user-slash mr-2 text-rose-500"></i> รายการลางาน & ปฏิบัติงานนอกสถานที่ (${leavesList.length})
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">พักร้อน / ป่วย / นอกสถานที่</span>
+                                </div>
+
+                                <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                `;
+
+                if (leavesList.length === 0) {
+                    dayHtml += `
+                        <div class="p-8 text-center text-slate-400 space-y-1">
+                            <i class="fa-solid fa-circle-check text-2xl text-emerald-500"></i>
+                            <p class="text-xs font-bold text-slate-700">ไม่มีรายการลางานในวันนี้</p>
+                            <p class="text-[11px]">${isWk ? 'เป็นวันหยุดสุดสัปดาห์' : 'บุคลากรพร้อมปฏิบัติงานในสำนักงานครบถ้วน'}</p>
+                        </div>
+                    `;
+                } else {
+                    leavesList.forEach(lv => {
+                        const nick = getEmployeeNickname(lv.empId);
+                        const displayName = nick ? `${lv.empName} (${nick})` : lv.empName;
+                        dayHtml += `
+                            <div onclick="openItemDetailModal('${lv.id}', true)" class="bg-white rounded-xl p-3.5 border ${lv.borderColor} hover:shadow-xs transition cursor-pointer flex items-center justify-between gap-3">
+                                <div class="flex items-center space-x-3 min-w-0">
+                                    <img src="${getEmployeeAvatar(lv.empId)}" alt="${lv.empName}" class="w-10 h-10 rounded-xl object-cover bg-white shrink-0 border border-slate-200" onerror="handleImageError(this, '${lv.empId}')">
+                                    <div class="min-w-0 leading-tight">
+                                        <span class="font-bold text-xs text-slate-900 block truncate">${displayName}</span>
+                                        <span class="text-[11px] text-slate-600 font-semibold block truncate mt-0.5">${lv.title}</span>
+                                        <span class="text-[10px] text-slate-400 block truncate">เหตุผล: ${lv.reason}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <span class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full ${lv.bgLight} border ${lv.borderColor}">${lv.days} วัน</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                dayHtml += `
+                                </div>
+                            </div>
+
+                            <!-- Right: Meetings & Events Schedule -->
+                            <div class="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 space-y-3">
+                                <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
+                                    <h4 class="font-extrabold text-xs text-slate-800 flex items-center">
+                                        <i class="fa-solid fa-calendar-check mr-2 text-amber-500"></i> กิจกรรมและการประชุมประจำวัน (${eventsList.length})
+                                    </h4>
+                                    <span class="text-[10px] text-slate-400">กำหนดการ & นัดหมาย</span>
+                                </div>
+
+                                <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                `;
+
+                if (eventsList.length === 0) {
+                    dayHtml += `
+                        <div class="p-8 text-center text-slate-400 space-y-1">
+                            <i class="fa-regular fa-calendar text-2xl text-slate-300"></i>
+                            <p class="text-xs font-bold text-slate-700">ไม่มีกิจกรรมหรือนัดหมายในวันนี้</p>
+                            <p class="text-[11px]">สามารถกดปุ่ม "เพิ่มกิจกรรมวันนี้" เพื่อบันทึกนัดหมายใหม่</p>
+                        </div>
+                    `;
+                } else {
+                    eventsList.forEach(ev => {
+                        const nick = getEmployeeNickname(ev.empId);
+                        const displayName = nick ? `${ev.empName} (${nick})` : ev.empName;
+                        dayHtml += `
+                            <div onclick="openItemDetailModal('${ev.id}', false)" class="bg-white rounded-xl p-3.5 border border-amber-300 hover:shadow-xs transition cursor-pointer flex items-center justify-between gap-3">
+                                <div class="flex items-center space-x-3 min-w-0">
+                                    <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex flex-col items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-clock text-xs"></i>
+                                        <span class="text-[9px] font-bold font-mono mt-0.5">${ev.startTime}</span>
+                                    </div>
+                                    <div class="min-w-0 leading-tight">
+                                        <span class="font-bold text-xs text-slate-900 block truncate">${ev.title}</span>
+                                        <span class="text-[11px] text-slate-500 block truncate mt-0.5">ผู้บันทึก: ${displayName}</span>
+                                        <span class="text-[10px] text-amber-700 font-mono block">เวลา: ${ev.startTime} - ${ev.endTime} น.</span>
+                                    </div>
+                                </div>
+                                <div class="shrink-0">
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">นัดหมาย</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                dayHtml += `
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = dayHtml;
             }
         }
 
@@ -2459,7 +3213,7 @@
                 const nick = getEmployeeNickname(emp.id);
                 const tenure = calculateWorkTenure(emp.startDate);
                 staffGrid.innerHTML += `
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 cursor-pointer hover:shadow-xs transition" onclick="handleInspectEmployeeChange('${emp.id}')">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 cursor-pointer hover:shadow-xs transition" onclick="handleInspectEmployeeChange('${emp.id}'); switchTab('dashboard');">
                         <div class="flex items-center space-x-3">
                             <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-11 h-11 rounded-xl object-cover border bg-white shrink-0" onerror="handleImageError(this, '${emp.id}')">
                             <div class="leading-tight min-w-0">
