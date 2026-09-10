@@ -282,12 +282,6 @@
                 <button type="button" onclick="history.forward()" class="text-slate-400 hover:text-slate-600 text-xs px-1"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
 
-            <!-- Fake Browser URL Bar -->
-            <div class="hidden sm:flex items-center space-x-2 bg-slate-50 border border-slate-200/80 rounded-full px-4 py-1 text-xs text-slate-500 w-80 justify-center font-mono">
-                <i class="fa-solid fa-lock text-[10px] text-emerald-600"></i>
-                <span class="text-slate-600 font-sans font-medium">hrconnect.pcbk.co.th</span>
-            </div>
-
             <!-- Top Right Action Controls -->
             <div class="flex items-center space-x-3">
                 <div id="exec-switcher-wrapper" class="hidden items-center space-x-1.5 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-1 text-xs">
@@ -556,14 +550,7 @@
                                     <div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs font-bold text-slate-800 block text-left">Weekly Attendance</span>
-                                            <div class="flex items-center space-x-1">
-                                                <div id="gauge-emp-switcher-badge" class="hidden">
-                                                    <select id="gauge-inspect-select" onchange="handleInspectEmployeeChange(this.value)" class="bg-blue-50 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded-full border border-blue-200 focus:outline-none cursor-pointer">
-                                                        <!-- Populated dynamically for Admin/Exec -->
-                                                    </select>
-                                                </div>
-                                                <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold">สัปดาห์นี้</span>
-                                            </div>
+                                            <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold">สัปดาห์นี้</span>
                                         </div>
                                         <span class="text-[10px] text-slate-400 block text-left" id="attendance-card-subtitle">อัตราการมาปฏิบัติงานรายบุคคล</span>
                                     </div>
@@ -1695,32 +1682,24 @@
             const isBoss = isExecutiveOrAdmin();
             const switcherWrapper = document.getElementById('exec-switcher-wrapper');
             const inspectSelect = document.getElementById('exec-inspect-select');
-            const gaugeBadge = document.getElementById('gauge-emp-switcher-badge');
-            const gaugeSelect = document.getElementById('gauge-inspect-select');
 
-            // Top Bar & Gauge Inline Executive Switcher
+            // Top Bar Executive Switcher
             if (isBoss) {
                 if (switcherWrapper) {
                     switcherWrapper.classList.remove('hidden');
                     switcherWrapper.classList.add('flex');
                 }
-                if (gaugeBadge) gaugeBadge.classList.remove('hidden');
 
-                const populateOptions = (selEl) => {
-                    if (!selEl) return;
-                    selEl.innerHTML = '';
+                if (inspectSelect) {
+                    inspectSelect.innerHTML = '';
                     employees.forEach(e => {
                         const nick = getEmployeeNickname(e.id);
                         const isSel = (displayEmp && displayEmp.id === e.id) ? 'selected' : '';
-                        selEl.innerHTML += `<option value="${e.id}" ${isSel}>${formatDisplayName(e)} ${nick ? `(${nick})` : ''}</option>`;
+                        inspectSelect.innerHTML += `<option value="${e.id}" ${isSel}>${formatDisplayName(e)} ${nick ? `(${nick})` : ''}</option>`;
                     });
-                };
-
-                populateOptions(inspectSelect);
-                populateOptions(gaugeSelect);
+                }
             } else {
                 if (switcherWrapper) switcherWrapper.classList.add('hidden');
-                if (gaugeBadge) gaugeBadge.classList.add('hidden');
             }
 
             // Summary Table edit badge
@@ -1920,11 +1899,9 @@
             if (emp) {
                 displayEmp = emp;
                 adminViewMode = 'detail';
-                // Sync dropdowns
+                // Sync dropdown
                 const topSel = document.getElementById('exec-inspect-select');
                 if (topSel) topSel.value = emp.id;
-                const gaugeSel = document.getElementById('gauge-inspect-select');
-                if (gaugeSel) gaugeSel.value = emp.id;
 
                 // Update subtitle to clearly show whose attendance is shown
                 const subTitle = document.getElementById('attendance-card-subtitle');
