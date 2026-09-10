@@ -35,7 +35,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global save function to Cloud Firestore
         window.saveToFirebase = async function(employeesData, requestsData, eventsData) {
             try {
                 await setDoc(doc(db, "pcbk_hr_database", "main_store"), {
@@ -51,7 +50,6 @@
             }
         };
 
-        // Global load function from Cloud Firestore
         window.loadFromFirebase = async function() {
             try {
                 const docSnap = await getDoc(doc(db, "pcbk_hr_database", "main_store"));
@@ -65,7 +63,6 @@
             }
         };
 
-        // Real-time active listener
         try {
             onSnapshot(doc(db, "pcbk_hr_database", "main_store"), (docSnap) => {
                 if (docSnap.exists()) {
@@ -105,14 +102,12 @@
             letter-spacing: -0.015em;
         }
 
-        /* App Window Canvas */
         .app-window {
             background-color: var(--card-bg);
             border-radius: 28px;
             box-shadow: 0 25px 60px -15px rgba(22, 35, 64, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
         }
 
-        /* Bento Cards */
         .bento-card {
             background: #ffffff;
             border-radius: 22px;
@@ -124,7 +119,6 @@
             box-shadow: 0 8px 24px -4px rgba(26, 38, 74, 0.06);
         }
 
-        /* Sidebar Navigation Item */
         .nav-item {
             color: #64748b;
             font-size: 13.5px;
@@ -150,7 +144,6 @@
             color: #ffffff !important;
         }
 
-        /* Soft Press */
         .pressable {
             transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.15s ease;
         }
@@ -158,7 +151,6 @@
             transform: scale(0.97);
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -179,7 +171,6 @@
             border-left: 4px solid #f43f5e !important;
         }
 
-        /* Floating Bubble Keyframes & Styles for Admin Hub */
         @keyframes spongeFloat1 {
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-12px) rotate(1.5deg); }
@@ -202,7 +193,6 @@
         .bubble-anim-3 { animation: spongeFloat3 4.6s ease-in-out infinite 1.2s; }
         .bubble-anim-4 { animation: spongeFloat4 5.4s ease-in-out infinite 1.8s; }
 
-        /* Mini Sponge Float for Today's Out Cards */
         @keyframes miniFloat1 {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-3.5px); }
@@ -228,11 +218,31 @@
             box-shadow: 0 20px 35px -10px rgba(47, 102, 238, 0.2), 0 0 0 2px rgba(47, 102, 238, 0.3);
             background: #ffffff;
         }
+
+        /* Seamless Infinite Marquee Scroll (Slow & Smooth Continuous Loop) */
+        .marquee-wrapper {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            width: 100%;
+        }
+        .marquee-track {
+            display: inline-block;
+            white-space: nowrap;
+            animation: continuousMarquee 14s linear infinite;
+        }
+        .marquee-wrapper:hover .marquee-track {
+            animation-play-state: paused;
+        }
+        @keyframes continuousMarquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen p-2 sm:p-4 lg:p-6 flex items-center justify-center antialiased">
 
-    <!-- ================= LOGIN MODAL ================= -->
+    <!-- LOGIN MODAL -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[32px] max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
             <div class="flex flex-col items-center justify-center">
@@ -279,12 +289,10 @@
         </div>
     </div>
 
-    <!-- ================= MAIN APP SHELL (BENTO WINDOW) ================= -->
+    <!-- MAIN APP WINDOW -->
     <div class="app-window w-full max-w-[1440px] min-h-[920px] flex flex-col overflow-hidden">
         
-        <!-- Mac / Browser Style Top Window Bar -->
         <div class="h-12 border-b border-slate-100 px-5 flex items-center justify-between bg-white select-none">
-            <!-- Window Traffic Light Dots -->
             <div class="flex items-center space-x-2">
                 <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block border border-[#e0443e]"></span>
                 <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block border border-[#dea123]"></span>
@@ -294,12 +302,10 @@
                 <button type="button" onclick="history.forward()" class="text-slate-400 hover:text-slate-600 text-xs px-1"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
 
-            <!-- Top Right Action Controls -->
             <div class="flex items-center space-x-3">
                 <div id="exec-switcher-wrapper" class="hidden items-center space-x-1.5 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-1 text-xs">
                     <span class="text-blue-700 font-bold text-[11px]"><i class="fa-solid fa-user-shield mr-1"></i>โหมดผู้บริหาร:</span>
                     <select id="exec-inspect-select" onchange="handleInspectEmployeeChange(this.value)" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
-                        <!-- Populated with all employees for executive to switch card -->
                     </select>
                 </div>
 
@@ -309,13 +315,10 @@
             </div>
         </div>
 
-        <!-- App Body (Sidebar + Content Canvas) -->
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f7f8fc]">
             
-            <!-- ================= LEFT SIDEBAR ================= -->
             <aside class="w-full md:w-64 bg-white border-r border-slate-100 p-5 flex flex-col justify-between shrink-0 space-y-6">
                 <div class="space-y-6">
-                    <!-- Brand Header -->
                     <div class="flex items-center space-x-3 px-1">
                         <div class="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm overflow-hidden p-1 shrink-0">
                             <img src="LOGO PCBK API - 1.png" alt="PCBK Logo" class="w-full h-full object-contain" onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='LOGO%20PCBK%20API%20-%201.png';}">
@@ -326,7 +329,6 @@
                         </div>
                     </div>
 
-                    <!-- Primary Nav Links -->
                     <nav class="space-y-1.5 text-xs">
                         <button type="button" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active w-full">
                             <i class="fa-solid fa-house text-slate-400 w-4"></i>
@@ -368,7 +370,6 @@
                     </nav>
                 </div>
 
-                <!-- Bottom User Chip & Logout -->
                 <div class="pt-4 border-t border-slate-100 space-y-2">
                     <div class="flex items-center space-x-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
                         <img id="sidebar-user-avatar" src="" alt="avatar" class="w-9 h-9 rounded-xl object-cover border border-slate-200 bg-white shrink-0" onerror="handleImageError(this, currentUser ? currentUser.id : '')">
@@ -385,15 +386,12 @@
                 </div>
             </aside>
 
-            <!-- ================= MAIN CONTENT CANVAS ================= -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
 
-                <!-- ***************** TAB 1: BENTO DASHBOARD (HOME) ***************** -->
+                <!-- TAB 1: DASHBOARD & HOME -->
                 <section id="tab-dashboard" class="tab-view space-y-6">
                     
-                    <!-- ADMIN FLOATING BUBBLE OVERVIEW (Displayed for Admin when in Hub mode) -->
                     <div id="admin-bubble-hub" class="hidden space-y-5">
-                        <!-- Hub Header (Compact Status Bar) -->
                         <div class="flex justify-center sm:justify-end">
                             <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 rounded-2xl p-2.5 sm:px-6 sm:py-3 text-white shadow-md shadow-blue-500/15 flex items-center space-x-3 text-xs border border-white/20">
                                 <div class="px-3 py-1 text-center">
@@ -413,26 +411,19 @@
                             </div>
                         </div>
 
-                        <!-- Asymmetrical Floating Sponge Grid Container -->
                         <div class="relative py-4 px-2">
-                            <!-- Background Floating Soft Glows -->
                             <div class="absolute top-10 left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
                             <div class="absolute bottom-10 right-12 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
                             <div class="absolute top-1/2 left-1/3 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                            <!-- 3 Asymmetrical Staggered Columns -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
-                                <!-- Column 1 (Offset Top) -->
                                 <div class="space-y-6 pt-0 sm:pt-4" id="bubble-col-1"></div>
-                                <!-- Column 2 (Offset Higher & Staggered) -->
                                 <div class="space-y-6 -mt-0 sm:-mt-3" id="bubble-col-2"></div>
-                                <!-- Column 3 (Offset Down & Asymmetrical) -->
                                 <div class="space-y-6 pt-0 sm:pt-8" id="bubble-col-3"></div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ADMIN BACK NAVIGATION BAR (Shown in detail mode for Admin) -->
                     <div id="admin-back-bar" class="hidden items-center justify-between bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs">
                         <button type="button" onclick="returnToAdminBubbleHub()" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-extrabold text-xs px-4 py-2 rounded-xl transition cursor-pointer pressable border border-slate-200/80">
                             <i class="fa-solid fa-arrow-left text-blue-600"></i>
@@ -444,7 +435,6 @@
                         </div>
                     </div>
 
-                    <!-- Top Notification banner for Executive if pending requests exist -->
                     <div id="exec-approval-banner" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white rounded-2xl p-4 shadow-sm items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white">
@@ -460,15 +450,12 @@
                         </button>
                     </div>
 
-                    <!-- BENTO GRID CONTAINER -->
+                    <!-- BENTO GRID -->
                     <div id="bento-main-container" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                         
-                        <!-- COLUMN 1: Profile Card + 4 Stat Bento Tiles (lg:col-span-4) -->
+                        <!-- COLUMN 1 -->
                         <div class="lg:col-span-4 space-y-5">
-                            
-                            <!-- MAIN PROFILE BENTO CARD (Matched Exactly with Reference) -->
                             <div class="bento-card p-6 space-y-4">
-                                <!-- Circular Photo Container (Not Zoomed) -->
                                 <div class="relative flex flex-col items-center justify-center pt-2 pb-2">
                                     <div class="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-1.5 bg-gradient-to-tr from-blue-500/20 via-sky-400/20 to-indigo-500/20 shadow-md">
                                         <div class="w-full h-full rounded-full overflow-hidden bg-slate-100 border-2 border-white shadow-inner flex items-center justify-center">
@@ -480,7 +467,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Info Details -->
                                 <div class="space-y-3 text-left">
                                     <div>
                                         <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Name</span>
@@ -511,9 +497,7 @@
                                 </div>
                             </div>
 
-                            <!-- 4 COLORFUL STAT TILES (Pink, Green, Blue, Red/Orange) -->
                             <div class="grid grid-cols-2 gap-3.5">
-                                <!-- 1. Pink Tile: Days in company / Tenure -->
                                 <div class="bg-[#ff4b72] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
                                     <div class="text-2xl font-black tracking-tight" id="bento-stat-tenure">-</div>
                                     <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
@@ -522,7 +506,6 @@
                                     </div>
                                 </div>
 
-                                <!-- 2. Green Tile: Remaining Vacation (Max 20) -->
                                 <div class="bg-[#2cc56f] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
                                     <div class="text-2xl font-black tracking-tight" id="bento-stat-vac-rem">0 วัน</div>
                                     <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
@@ -531,7 +514,6 @@
                                     </div>
                                 </div>
 
-                                <!-- 3. Blue Tile: Vacation Used this year -->
                                 <div class="bg-[#2f66ee] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
                                     <div class="text-2xl font-black tracking-tight" id="bento-stat-vac-used">0 วัน</div>
                                     <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
@@ -540,7 +522,6 @@
                                     </div>
                                 </div>
 
-                                <!-- 4. Orange Tile: Sick Leave Used -->
                                 <div class="bg-[#f95738] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
                                     <div class="text-2xl font-black tracking-tight" id="bento-stat-sick-used">0 วัน</div>
                                     <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
@@ -551,13 +532,11 @@
                             </div>
                         </div>
 
-                        <!-- COLUMN 2: Middle Column (Activity Gauge, Working Format, Today Out List, Banner) (lg:col-span-5) -->
+                        <!-- COLUMN 2 -->
                         <div class="lg:col-span-5 space-y-5">
                             
-                            <!-- ROW: Weekly Activity Gauge + Working Format (Personalized for Current Employee) -->
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 
-                                <!-- Weekly Activity Gauge Card (Personalized for Current Employee) -->
                                 <div class="bento-card p-5 space-y-3 text-center flex flex-col justify-between">
                                     <div>
                                         <div class="flex items-center justify-between">
@@ -567,12 +546,9 @@
                                         <span class="text-[10px] text-slate-400 block text-left" id="attendance-card-subtitle">อัตราการมาปฏิบัติงานรายบุคคล</span>
                                     </div>
 
-                                    <!-- Gauge Semicircle (Fixed & Clean Proportional Arc) -->
                                     <div class="relative w-44 h-24 mx-auto flex items-end justify-center">
                                         <svg class="w-44 h-24" viewBox="0 0 100 58">
-                                            <!-- Background Arc Track -->
                                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round" />
-                                            <!-- Progress Arc Track -->
                                             <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="9" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="0" style="transition: stroke-dashoffset 0.8s ease;" />
                                         </svg>
                                         <div class="absolute bottom-1 inset-x-0 flex flex-col items-center justify-center pointer-events-none">
@@ -581,7 +557,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Mini Breakdown under gauge (Now includes leave days & 100% week total) -->
                                     <div class="space-y-1.5 text-[11px] pt-1 border-t border-slate-100">
                                         <div class="flex items-center justify-between text-slate-600">
                                             <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>ประจำสำนักงาน</span>
@@ -602,7 +577,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Working Format Card (Personalized for Current Employee) -->
                                 <div class="bento-card p-5 space-y-3 flex flex-col justify-between">
                                     <div class="flex items-center justify-between">
                                         <div>
@@ -612,9 +586,7 @@
                                         <button type="button" onclick="switchTab('calendar-view')" class="text-[11px] text-blue-600 font-bold hover:underline">Details</button>
                                     </div>
 
-                                    <!-- Dynamic Vertical Bar Chart Container -->
                                     <div class="flex items-end gap-3 my-auto h-40 pb-0.5">
-                                        <!-- Remote/Offsite Bar Pillar -->
                                         <div id="workformat-offsite-bar" class="flex-1 bg-[#2cc56f] text-white rounded-2xl p-3 flex flex-col justify-between text-left shadow-sm transition-all duration-700 ease-out" style="height: 105px;">
                                             <div class="text-2xl font-black" id="workformat-offsite-txt">0%</div>
                                             <div>
@@ -623,7 +595,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Office/Company Bar Pillar -->
                                         <div id="workformat-office-bar" class="flex-1 bg-[#2f66ee] text-white rounded-2xl p-3 flex flex-col justify-between text-left shadow-sm transition-all duration-700 ease-out" style="height: 156px;">
                                             <div class="text-2xl font-black" id="workformat-office-txt">100%</div>
                                             <div>
@@ -635,7 +606,6 @@
                                 </div>
                             </div>
 
-                            <!-- "Time Tracking" / Today's Out of Office Card -->
                             <div class="bento-card p-5 space-y-3.5 text-left">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                                     <div>
@@ -648,11 +618,9 @@
                                 </div>
 
                                 <div id="bento-today-out-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-                                    <!-- Populated with employee cards out today -->
                                 </div>
                             </div>
 
-                            <!-- StaffCentral Style Bottom Promo / Info Banner -->
                             <div class="rounded-2xl p-5 text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 shadow-sm relative overflow-hidden flex flex-col justify-between space-y-3 text-left">
                                 <div class="flex items-center justify-between">
                                     <span class="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">HR Connect Platform</span>
@@ -664,7 +632,6 @@
                                 </div>
                                 <div class="flex items-center justify-between pt-1">
                                     <div class="flex -space-x-2 overflow-hidden" id="banner-avatars-pile">
-                                        <!-- Avatars pile -->
                                     </div>
                                     <button type="button" onclick="switchTab('request-leave')" class="bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs transition pressable">
                                         ยื่นขอลางาน <i class="fa-solid fa-arrow-right ml-1"></i>
@@ -674,10 +641,9 @@
 
                         </div>
 
-                        <!-- COLUMN 3: Right Column (Mini Calendar + Upcoming Schedule Feed) (lg:col-span-3) -->
+                        <!-- COLUMN 3 -->
                         <div class="lg:col-span-3 space-y-5">
                             
-                            <!-- Mini Calendar Bento Card -->
                             <div class="bento-card p-5 space-y-3">
                                 <div class="flex items-center justify-between text-slate-800">
                                     <button type="button" onclick="changeMiniCalMonth(-1)" class="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
@@ -685,18 +651,14 @@
                                     <button type="button" onclick="changeMiniCalMonth(1)" class="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
                                 </div>
 
-                                <!-- Day labels (M T W T F S S) -->
                                 <div class="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400">
                                     <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span class="text-rose-400">S</span><span class="text-rose-400">S</span>
                                 </div>
 
-                                <!-- Calendar Grid (5-6 rows) -->
                                 <div id="mini-cal-grid" class="grid grid-cols-7 gap-1 text-center text-xs">
-                                    <!-- Populated dynamically -->
                                 </div>
                             </div>
 
-                            <!-- Upcoming Schedule / Events Feed (Right Column bottom) -->
                             <div class="bento-card p-5 space-y-3 text-left">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                                     <span class="font-bold text-xs text-slate-900">กำหนดการ & นัดหมาย</span>
@@ -707,7 +669,6 @@
                                 </div>
 
                                 <div id="bento-schedule-feed" class="space-y-3 text-xs max-h-[360px] overflow-y-auto pr-1">
-                                    <!-- Populated with events and upcoming leaves -->
                                 </div>
                             </div>
 
@@ -716,7 +677,7 @@
                     </div>
                 </section>
 
-                <!-- ***************** TAB 2: FULL CALENDAR VIEW ***************** -->
+                <!-- TAB 2: CALENDAR VIEW -->
                 <section id="tab-calendar-view" class="tab-view hidden space-y-5">
                     <div class="bento-card p-6 space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -741,7 +702,6 @@
                             </div>
                         </div>
 
-                        <!-- Legend -->
                         <div class="flex flex-wrap items-center gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
                             <span class="font-bold text-slate-500 text-[11px] uppercase mr-1">สัญลักษณ์สี:</span>
                             <span class="inline-flex items-center space-x-1.5 bg-white border border-sky-200 px-3 py-1 rounded-full text-sky-700 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span><span>สีฟ้า: พักร้อน</span></span>
@@ -750,12 +710,11 @@
                             <span class="inline-flex items-center space-x-1.5 bg-white border border-amber-200 px-3 py-1 rounded-full text-amber-800 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span><span>สีเหลือง: กิจกรรม/ประชุม</span></span>
                         </div>
 
-                        <!-- Calendar Content Canvas -->
                         <div id="calendar-content-box" class="min-h-[440px]"></div>
                     </div>
                 </section>
 
-                <!-- ***************** TAB 3: LEAVE REQUEST FORM ***************** -->
+                <!-- TAB 3: LEAVE REQUEST -->
                 <section id="tab-request-leave" class="tab-view hidden max-w-3xl mx-auto space-y-5">
                     <div class="bento-card p-6 sm:p-8 space-y-5 text-left">
                         <div class="border-b border-slate-100 pb-4">
@@ -860,7 +819,7 @@
                     </div>
                 </section>
 
-                <!-- ***************** TAB 4: APPROVAL CENTER ***************** -->
+                <!-- TAB 4: APPROVAL CENTER -->
                 <section id="tab-approval-center" class="tab-view hidden space-y-4">
                     <div class="bento-card p-6 space-y-4 text-left">
                         <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
@@ -876,7 +835,7 @@
                     </div>
                 </section>
 
-                <!-- ***************** TAB 5: SUMMARY TABLE ***************** -->
+                <!-- TAB 5: SUMMARY TABLE -->
                 <section id="tab-summary-table" class="tab-view hidden space-y-4">
                     <div class="bento-card p-6 space-y-4 text-left">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
@@ -932,7 +891,7 @@
                     </div>
                 </section>
 
-                <!-- ***************** TAB 6: STAFF DIRECTORY ***************** -->
+                <!-- TAB 6: DIRECTORY -->
                 <section id="tab-directory" class="tab-view hidden space-y-5">
                     <div class="bento-card p-6 space-y-6 text-left">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
@@ -957,9 +916,8 @@
                     </div>
                 </section>
 
-                <!-- ***************** TAB 7: ANALYTICS & STATS ***************** -->
+                <!-- TAB 7: ANALYTICS -->
                 <section id="tab-analytics" class="tab-view hidden space-y-5">
-                    <!-- Top Company-Wide Overview Cards (Moved from Home) -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="bento-card p-5 flex items-center space-x-4 text-left">
                             <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
@@ -1029,13 +987,13 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-message">ทำรายการสำเร็จ</span>
     </div>
 
-    <!-- Quick Contact & Message Modal -->
+    <!-- Contact Modal -->
     <div id="contact-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-[28px] max-w-md w-full p-6 shadow-2xl border border-slate-100 text-left space-y-4 text-xs">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -1048,7 +1006,6 @@
                 <button type="button" onclick="closeContactModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <!-- Staff Header Mini Card -->
             <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl flex items-center space-x-3">
                 <img id="contact-modal-avatar" src="" alt="avatar" class="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-white" onerror="handleImageError(this, '')">
                 <div class="min-w-0 flex-1 leading-tight">
@@ -1058,7 +1015,6 @@
                 </div>
             </div>
 
-            <!-- Communication Channels -->
             <div class="space-y-2">
                 <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200/80 rounded-xl">
                     <div class="flex items-center space-x-2.5 min-w-0">
@@ -1084,7 +1040,6 @@
                 </div>
             </div>
 
-            <!-- Quick Note Form (Records directly to calendar/schedule) -->
             <form onsubmit="handleSendQuickNote(event)" class="space-y-2.5 pt-1 border-t border-slate-100">
                 <label class="block font-bold text-slate-800 text-xs">ฝากข้อความโน้ต / นัดหมายด่วนลงปฏิทิน</label>
                 <textarea id="contact-quick-note-msg" rows="2" required placeholder="เช่น ฝากตรวจเอกสารสัญญา DEDE ก่อน 15:00 น. หรือ แจ้งประชุมด่วน" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:bg-white focus:ring-2 focus:ring-blue-500"></textarea>
@@ -1145,7 +1100,7 @@
                 <p id="modal-event-time" class="text-xs font-semibold text-slate-600">🕒 10:00 - 12:00 น.</p>
                 <div class="w-full bg-slate-50 p-3 rounded-xl text-left border border-slate-100">
                     <span class="text-[10px] text-slate-400 block font-bold uppercase">รายละเอียด / ภารกิจ:</span>
-                    <p id="modal-event-title" class="font-bold text-slate-800 text-xs mt-0.5">-</p>
+                    <p id="modal-event-title" class="font-bold text-slate-800 text-xs mt-0.5 break-words">-</p>
                 </div>
                 <div id="modal-event-action-container" class="pt-2 w-full flex justify-center space-x-2"></div>
             </div>
@@ -1155,10 +1110,9 @@
     <script>
         const ADMIN_PASSWORD = "pcbk2026";
 
-        // Nicknames for PCBK staff
         const EMPLOYEE_NICKNAMES = {
-            "1102003": "MAC",
-            "1102033": "ICE",
+            "1101001": "MAC",
+            "1102003": "ICE",
             "1104008": "KAI",
             "1103020": "CHAIYO",
             "1103059": "PANYA",
@@ -1177,7 +1131,6 @@
             return nick ? `${empName} (${nick})` : empName;
         }
 
-        // Helper to format leave numbers with exact decimal places (e.g., .25, .5, .75) without rounding .25 to .30
         function formatLeaveNumber(val) {
             if (val === null || val === undefined || isNaN(val)) return '0';
             const num = parseFloat(val);
@@ -1290,9 +1243,9 @@
         let requests = [];
         let events = [];
         let currentUser = null;
-        let displayEmp = null; // The employee currently showcased on the profile card (for Admin/Exec switching)
+        let displayEmp = null;
         let isAdmin = false;
-        let adminViewMode = 'hub'; // 'hub' = floating sponges overview, 'detail' = individual bento card
+        let adminViewMode = 'hub';
 
         let calendarMode = 'month';
         let calendarBaseDate = new Date();
@@ -1321,7 +1274,6 @@
             return `${empId}.jpg`;
         }
 
-        // Mapping company emails & contact extensions
         const EMPLOYEE_CONTACT_INFO = {
             "1101001": { email: "chaisak@pcbk.co.th", phone: "02-589-1001 ต่อ 101" },
             "1102003": { email: "lalana@pcbk.co.th", phone: "02-589-1001 ต่อ 102" },
@@ -1339,7 +1291,6 @@
             return EMPLOYEE_CONTACT_INFO[String(empId)] || { email: `${empId}@pcbk.co.th`, phone: "02-589-1001" };
         }
 
-        // ================= QUICK ACTION BUTTONS LOGIC =================
         function openContactModal() {
             const emp = displayEmp || currentUser || employees[0];
             if (!emp) return;
@@ -1366,7 +1317,6 @@
             if (phoneEl) phoneEl.innerText = contact.phone;
             if (mailtoEl) mailtoEl.href = `mailto:${contact.email}`;
 
-            // Check if emp is out today
             const d = getLiveDateData();
             const outReq = requests.find(r => r.empId === emp.id && r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
             if (badgeEl) {
@@ -1440,14 +1390,12 @@
 
             const sel = document.getElementById('form-emp-id');
             if (sel) {
-                // If user is admin/exec or targetEmp is permitted
                 if (isAdmin || isExecutiveOrAdmin() || (currentUser && String(currentUser.id) === String(targetEmp.id))) {
                     sel.value = targetEmp.id;
                     handleFormEmpChange();
                 }
             }
 
-            // Scroll to form nicely
             const formSection = document.getElementById('tab-request-leave');
             if (formSection) {
                 formSection.scrollIntoView({ behavior: 'smooth' });
@@ -1597,7 +1545,6 @@
                         if (!existing) {
                             employees.push(JSON.parse(JSON.stringify(d)));
                         } else {
-                            // Synchronize otherLeaveDays if currently 0 or missing
                             if (d.otherLeaveDays && (!existing.otherLeaveDays || existing.otherLeaveDays === 0)) {
                                 existing.otherLeaveDays = d.otherLeaveDays;
                             }
@@ -1621,7 +1568,6 @@
                         if (existingIdx === -1) {
                             requests.push(JSON.parse(JSON.stringify(defReq)));
                         } else {
-                            // Ensure demonstration dates and status stay synchronized for this week
                             requests[existingIdx].startDate = defReq.startDate;
                             requests[existingIdx].endDate = defReq.endDate;
                             requests[existingIdx].days = defReq.days;
@@ -1670,7 +1616,6 @@
             if (trimmed === ADMIN_PASSWORD) {
                 isAdmin = true;
                 currentUser = { id: "ADMIN", name: "ผู้ดูแลระบบ (Admin)", position: "HR Executive", isMasterAdmin: true };
-                // Default Admin to Hub mode
                 adminViewMode = 'hub';
                 displayEmp = employees.find(e => String(e.id) === "1102055") || employees[0];
             } else {
@@ -1702,7 +1647,6 @@
             const switcherWrapper = document.getElementById('exec-switcher-wrapper');
             const inspectSelect = document.getElementById('exec-inspect-select');
 
-            // Top Bar Executive Switcher
             if (isBoss) {
                 if (switcherWrapper) {
                     switcherWrapper.classList.remove('hidden');
@@ -1721,7 +1665,6 @@
                 if (switcherWrapper) switcherWrapper.classList.add('hidden');
             }
 
-            // Summary Table edit badge
             const lockBadge = document.getElementById('badge-lock-status');
             if (lockBadge) {
                 lockBadge.innerText = isAdmin ? 'โหมดแก้ไข (Admin)' : 'ดูอย่างเดียว';
@@ -1729,7 +1672,6 @@
             }
         }
 
-        // ================= ADMIN FLOATING SPONGE / BUBBLE LOGIC =================
         function renderAdminBubbleHub() {
             const hubContainer = document.getElementById('admin-bubble-hub');
             const bentoContainer = document.getElementById('bento-main-container');
@@ -1761,10 +1703,6 @@
                 let inOfficeCount = 0;
                 let outCount = 0;
 
-                // Separate employees into:
-                // 1. Those who have activity today (leaves, offsite, or events)
-                // 2. High executives (ผศ.ดร.ชัยศักดิ์ & ดร.ลลนา) who don't have activity today
-                // 3. Normal staff who don't have activity today
                 const activeTodayList = [];
                 const normalExecList = [];
                 const normalStaffList = [];
@@ -1782,23 +1720,17 @@
                     }
                 });
 
-                // Sort active group by tenure
                 activeTodayList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
-                // Normal executives: ผศ.ดร.ชัยศักดิ์ (1101001) first, followed by ดร.ลลนา (1102003)
                 normalExecList.sort((a, b) => (a.id === '1101001' ? -1 : 1));
-                // Normal staff sorted by tenure (oldest tenure first)
                 normalStaffList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
 
-                // Combined list: Active today first -> Executives (no activity) -> Other staff sorted by tenure
                 const allSorted = [...activeTodayList, ...normalExecList, ...normalStaffList];
 
-                // Distribute into 3 columns asymmetrically with floating bubble animations
                 allSorted.forEach((emp, index) => {
                     const nick = getEmployeeNickname(emp.id);
                     const quotas = getEmpRemainingQuotas(emp.id);
                     const tenure = calculateWorkTenure(emp.startDate);
 
-                    // Check attendance status today
                     const outReq = requests.find(r => String(r.empId) === String(emp.id) && r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
                     let statusDot = 'bg-emerald-500';
                     let statusLabel = 'ประจำสำนักงาน';
@@ -1819,17 +1751,13 @@
                         inOfficeCount++;
                     }
 
-                    // Alternate float animation classes (1 to 4)
                     const animClass = `bubble-anim-${(index % 4) + 1}`;
 
-                    // Bubble card HTML
                     const bubbleHtml = `
                         <div class="sponge-bubble-card p-5 ${animClass} relative overflow-hidden group" onclick="selectEmployeeFromHub('${emp.id}')">
-                            <!-- Top Ambient Accent -->
                             <div class="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-bl from-blue-400/15 via-indigo-300/10 to-transparent rounded-full pointer-events-none group-hover:scale-150 transition duration-500"></div>
 
                             <div class="flex items-start space-x-3.5 relative z-10">
-                                <!-- Large Avatar with Live Status Dot -->
                                 <div class="relative shrink-0">
                                     <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-blue-500/30 to-indigo-500/20 shadow-sm">
                                         <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-full object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
@@ -1837,7 +1765,6 @@
                                     <span class="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full ${statusDot} border-2 border-white shadow-xs"></span>
                                 </div>
 
-                                <!-- Info -->
                                 <div class="min-w-0 flex-1 leading-snug text-left">
                                     <div class="flex items-center justify-between gap-1">
                                         <h4 class="font-extrabold text-slate-900 text-sm truncate group-hover:text-blue-600 transition">${formatDisplayName(emp)}</h4>
@@ -1848,7 +1775,6 @@
                                 </div>
                             </div>
 
-                            <!-- Bottom Quick Meta Bar -->
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 relative z-10">
                                 <div>
                                     <span class="text-[10px] text-slate-400 block font-medium">พักร้อนคงเหลือ</span>
@@ -1865,13 +1791,11 @@
                         </div>
                     `;
 
-                    // Push into 3 columns: Column 1 (4 items), Column 2 (3 items), Column 3 (3 items)
                     if (index % 3 === 0) col1.innerHTML += bubbleHtml;
                     else if (index % 3 === 1) col2.innerHTML += bubbleHtml;
                     else col3.innerHTML += bubbleHtml;
                 });
 
-                // Update stat pills
                 const totalEl = document.getElementById('hub-stat-total');
                 const inOffEl = document.getElementById('hub-stat-inoffice');
                 const outEl = document.getElementById('hub-stat-out');
@@ -1918,16 +1842,13 @@
             if (emp) {
                 displayEmp = emp;
                 adminViewMode = 'detail';
-                // Sync dropdown
                 const topSel = document.getElementById('exec-inspect-select');
                 if (topSel) topSel.value = emp.id;
 
-                // Update subtitle to clearly show whose attendance is shown
                 const subTitle = document.getElementById('attendance-card-subtitle');
                 const nick = getEmployeeNickname(emp.id);
                 if (subTitle) subTitle.innerText = `ข้อมูลของ: ${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}`;
 
-                // Re-render both Profile and Bento Stats
                 renderAdminBubbleHub();
                 renderBentoProfileCard();
                 renderBentoStats();
@@ -1979,7 +1900,6 @@
             const liveDateEl = document.getElementById('topbar-live-date');
             if (liveDateEl) liveDateEl.innerText = `${d.liveNow.getDate()} ${d.thaiMonthsShort[d.liveNow.getMonth()]} ${d.yearBE}`;
 
-            // Sidebar User
             if (currentUser) {
                 const sName = document.getElementById('sidebar-user-name');
                 const sRole = document.getElementById('sidebar-user-role');
@@ -1992,7 +1912,6 @@
                 }
             }
 
-            // Pending badge
             let pendingCount = 0;
             if (isExecutiveOrAdmin()) {
                 pendingCount = requests.filter(r => !isApprovedStatus(r.status) && !isRejectedStatus(r.status)).length;
@@ -2006,7 +1925,6 @@
                 badge.className = pendingCount > 0 ? 'bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse' : 'bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold';
             }
 
-            // Executive Banner
             const banner = document.getElementById('exec-approval-banner');
             const bannerTitle = document.getElementById('banner-pending-title');
             if (isExecutiveOrAdmin() && pendingCount > 0) {
@@ -2043,11 +1961,9 @@
                 avatarEl.onerror = function() { handleImageError(this, emp.id); };
             }
 
-            // Tenure
             const tenureEl = document.getElementById('bento-stat-tenure');
             if (tenureEl) tenureEl.innerText = calculateWorkTenure(emp.startDate);
 
-            // Quotas for displayed employee
             const quotas = getEmpRemainingQuotas(emp.id);
             const vacRemEl = document.getElementById('bento-stat-vac-rem');
             const vacUsedEl = document.getElementById('bento-stat-vac-used');
@@ -2069,8 +1985,7 @@
             const emp = displayEmp || currentUser || employees[0];
             if (!emp) return;
 
-            // 1. Calculate Current Week Attendance (Mon - Fri: 5 working days) for this specific employee
-            const currentDayOfWeek = d.liveNow.getDay(); // 0: Sun, 1: Mon, ..., 6: Sat
+            const currentDayOfWeek = d.liveNow.getDay();
             const mondayOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
             const mondayDate = new Date(d.liveNow);
             mondayDate.setDate(d.liveNow.getDate() + mondayOffset);
@@ -2079,7 +1994,6 @@
             let weekLeaveDays = 0;
             let weekOffsiteDays = 0;
 
-            // Iterate 5 days of this week (Mon to Fri)
             for (let i = 0; i < 5; i++) {
                 const dayCheck = new Date(mondayDate);
                 dayCheck.setDate(mondayDate.getDate() + i);
@@ -2116,7 +2030,6 @@
             if (gaugePctTxt) gaugePctTxt.innerText = `${attendancePct}%`;
             if (gaugeStatusTxt) gaugeStatusTxt.innerText = `ปฏิบัติงาน ${workingDaysTotal}/5 วัน`;
             if (gaugeArc) {
-                // Semicircle arc length = PI * 40 ≈ 125.66
                 const totalLength = 125.66;
                 const offset = totalLength * (1 - (attendancePct / 100));
                 gaugeArc.style.strokeDashoffset = Math.max(0, Math.min(totalLength, offset));
@@ -2126,7 +2039,6 @@
             if (gaugeLeave) gaugeLeave.innerText = `${weekLeaveDays} วัน (${leavePct}%)`;
             if (gaugeTotalWeek) gaugeTotalWeek.innerText = `5 วันทำการ (100%)`;
 
-            // 2. Calculate Working format (Remote vs In-Office) for this specific employee
             let offsiteFromRequests = 0;
             requests.forEach(r => {
                 if (String(r.empId) === String(emp.id) && (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && !isRejectedStatus(r.status)) {
@@ -2136,7 +2048,6 @@
             const tableOffsite = parseFloat(emp.otherLeaveDays) || 0;
             const totalOffsiteRecorded = Math.max(tableOffsite, offsiteFromRequests);
 
-            // Benchmark monthly working days ≈ 20 days
             const benchmarkWorkDays = 20;
             const remoteRatio = Math.min(100, Math.round((totalOffsiteRecorded / benchmarkWorkDays) * 100));
             const officeRatio = 100 - remoteRatio;
@@ -2153,7 +2064,6 @@
             if (wfOfficeDays) wfOfficeDays.innerText = `ประจำการที่ออฟฟิศ`;
             if (wfOffsiteDays) wfOffsiteDays.innerText = `${totalOffsiteRecorded} วันสะสม`;
 
-            // Dynamic Bar Chart Height Calculation (Min: 92px, Max: 156px)
             const minBarHeight = 92;
             const maxBarHeight = 156;
             if (wfOffsiteBar) {
@@ -2165,7 +2075,6 @@
                 wfOfficeBar.style.height = `${calculatedOfficeHeight}px`;
             }
 
-            // Avatars pile in banner
             const pile = document.getElementById('banner-avatars-pile');
             if (pile) {
                 pile.innerHTML = '';
@@ -2174,7 +2083,6 @@
                 });
             }
 
-            // 3. Update Company-Wide Analytics Overview (For Dashboard & Stats tab)
             updateCompanyAnalyticsOverview(d);
         }
 
@@ -2265,7 +2173,6 @@
             });
         }
 
-        // Mini Calendar Widget in right column
         function renderMiniCalendar() {
             const container = document.getElementById('mini-cal-grid');
             const titleEl = document.getElementById('mini-cal-header-title');
@@ -2281,11 +2188,9 @@
             const lastDay = new Date(year, month + 1, 0);
             const totalDays = lastDay.getDate();
 
-            // Monday as first day of week (0=Mon, ..., 6=Sun)
             let startDay = firstDay.getDay() - 1;
             if (startDay === -1) startDay = 6;
 
-            // Empty prefix cells
             for (let i = 0; i < startDay; i++) {
                 container.innerHTML += `<div class="h-7"></div>`;
             }
@@ -2326,7 +2231,6 @@
             container.innerHTML = '';
 
             const d = getLiveDateData();
-            // Upcoming events or leaves
             const upcoming = [];
 
             events.forEach(ev => {
@@ -2344,7 +2248,9 @@
                         startTime: '08:30',
                         endTime: '17:30',
                         type: 'leave',
-                        sortDate: r.startDate
+                        sortDate: r.startDate,
+                        isRequest: true,
+                        reason: r.reason || '-'
                     });
                 }
             });
@@ -2361,24 +2267,39 @@
                 const dateParts = item.date.split('-');
                 const dayMonth = `${parseInt(dateParts[2])} ${getLiveDateData().thaiMonthsShort[parseInt(dateParts[1]) - 1]}`;
 
+                // Check if title is long to trigger infinite loop seamless marquee
+                const isLong = item.title.length > 18;
+                let titleContent = `<span class="font-bold text-slate-800 text-xs block truncate">${item.title}</span>`;
+                if (isLong) {
+                    titleContent = `
+                        <div class="marquee-wrapper">
+                            <div class="marquee-track">
+                                <span class="font-bold text-slate-800 text-xs inline-block mr-12">${item.title}</span>
+                                <span class="font-bold text-slate-800 text-xs inline-block mr-12">${item.title}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const clickAttr = item.isRequest ? `openItemDetailModal('${item.id}', true)` : `openItemDetailModal('${item.id}', false)`;
+
                 container.innerHTML += `
-                    <div class="flex items-start space-x-2.5 p-2 rounded-xl hover:bg-slate-50 transition border border-slate-100">
+                    <div onclick="${clickAttr}" class="flex items-center space-x-2.5 p-2 rounded-xl hover:bg-slate-50 transition border border-slate-100 cursor-pointer">
                         <div class="text-center shrink-0 w-10">
                             <span class="text-[10px] text-slate-400 font-bold block leading-none">${dayMonth}</span>
-                            <span class="text-[9px] text-slate-600 font-mono font-medium mt-0.5 block">${item.startTime}</span>
+                            <span class="text-[9px] text-slate-600 font-mono font-medium mt-0.5 block">${item.startTime || '08:30'}</span>
                         </div>
-                        <div class="h-6 w-0.5 ${isMeet ? 'bg-amber-400' : 'bg-blue-500'} rounded-full"></div>
-                        <div class="min-w-0 flex-1 leading-tight">
-                            <span class="font-bold text-slate-800 text-xs block truncate">${item.title}</span>
+                        <div class="h-6 w-0.5 ${isMeet ? 'bg-amber-400' : 'bg-blue-500'} rounded-full shrink-0"></div>
+                        <div class="min-w-0 flex-1 leading-tight overflow-hidden">
+                            ${titleContent}
                             <span class="text-[10px] text-slate-400 block truncate">${item.empName}</span>
                         </div>
-                        <i class="fa-solid ${isMeet ? 'fa-video text-amber-500' : 'fa-calendar-check text-blue-500'} text-xs shrink-0 mt-1"></i>
+                        <i class="fa-solid ${isMeet ? 'fa-video text-amber-500' : 'fa-calendar-check text-blue-500'} text-xs shrink-0 ml-1"></i>
                     </div>
                 `;
             });
         }
 
-        // Quota calculations
         function getEmpRemainingQuotas(empId) {
             const emp = employees.find(x => x.id === empId);
             if (!emp) return { vacRem: 0, sickRem: 30 };
@@ -2484,7 +2405,6 @@
             return items;
         }
 
-        // Full Interactive Calendar views
         function setCalendarMode(mode) {
             calendarMode = mode;
             ['month', 'week', 'day'].forEach(m => {
@@ -2522,7 +2442,7 @@
                 const firstDay = new Date(year, month, 1);
                 const lastDay = new Date(year, month + 1, 0);
                 const totalDays = lastDay.getDate();
-                const startDayIndex = firstDay.getDay(); // 0 = Sun, 6 = Sat
+                const startDayIndex = firstDay.getDay();
                 const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสฯ', 'ศุกร์', 'เสาร์'];
 
                 let html = `
@@ -2571,7 +2491,6 @@
                 html += `</div></div>`;
                 container.innerHTML = html;
             } else if (calendarMode === 'week') {
-                // Sunday (0) to Saturday (6)
                 const startOfWeek = new Date(calendarBaseDate);
                 startOfWeek.setDate(calendarBaseDate.getDate() - calendarBaseDate.getDay());
                 startOfWeek.setHours(0, 0, 0, 0);
@@ -2653,7 +2572,6 @@
 
                 let dayHtml = `
                     <div class="space-y-5">
-                        <!-- Top Day Header & Status Banner -->
                         <div class="bg-gradient-to-r ${isToday ? 'from-blue-600 to-indigo-600' : 'from-slate-800 to-slate-900'} rounded-2xl p-5 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                             <div class="space-y-1">
                                 <div class="flex items-center space-x-2">
@@ -2671,10 +2589,7 @@
                             </div>
                         </div>
 
-                        <!-- 2 Columns: Leaves & Offsite vs Schedule & Meetings -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                            
-                            <!-- Left: Leaves & Remote Work -->
                             <div class="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 space-y-3">
                                 <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
                                     <h4 class="font-extrabold text-xs text-slate-800 flex items-center">
@@ -2720,7 +2635,6 @@
                                 </div>
                             </div>
 
-                            <!-- Right: Meetings & Events Schedule -->
                             <div class="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 space-y-3">
                                 <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
                                     <h4 class="font-extrabold text-xs text-slate-800 flex items-center">
@@ -2790,7 +2704,7 @@
                 avatarImg.src = getEmployeeAvatar(req.empId);
                 nameEl.innerText = formatNameWithNickname(req.empName, req.empId);
                 timeEl.innerText = `📅 ${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
-                titleEl.innerText = req.type;
+                titleEl.innerText = `${req.type}\nเหตุผล: ${req.reason || '-'}`;
 
                 let actions = '';
                 if (isExecutiveOrAdmin() && !isApprovedStatus(req.status)) {
@@ -2843,7 +2757,6 @@
             showToast("บันทึกกิจกรรมเรียบร้อยแล้ว");
         }
 
-        // Summary Table
         function renderSummaryTable() {
             const tbody = document.getElementById('summary-table-body');
             if (!tbody) return;
@@ -2987,7 +2900,6 @@
             showToast("บันทึกข้อมูลสำเร็จ");
         }
 
-        // Leave Request Form logic
         function renderEmpSelectOptions(id) {
             const sel = document.getElementById(id);
             if (!sel) return;
@@ -3096,7 +3008,6 @@
             switchTab('dashboard');
         }
 
-        // Approval Queue
         function renderApprovalQueue() {
             const container = document.getElementById('approval-list');
             if (!container) return;
@@ -3174,7 +3085,6 @@
             }
         }
 
-        // Staff Directory
         function renderStaffDirectory() {
             const execGrid = document.getElementById('directory-executives-grid');
             const staffGrid = document.getElementById('directory-staff-grid');
