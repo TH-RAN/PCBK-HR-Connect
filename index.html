@@ -17,7 +17,6 @@
     <!-- SheetJS for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Firebase SDK (v10 Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -241,7 +240,6 @@
 </head>
 <body class="text-slate-800 min-h-screen p-2 sm:p-4 lg:p-6 flex items-center justify-center antialiased">
 
-    <!-- LOGIN MODAL -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[32px] max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
             <div class="flex flex-col items-center justify-center">
@@ -288,7 +286,6 @@
         </div>
     </div>
 
-    <!-- MAIN APP WINDOW -->
     <div class="app-window w-full max-w-[1440px] min-h-[920px] flex flex-col overflow-hidden">
         
         <div class="h-12 border-b border-slate-100 px-5 flex items-center justify-between bg-white select-none">
@@ -387,7 +384,6 @@
 
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
 
-                <!-- TAB 1: DASHBOARD & HOME -->
                 <section id="tab-dashboard" class="tab-view space-y-6">
                     
                     <div id="admin-bubble-hub" class="hidden space-y-5">
@@ -676,7 +672,6 @@
                     </div>
                 </section>
 
-                <!-- TAB 2: CALENDAR VIEW -->
                 <section id="tab-calendar-view" class="tab-view hidden space-y-5">
                     <div class="bento-card p-6 space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -713,7 +708,6 @@
                     </div>
                 </section>
 
-                <!-- TAB 3: LEAVE REQUEST -->
                 <section id="tab-request-leave" class="tab-view hidden max-w-3xl mx-auto space-y-5">
                     <div class="bento-card p-6 sm:p-8 space-y-5 text-left">
                         <div class="border-b border-slate-100 pb-4">
@@ -818,7 +812,6 @@
                     </div>
                 </section>
 
-                <!-- TAB 4: APPROVAL CENTER -->
                 <section id="tab-approval-center" class="tab-view hidden space-y-4">
                     <div class="bento-card p-6 space-y-4 text-left">
                         <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
@@ -834,7 +827,6 @@
                     </div>
                 </section>
 
-                <!-- TAB 5: SUMMARY TABLE -->
                 <section id="tab-summary-table" class="tab-view hidden space-y-4">
                     <div class="bento-card p-6 space-y-4 text-left">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
@@ -890,32 +882,42 @@
                     </div>
                 </section>
 
-                <!-- TAB 6: DIRECTORY -->
-                <section id="tab-directory" class="tab-view hidden space-y-5">
-                    <div class="bento-card p-6 space-y-6 text-left">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <section id="tab-directory" class="tab-view hidden space-y-6">
+                    <div class="bento-card p-6 sm:p-8 space-y-8 text-left">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
                             <div>
-                                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center">
-                                    <i class="fa-solid fa-users-rectangle text-blue-600 mr-2.5"></i> ทำเนียบบุคลากร (Employee Directory)
+                                <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-2">PCBK Organization</span>
+                                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center">
+                                    <i class="fa-solid fa-users-rectangle text-blue-600 mr-3"></i> ทำเนียบบุคลากรองค์กร
                                 </h2>
-                                <p class="text-xs text-slate-500 mt-0.5">เรียงลำดับตามอายุงานเพื่อความสะดวกในการตรวจสอบ</p>
+                                <p class="text-xs sm:text-sm text-slate-500 mt-1">ทำเนียบรายชื่อ คณะผู้บริหาร และพนักงาน พร้อมข้อมูลอายุงานในองค์กร</p>
                             </div>
-                            <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส, ตำแหน่ง..." class="px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl w-60">
+                            <div class="relative w-full md:w-72">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                                <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส, ตำแหน่ง..." class="w-full pl-10 pr-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium">
+                            </div>
                         </div>
 
-                        <div class="space-y-3">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">คณะผู้บริหารระดับสูง (Executive Board)</h3>
-                            <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        <!-- Executive Board -->
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-2 text-xs font-black text-slate-400 uppercase tracking-wider">
+                                <i class="fa-solid fa-crown text-amber-500"></i>
+                                <span>คณะผู้บริหารระดับสูง (Executive Board)</span>
+                            </div>
+                            <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
                         </div>
 
-                        <div class="space-y-3 pt-2">
-                            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">พนักงานประจำการ (Employee)</h3>
-                            <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                        <!-- Staff Grid -->
+                        <div class="space-y-4 pt-4 border-t border-slate-100">
+                            <div class="flex items-center space-x-2 text-xs font-black text-slate-400 uppercase tracking-wider">
+                                <i class="fa-solid fa-user-tie text-blue-500"></i>
+                                <span>พนักงานประจำการ (Employee & Operations)</span>
+                            </div>
+                            <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
                         </div>
                     </div>
                 </section>
 
-                <!-- TAB 7: ANALYTICS -->
                 <section id="tab-analytics" class="tab-view hidden space-y-5">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="bento-card p-5 flex items-center space-x-4 text-left">
@@ -986,71 +988,9 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-message">ทำรายการสำเร็จ</span>
-    </div>
-
-    <!-- Contact Modal -->
-    <div id="contact-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-[28px] max-w-md w-full p-6 shadow-2xl border border-slate-100 text-left space-y-4 text-xs">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                        <i class="fa-solid fa-paper-plane"></i>
-                    </div>
-                    <h3 class="font-extrabold text-slate-900 text-sm">ติดต่อและฝากโน้ตถึงพนักงาน</h3>
-                </div>
-                <button type="button" onclick="closeContactModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <div class="bg-slate-50 border border-slate-100 p-3 rounded-2xl flex items-center space-x-3">
-                <img id="contact-modal-avatar" src="" alt="avatar" class="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-white" onerror="handleImageError(this, '')">
-                <div class="min-w-0 flex-1 leading-tight">
-                    <h4 id="contact-modal-name" class="font-extrabold text-slate-900 text-xs truncate">ชื่อพนักงาน</h4>
-                    <p id="contact-modal-pos" class="text-[11px] text-slate-500 mt-0.5 truncate">ตำแหน่ง</p>
-                    <span id="contact-modal-status-badge" class="inline-block mt-1 text-[9px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800">พร้อมปฏิบัติงาน</span>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200/80 rounded-xl">
-                    <div class="flex items-center space-x-2.5 min-w-0">
-                        <i class="fa-solid fa-envelope text-blue-500 text-sm"></i>
-                        <span id="contact-modal-email" class="font-mono text-slate-700 text-xs truncate">email@pcbk.co.th</span>
-                    </div>
-                    <div class="flex items-center space-x-1 shrink-0">
-                        <button type="button" onclick="copyContactEmail()" title="คัดลอกอีเมล" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-[11px] font-bold transition">
-                            <i class="fa-regular fa-copy mr-1"></i>คัดลอก
-                        </button>
-                        <a id="contact-modal-mailto" href="mailto:email@pcbk.co.th" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[11px] font-bold transition">
-                            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>ส่งอีเมล
-                        </a>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between p-2.5 bg-white border border-slate-200/80 rounded-xl">
-                    <div class="flex items-center space-x-2.5">
-                        <i class="fa-solid fa-phone text-emerald-500 text-sm"></i>
-                        <span id="contact-modal-phone" class="font-mono text-slate-700 text-xs">02-xxx-xxxx ต่อ 101</span>
-                    </div>
-                    <span class="text-[10px] text-slate-400 font-medium">โทรศัพท์ภายในองค์กร</span>
-                </div>
-            </div>
-
-            <form onsubmit="handleSendQuickNote(event)" class="space-y-2.5 pt-1 border-t border-slate-100">
-                <label class="block font-bold text-slate-800 text-xs">ฝากข้อความโน้ต / นัดหมายด่วนลงปฏิทิน</label>
-                <textarea id="contact-quick-note-msg" rows="2" required placeholder="เช่น ฝากตรวจเอกสารสัญญา DEDE ก่อน 15:00 น. หรือ แจ้งประชุมด่วน" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:bg-white focus:ring-2 focus:ring-blue-500"></textarea>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" onclick="closeContactModal()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs">ปิด</button>
-                    <button type="submit" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm flex items-center space-x-1.5 pressable">
-                        <i class="fa-solid fa-paper-plane text-[10px]"></i>
-                        <span>ส่งโน้ตลงปฏิทิน</span>
-                    </button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- Event Add Modal -->
@@ -1110,9 +1050,9 @@
         const ADMIN_PASSWORD = "pcbk2026";
 
         const EMPLOYEE_NICKNAMES = {
-            "1101001": "",       /* ดร.ชัยศักดิ์ ไม่มีชื่อเล่นตามที่ขอ */
-            "1102003": "MAC",    /* ดร.ลลนา (MAC) ตามที่ขอ */
-            "1102033": "ICE",    /* คุณภัคชนก (ICE) ตามที่ขอ */
+            "1101001": "",       /* ดร.ชัยศักดิ์ ไม่มีชื่อเล่น */
+            "1102003": "MAC",    /* ดร.ลลนา (MAC) */
+            "1102033": "ICE",    /* คุณภัคชนก (ICE) */
             "1104008": "KAI",
             "1103020": "CHAIYO",
             "1103059": "PANYA",
@@ -1248,114 +1188,6 @@
 
         function getEmployeeAvatar(empId) {
             return `${empId}.jpg`;
-        }
-
-        const EMPLOYEE_CONTACT_INFO = {
-            "1101001": { email: "chaisak@pcbk.co.th", phone: "02-589-1001 ต่อ 101" },
-            "1102003": { email: "lalana@pcbk.co.th", phone: "02-589-1001 ต่อ 102" },
-            "1102033": { email: "phakchanok@pcbk.co.th", phone: "02-589-1001 ต่อ 103" },
-            "1104008": { email: "kanokorn@pcbk.co.th", phone: "02-589-1001 ต่อ 104" },
-            "1103020": { email: "chaiyo@pcbk.co.th", phone: "02-589-1001 ต่อ 105" },
-            "1103059": { email: "panya@pcbk.co.th", phone: "02-589-1001 ต่อ 106" },
-            "1102049": { email: "nattakarn@pcbk.co.th", phone: "02-589-1001 ต่อ 107" },
-            "1102050": { email: "pawinee@pcbk.co.th", phone: "02-589-1001 ต่อ 108" },
-            "1102055": { email: "Secretary.fine@gmail.com", phone: "02-589-1001 ต่อ 109" },
-            "1103063": { email: "krit@pcbk.co.th", phone: "02-589-1001 ต่อ 110" }
-        };
-
-        function getEmpContact(empId) {
-            return EMPLOYEE_CONTACT_INFO[String(empId)] || { email: `${empId}@pcbk.co.th`, phone: "02-589-1001" };
-        }
-
-        function openContactModal() {
-            const emp = displayEmp || currentUser || employees[0];
-            if (!emp) return;
-
-            const modal = document.getElementById('contact-modal');
-            const avatar = document.getElementById('contact-modal-avatar');
-            const nameEl = document.getElementById('contact-modal-name');
-            const posEl = document.getElementById('contact-modal-pos');
-            const emailEl = document.getElementById('contact-modal-email');
-            const phoneEl = document.getElementById('contact-modal-phone');
-            const mailtoEl = document.getElementById('contact-modal-mailto');
-            const badgeEl = document.getElementById('contact-modal-status-badge');
-
-            const nick = getEmployeeNickname(emp.id);
-            if (nameEl) nameEl.innerText = `${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}`;
-            if (posEl) posEl.innerText = emp.position || '-';
-            if (avatar) {
-                avatar.src = getEmployeeAvatar(emp.id);
-                avatar.onerror = function() { handleImageError(this, emp.id); };
-            }
-
-            const contact = getEmpContact(emp.id);
-            if (emailEl) emailEl.innerText = contact.email;
-            if (phoneEl) phoneEl.innerText = contact.phone;
-            if (mailtoEl) mailtoEl.href = `mailto:${contact.email}`;
-
-            const d = getLiveDateData();
-            const outReq = requests.find(r => r.empId === emp.id && r.startDate <= d.iso && r.endDate >= d.iso && !isRejectedStatus(r.status));
-            if (badgeEl) {
-                if (outReq) {
-                    badgeEl.innerText = `ไม่อยู่ออฟฟิศ (${outReq.type})`;
-                    badgeEl.className = "inline-block mt-1 text-[9px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800";
-                } else {
-                    badgeEl.innerText = "ประจำสำนักงานพร้อมปฏิบัติงาน";
-                    badgeEl.className = "inline-block mt-1 text-[9px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 text-emerald-800";
-                }
-            }
-
-            const noteInput = document.getElementById('contact-quick-note-msg');
-            if (noteInput) noteInput.value = '';
-
-            if (modal) modal.classList.remove('hidden');
-        }
-
-        function closeContactModal() {
-            const modal = document.getElementById('contact-modal');
-            if (modal) modal.classList.add('hidden');
-        }
-
-        function copyContactEmail() {
-            const emailEl = document.getElementById('contact-modal-email');
-            if (!emailEl) return;
-            const emailText = emailEl.innerText.trim();
-
-            const tempInput = document.createElement("input");
-            tempInput.value = emailText;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
-
-            showToast(`คัดลอกอีเมล ${emailText} แล้ว`);
-        }
-
-        async function handleSendQuickNote(e) {
-            e.preventDefault();
-            const emp = displayEmp || currentUser || employees[0];
-            const msgInput = document.getElementById('contact-quick-note-msg');
-            if (!emp || !msgInput || !msgInput.value.trim()) return;
-
-            const d = getLiveDateData();
-            const noteText = msgInput.value.trim();
-            const senderName = currentUser ? formatDisplayName(currentUser) : 'HR';
-
-            const newEvent = {
-                id: `EVT-${Date.now().toString().slice(-4)}`,
-                empId: emp.id,
-                empName: formatDisplayName(emp),
-                date: d.iso,
-                startTime: '10:00',
-                endTime: '11:00',
-                title: `[โน้ตจาก ${senderName}] ${noteText}`
-            };
-
-            events.push(newEvent);
-            await saveAllToCloud();
-            renderAllViews();
-            closeContactModal();
-            showToast(`ส่งโน้ตบันทึกลงปฏิทินของ ${formatDisplayName(emp)} แล้ว`);
         }
 
         function quickApplyLeaveForCurrent() {
@@ -2756,7 +2588,6 @@
                 const isCurrentLoggedIn = currentUser && String(currentUser.id) === String(e.id);
                 const rowClass = isCurrentLoggedIn ? 'my-row-highlight font-semibold' : 'hover:bg-slate-50';
 
-                // Display name in summary table with nicknames updated according to user request
                 const nick = getEmployeeNickname(e.id);
                 const displayNameWithNick = nick ? `${e.name} (${nick})` : e.name;
 
@@ -3073,13 +2904,35 @@
 
             execList.forEach(emp => {
                 const nick = getEmployeeNickname(emp.id);
+                const tenure = calculateWorkTenure(emp.startDate);
+                const quotas = getEmpRemainingQuotas(emp.id);
+
                 execGrid.innerHTML += `
-                    <div class="bg-gradient-to-br from-blue-50/70 to-indigo-50/70 border border-blue-200/80 rounded-2xl p-4 flex items-center space-x-3.5 cursor-pointer hover:shadow-xs transition" onclick="handleInspectEmployeeChange('${emp.id}')">
-                        <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-14 h-14 rounded-xl object-cover border bg-white shrink-0" onerror="handleImageError(this, '${emp.id}')">
-                        <div class="leading-tight">
-                            <h4 class="font-extrabold text-slate-900 text-xs">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h4>
-                            <p class="text-[11px] text-blue-700 font-semibold mt-0.5">${emp.position}</p>
-                            <span class="text-[10px] text-slate-400 font-mono">รหัส: ${emp.id}</span>
+                    <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-600 text-white rounded-[24px] p-6 shadow-lg relative overflow-hidden flex flex-col justify-between space-y-4">
+                        <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div class="flex items-start space-x-4 relative z-10">
+                            <div class="w-20 h-20 rounded-2xl p-1 bg-white/20 backdrop-blur-md shadow-md shrink-0">
+                                <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-xl object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
+                            </div>
+                            <div class="min-w-0 flex-1 leading-snug text-left">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">Executive Board</span>
+                                    <span class="text-xs font-mono text-white/80">ID: ${emp.id}</span>
+                                </div>
+                                <h3 class="text-lg font-extrabold mt-1 truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h3>
+                                <p class="text-xs text-white/90 truncate font-medium">${emp.position}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-3 border-t border-white/20 text-xs relative z-10 text-center">
+                            <div class="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
+                                <span class="text-[10px] text-white/70 block">อายุงาน</span>
+                                <strong class="font-bold text-emerald-300">${tenure}</strong>
+                            </div>
+                            <div class="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
+                                <span class="text-[10px] text-white/70 block">พักร้อนคงเหลือ</span>
+                                <strong class="font-bold text-amber-300">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -3088,19 +2941,33 @@
             staffList.forEach(emp => {
                 const nick = getEmployeeNickname(emp.id);
                 const tenure = calculateWorkTenure(emp.startDate);
+                const quotas = getEmpRemainingQuotas(emp.id);
+
                 staffGrid.innerHTML += `
-                    <div class="bg-white border border-slate-200 rounded-2xl p-4 space-y-2 cursor-pointer hover:shadow-xs transition" onclick="handleInspectEmployeeChange('${emp.id}'); switchTab('dashboard');">
-                        <div class="flex items-center space-x-3">
-                            <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-11 h-11 rounded-xl object-cover border bg-white shrink-0" onerror="handleImageError(this, '${emp.id}')">
-                            <div class="leading-tight min-w-0">
-                                <h4 class="font-extrabold text-slate-900 text-xs truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h4>
-                                <p class="text-[10px] text-slate-500 font-medium truncate mt-0.5">${emp.position}</p>
-                                <span class="text-[9px] text-slate-400 font-mono">รหัส: ${emp.id}</span>
+                    <div class="bento-card p-5 space-y-4 text-left flex flex-col justify-between">
+                        <div class="flex items-start space-x-3.5">
+                            <div class="w-14 h-14 rounded-2xl p-0.5 bg-slate-100 border border-slate-200 shadow-2xs shrink-0 overflow-hidden">
+                                <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-xl object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
+                            </div>
+                            <div class="min-w-0 flex-1 leading-tight">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[10px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full">#${emp.id}</span>
+                                    ${nick ? `<span class="text-[10px] font-black text-slate-400">@${nick}</span>` : ''}
+                                </div>
+                                <h4 class="font-extrabold text-slate-900 text-xs truncate mt-1">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h4>
+                                <p class="text-[11px] text-slate-500 truncate mt-0.5 font-medium">${emp.position}</p>
                             </div>
                         </div>
-                        <div class="flex justify-between items-center text-[10px] pt-2 border-t border-slate-100 text-slate-500">
-                            <span>อายุงาน PCBK:</span>
-                            <strong class="text-blue-600 font-bold">${tenure}</strong>
+
+                        <div class="space-y-2 pt-2 border-t border-slate-100 text-[11px]">
+                            <div class="flex items-center justify-between text-slate-600">
+                                <span class="text-slate-400">อายุงาน PCBK:</span>
+                                <strong class="text-slate-800 font-bold">${tenure}</strong>
+                            </div>
+                            <div class="flex items-center justify-between text-slate-600">
+                                <span class="text-slate-400">พักร้อนคงเหลือ:</span>
+                                <strong class="text-emerald-600 font-extrabold">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
+                            </div>
                         </div>
                     </div>
                 `;
