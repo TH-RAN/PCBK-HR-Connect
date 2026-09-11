@@ -1049,7 +1049,7 @@
                 seq: 9, id: "1102055", name: "รัญชน์ ทองยอดเกรื่อง", position: "Secretary (เลขานุการ)", dob: "21 ก.พ. 2544", startDate: "15 พ.ค. 2566", carryVacation: 5,
                 vacationAccrued: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0],
                 vacationUsedMonths: [0, 0.25, 1.75, 2.25, 0.25, 0, 1.25, 0.5, 0, 0, 0, 0],
-                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 4, note: ""
+                sickMonths: [0, 0, 0, 0, 0.5, 0, 2, 0, 0, 0, 0, 0], otherLeaveDays: 5, note: ""
             },
             {
                 seq: 10, id: "1103063", name: "กฤษณ์ พิมพ์ทอง", position: "Driver (พนักงานขับรถ)", dob: "19 ต.ค. 2533", startDate: "1 เม.ย. 2568", carryVacation: 7,
@@ -1299,6 +1299,16 @@
                 } else {
                     employees = JSON.parse(JSON.stringify(defaultDataset));
                 }
+
+                const rannEmp = employees.find(e => String(e.id) === '1102055');
+                if (rannEmp && rannEmp.otherLeaveDays !== 5) {
+                    rannEmp.otherLeaveDays = 5;
+                }
+                const kaiEmp = employees.find(e => String(e.id) === '1104008');
+                if (kaiEmp && kaiEmp.otherLeaveDays !== 1) {
+                    kaiEmp.otherLeaveDays = 1;
+                }
+
                 if (masterReq) {
                     try {
                         requests = JSON.parse(masterReq);
@@ -1834,8 +1844,9 @@
                     }
                 }
             });
+            // ยึดตามค่าในตารางสรุปวันลา (otherLeaveDays) เป็นหลักเสมอ เพื่อความถูกต้องของข้อมูล
             const tableOffsite = parseFloat(emp.otherLeaveDays) || 0;
-            if (totalRemoteYTD === 0 && tableOffsite > 0) totalRemoteYTD = tableOffsite;
+            totalRemoteYTD = tableOffsite;
 
             const inOfficeYTD = Math.max(0, netWorkingDaysYTD - totalVacUsedYTD - totalSickUsedYTD - totalRemoteYTD);
 
@@ -2874,6 +2885,7 @@
 
                 let totalVac = 0, totalSick = 0, totalOff = 0;
 
+                // คำนวณจากตารางสรุปวันลาของพนักงานทุกคนเป็นหลัก 100% ป้องกันการนับเบิ้ล
                 employees.forEach(e => {
                     if (e.vacationUsedMonths) {
                         for (let m = 0; m < 12; m++) {
@@ -2889,18 +2901,36 @@
                             totalSick += s;
                         }
                     }
-                    const off = parseFloat(e.otherLeaveDays) || 0;
-                    totalOff += off;
-                    if (off > 0) {
-                        offsiteMonthly[8] += off;
-                    }
-                });
 
-                requests.forEach(r => {
-                    if ((r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && !isRejectedStatus(r.status)) {
-                        const mIdx = new Date(r.startDate).getMonth() || 0;
-                        offsiteMonthly[mIdx] += (parseFloat(r.days) || 0);
-                        totalOff += (parseFloat(r.days) || 0);
+                    // ยึดตามค่าในตารางสรุปวันลา (otherLeaveDays) ของพนักงานแต่ละคนเป็นเกณฑ์หลัก
+                    const empTableOff = parseFloat(e.otherLeaveDays) || 0;
+                    totalOff += empTableOff;
+
+                    if (empTableOff > 0) {
+                        // กระจายลงเดือนตามใบคำขอที่อนุมัติแล้วของพนักงานท่านนั้นๆ โดยไม่นับเกินยอดในตาราง
+                        const empOffRequests = requests.filter(r => 
+                            String(r.empId) === String(e.id) && 
+                            (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && 
+                            !isRejectedStatus(r.status)
+                        );
+
+                        let allocated = 0;
+                        empOffRequests.forEach(r => {
+                            if (allocated < empTableOff) {
+                                const mIdx = new Date(r.startDate).getMonth();
+                                const daysToAdd = Math.min(parseFloat(r.days) || 0, empTableOff - allocated);
+                                if (!isNaN(mIdx) && mIdx >= 0 && mIdx < 12) {
+                                    offsiteMonthly[mIdx] += daysToAdd;
+                                    allocated += daysToAdd;
+                                }
+                            }
+                        });
+
+                        // หากมียอดที่ไม่ได้ผูกกับใบคำขอ ให้ระบุลงในเดือนปัจจุบัน
+                        if (allocated < empTableOff) {
+                            const curMonth = (new Date()).getMonth();
+                            offsiteMonthly[curMonth] += (empTableOff - allocated);
+                        }
                     }
                 });
 
