@@ -238,46 +238,40 @@
             100% { transform: translateX(-50%); }
         }
 
-        @keyframes todayOutDukdik1 {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            25% { transform: translateY(-3px) rotate(-1deg); }
-            50% { transform: translateY(0px) rotate(0deg); }
-            75% { transform: translateY(-2px) rotate(1deg); }
-        }
-        @keyframes todayOutDukdik2 {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            25% { transform: translateY(2px) rotate(0.8deg); }
-            50% { transform: translateY(-3px) rotate(-0.8deg); }
-            75% { transform: translateY(1px) rotate(0.4deg); }
-        }
-        @keyframes nameBounceGlow {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); color: #2563eb; }
-        }
-        @keyframes pulseDotLive {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.35); opacity: 0.7; }
+        /* Subtle and smooth floating bubble animation for Today-Out cards */
+        @keyframes gentleBubbleFloat1 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
         }
 
-        .today-out-item-1 {
-            animation: todayOutDukdik1 3.2s ease-in-out infinite;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        @keyframes gentleBubbleFloat2 {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
         }
-        .today-out-item-2 {
-            animation: todayOutDukdik2 3.6s ease-in-out infinite 0.5s;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+        @keyframes pulseDotLive {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
         }
-        .today-out-item-1:hover, .today-out-item-2:hover {
-            animation-play-state: paused;
-            transform: translateY(-4px) scale(1.025) !important;
-            box-shadow: 0 8px 20px -4px rgba(244, 63, 94, 0.18), 0 0 0 1.5px rgba(244, 63, 94, 0.25);
+
+        .today-out-card {
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
         }
-        .today-out-animated-name {
-            display: inline-block;
-            animation: nameBounceGlow 2.8s ease-in-out infinite;
+        .today-out-card:hover {
+            transform: translateY(-3px) scale(1.01) !important;
+            box-shadow: 0 8px 20px -4px rgba(244, 63, 94, 0.15), 0 0 0 1px rgba(244, 63, 94, 0.25);
         }
+
+        .today-out-bubble-1 {
+            animation: gentleBubbleFloat1 4.2s ease-in-out infinite;
+        }
+
+        .today-out-bubble-2 {
+            animation: gentleBubbleFloat2 4.8s ease-in-out infinite 0.7s;
+        }
+
         .today-out-live-dot {
-            animation: pulseDotLive 1.8s ease-in-out infinite;
+            animation: pulseDotLive 2s ease-in-out infinite;
         }
     </style>
 </head>
@@ -1943,23 +1937,23 @@
                     title = (m && m[1]) ? m[1].trim() : (r.reason || 'นอกสถานที่');
                 }
 
-                const animClass = (idx % 2 === 0) ? 'today-out-item-1' : 'today-out-item-2';
+                const bubbleAnimClass = (idx % 2 === 0) ? 'today-out-bubble-1' : 'today-out-bubble-2';
 
                 container.innerHTML += `
-                    <div class="bg-gradient-to-r from-slate-50 via-white to-rose-50/30 border border-slate-200/90 rounded-2xl p-2.5 flex items-center justify-between text-xs shadow-2xs ${animClass} cursor-pointer">
-                        <div class="flex items-center space-x-2.5 min-w-0">
+                    <div class="today-out-card ${bubbleAnimClass} bg-gradient-to-r from-slate-50 via-white to-rose-50/30 border border-slate-200/90 rounded-2xl p-2.5 flex items-center justify-between text-xs shadow-2xs cursor-pointer">
+                        <div class="flex items-center space-x-2.5 min-w-0 flex-1 mr-2">
                             <div class="relative shrink-0">
                                 <img src="${getEmployeeAvatar(r.empId)}" alt="${r.empName}" class="w-8 h-8 rounded-xl object-cover border-2 border-white bg-white shadow-xs" onerror="handleImageError(this, '${r.empId}')">
                                 <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOffsite ? 'bg-emerald-500' : isSick ? 'bg-amber-500' : 'bg-rose-500'} border-2 border-white today-out-live-dot"></span>
                             </div>
-                            <div class="truncate leading-tight">
-                                <span class="font-extrabold text-slate-900 text-xs block truncate today-out-animated-name">
+                            <div class="truncate leading-tight flex-1 min-w-0">
+                                <span class="font-extrabold text-slate-900 text-xs block truncate">
                                     ${formatDisplayName(emp) || r.empName} ${nick ? `(${nick})` : ''}
                                 </span>
                                 <span class="text-[10.5px] text-slate-500 font-medium truncate block mt-0.5">${title}</span>
                             </div>
                         </div>
-                        <span class="text-[10px] ${badgeColor} border px-2.5 py-1 rounded-xl font-extrabold shrink-0 shadow-2xs">${formatLeaveNumber(r.days)} วัน</span>
+                        <span class="text-[10px] ${badgeColor} border px-2.5 py-1 rounded-xl font-extrabold shrink-0 shadow-2xs min-w-[50px] text-center select-none">${formatLeaveNumber(r.days)} วัน</span>
                     </div>
                 `;
             });
