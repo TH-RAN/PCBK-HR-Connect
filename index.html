@@ -110,7 +110,7 @@
 
         .bento-card {
             background: #ffffff;
-            border-radius: 22px;
+            border-radius: 20px;
             border: 1px solid rgba(226, 232, 240, 0.85);
             box-shadow: 0 4px 18px -4px rgba(26, 38, 74, 0.03);
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -121,13 +121,13 @@
 
         .nav-item {
             color: #64748b;
-            font-size: 13.5px;
+            font-size: 13px;
             font-weight: 600;
-            border-radius: 14px;
-            padding: 10px 14px;
+            border-radius: 12px;
+            padding: 8px 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             transition: all 0.16s ease;
             cursor: pointer;
         }
@@ -239,256 +239,247 @@
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen p-2 sm:p-4 lg:p-6 flex items-center justify-center antialiased">
+<body class="text-slate-800 h-screen p-2 sm:p-3 flex items-center justify-center antialiased overflow-hidden">
 
-    <!-- LOGIN MODAL -->
+    <!-- LOGIN MODAL (Version 260910.7.0.4) -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[32px] max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6 relative">
+        <div class="bg-white rounded-[32px] max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 relative">
             <div class="flex flex-col items-center justify-center">
-                <div class="w-16 h-16 bg-white border border-slate-100 rounded-2xl flex items-center justify-center mb-3 shadow-md overflow-hidden p-1.5">
+                <div class="w-14 h-14 bg-white border border-slate-100 rounded-2xl flex items-center justify-center mb-2 shadow-sm overflow-hidden p-1">
                     <img src="LOGO PCBK API - 1.png" alt="PCBK Logo" class="w-full h-full object-contain" onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='LOGO%20PCBK%20API%20-%201.png';}">
                 </div>
-                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">HR Connect</h2>
-                <p class="text-xs text-slate-500 mt-1 font-medium">เข้าสู่ระบบเพื่อจัดการข้อมูลบุคลากรและสถิติวันลา</p>
+                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">HR Connect</h2>
+                <p class="text-[11px] text-slate-500 mt-0.5">เข้าสู่ระบบเพื่อจัดการข้อมูลบุคลากรและสถิติวันลา</p>
             </div>
 
-            <form onsubmit="handleLoginSubmit(event)" class="space-y-4 text-left">
+            <form onsubmit="handleLoginSubmit(event)" class="space-y-3 text-left text-xs">
                 <div>
-                    <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">รหัสพนักงาน / Admin Key</label>
+                    <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1">รหัสพนักงาน / ADMIN KEY</label>
                     <div class="relative">
-                        <i class="fa-solid fa-id-badge absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="login-input-code" required placeholder="เช่น 1104055" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white font-mono tracking-wider transition">
+                        <i class="fa-solid fa-id-badge absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="login-input-code" required placeholder="เช่น 1104055" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 font-mono tracking-wider transition">
                     </div>
                 </div>
 
-                <div id="login-error-msg" class="hidden text-rose-600 text-xs font-bold bg-rose-50 border border-rose-200 p-3 rounded-2xl text-center">
+                <div id="login-error-msg" class="hidden text-rose-600 text-xs font-bold bg-rose-50 border border-rose-200 p-2 rounded-xl text-center">
                     <i class="fa-solid fa-circle-exclamation mr-1"></i> รหัสพนักงานหรือรหัส Admin ไม่ถูกต้อง
                 </div>
 
                 <div class="flex items-center justify-between text-xs">
                     <label class="flex items-center space-x-2 text-slate-600 cursor-pointer font-medium">
-                        <input type="checkbox" id="login-remember-me" checked class="rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4">
+                        <input type="checkbox" id="login-remember-me" checked class="rounded border-slate-300 text-blue-600 w-3.5 h-3.5">
                         <span>จดจำการเข้าสู่ระบบบนอุปกรณ์เครื่องนี้</span>
                     </label>
                 </div>
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center space-x-2 cursor-pointer pressable">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center space-x-2 cursor-pointer pressable text-xs">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     <span>เข้าสู่ระบบ (Sign In)</span>
                 </button>
             </form>
 
-            <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-3 flex flex-col items-center justify-center space-y-1">
-                <div class="flex items-center space-x-1">
-                    <i class="fa-solid fa-shield-halved text-slate-400"></i>
-                    <span>PCBK Personnel Management Platform</span>
-                </div>
-                <span class="text-[10px] text-slate-400 font-mono font-medium">version 260910.5.0.6</span>
+            <div class="text-[10px] text-slate-400 border-t border-slate-100 pt-2 flex flex-col items-center justify-center space-y-0.5">
+                <span>PCBK Personnel Management Platform</span>
+                <span class="font-mono font-medium">version 260910.7.0.4</span>
             </div>
         </div>
     </div>
 
     <!-- MAIN APP WINDOW -->
-    <div class="app-window w-full max-w-[1440px] min-h-[920px] flex flex-col overflow-hidden">
+    <div class="app-window w-full max-w-[1380px] h-[98vh] max-h-[880px] flex flex-col overflow-hidden">
         
-        <div class="h-12 border-b border-slate-100 px-5 flex items-center justify-between bg-white select-none">
+        <div class="h-8 border-b border-slate-100 px-4 flex items-center justify-between bg-white select-none shrink-0">
             <div class="flex items-center space-x-2">
-                <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block border border-[#e0443e]"></span>
-                <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block border border-[#dea123]"></span>
-                <span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block border border-[#1aab29]"></span>
-                <div class="h-4 w-px bg-slate-200 mx-2"></div>
-                <button type="button" onclick="history.back()" class="text-slate-400 hover:text-slate-600 text-xs px-1"><i class="fa-solid fa-chevron-left"></i></button>
-                <button type="button" onclick="history.forward()" class="text-slate-400 hover:text-slate-600 text-xs px-1"><i class="fa-solid fa-chevron-right"></i></button>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56] inline-block"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] inline-block"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f] inline-block"></span>
+                <div class="h-3 w-px bg-slate-200 mx-1"></div>
             </div>
 
             <div class="flex items-center space-x-3">
-                <div id="exec-switcher-wrapper" class="hidden items-center space-x-1.5 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-1 text-xs">
-                    <span class="text-blue-700 font-bold text-[11px]"><i class="fa-solid fa-user-shield mr-1"></i>โหมดผู้บริหาร:</span>
+                <div id="exec-switcher-wrapper" class="hidden items-center space-x-1.5 bg-blue-50 border border-blue-100 rounded-full px-2.5 py-0.5 text-xs">
+                    <span class="text-blue-700 font-bold text-[10px]"><i class="fa-solid fa-user-shield mr-1"></i>โหมดผู้บริหาร:</span>
                     <select id="exec-inspect-select" onchange="handleInspectEmployeeChange(this.value)" class="bg-transparent text-slate-800 font-bold text-xs focus:outline-none cursor-pointer">
                     </select>
                 </div>
 
                 <div class="flex items-center space-x-2 text-xs text-slate-500">
-                    <span id="topbar-live-date" class="font-medium">10 ก.ย. 2569</span>
+                    <span id="topbar-live-date" class="font-medium text-[11px]">10 ก.ย. 2569</span>
                 </div>
             </div>
         </div>
 
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f7f8fc]">
             
-            <aside class="w-full md:w-64 bg-white border-r border-slate-100 p-5 flex flex-col justify-between shrink-0 space-y-6">
-                <div class="space-y-6">
-                    <div class="flex items-center space-x-3 px-1">
-                        <div class="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-sm overflow-hidden p-1 shrink-0">
+            <aside class="w-full md:w-52 bg-white border-r border-slate-100 p-2.5 flex flex-col justify-between shrink-0 space-y-1">
+                <div class="space-y-1.5">
+                    <div class="flex items-center space-x-2 px-1">
+                        <div class="w-6 h-6 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm overflow-hidden p-0.5 shrink-0">
                             <img src="LOGO PCBK API - 1.png" alt="PCBK Logo" class="w-full h-full object-contain" onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='LOGO%20PCBK%20API%20-%201.png';}">
                         </div>
                         <div>
-                            <h1 class="font-extrabold text-slate-900 text-base leading-tight tracking-tight">HR Connect</h1>
-                            <span class="text-[10px] text-blue-600 font-bold tracking-wider uppercase">Platform</span>
+                            <h1 class="font-extrabold text-slate-900 text-xs leading-tight tracking-tight">HR Connect</h1>
+                            <span class="text-[7.5px] text-blue-600 font-bold tracking-wider uppercase">Platform</span>
                         </div>
                     </div>
 
-                    <nav class="space-y-1.5 text-xs">
-                        <button type="button" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active w-full">
-                            <i class="fa-solid fa-house text-slate-400 w-4"></i>
+                    <nav class="space-y-0.5 text-xs">
+                        <button type="button" onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item active w-full py-1.5">
+                            <i class="fa-solid fa-house text-slate-400 w-3.5"></i>
                             <span class="flex-1 text-left">หน้าแรก (Home)</span>
                         </button>
 
-                        <button type="button" onclick="switchTab('calendar-view')" id="nav-calendar-view" class="nav-item w-full">
-                            <i class="fa-solid fa-calendar-days text-slate-400 w-4"></i>
+                        <button type="button" onclick="switchTab('calendar-view')" id="nav-calendar-view" class="nav-item w-full py-1.5">
+                            <i class="fa-solid fa-calendar-days text-slate-400 w-3.5"></i>
                             <span class="flex-1 text-left">ปฏิทินงาน & กิจกรรม</span>
                         </button>
 
-                        <button type="button" onclick="switchTab('request-leave')" id="nav-request-leave" class="nav-item w-full">
-                            <i class="fa-solid fa-paper-plane text-slate-400 w-4"></i>
+                        <button type="button" onclick="switchTab('request-leave')" id="nav-request-leave" class="nav-item w-full py-1.5">
+                            <i class="fa-solid fa-paper-plane text-slate-400 w-3.5"></i>
                             <span class="flex-1 text-left">ยื่นขอลางาน</span>
                         </button>
 
-                        <button type="button" onclick="switchTab('approval-center')" id="nav-approval-center" class="nav-item w-full justify-between">
-                            <div class="flex items-center space-x-3">
-                                <i class="fa-regular fa-circle-check text-slate-400 w-4"></i>
+                        <button type="button" onclick="switchTab('approval-center')" id="nav-approval-center" class="nav-item w-full justify-between py-1.5">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-regular fa-circle-check text-slate-400 w-3.5"></i>
                                 <span>ศูนย์พิจารณาอนุมัติ</span>
                             </div>
-                            <span id="sidebar-pending-badge" class="bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">0</span>
+                            <span id="sidebar-pending-badge" class="bg-rose-500 text-white text-[8px] px-1.5 py-0.2 rounded-full font-bold">0</span>
                         </button>
 
-                        <button type="button" onclick="switchTab('summary-table')" id="nav-summary-table" class="nav-item w-full">
-                            <i class="fa-solid fa-table-list text-slate-400 w-4"></i>
+                        <button type="button" onclick="switchTab('summary-table')" id="nav-summary-table" class="nav-item w-full py-1.5">
+                            <i class="fa-solid fa-table-list text-slate-400 w-3.5"></i>
                             <span class="flex-1 text-left">ตารางสรุปวันลา</span>
                         </button>
 
-                        <button type="button" onclick="switchTab('directory')" id="nav-directory" class="nav-item w-full">
-                            <i class="fa-solid fa-users-rectangle text-slate-400 w-4"></i>
+                        <button type="button" onclick="switchTab('directory')" id="nav-directory" class="nav-item w-full py-1.5">
+                            <i class="fa-solid fa-users-rectangle text-slate-400 w-3.5"></i>
                             <span class="flex-1 text-left">ทำเนียบบุคลากร</span>
                         </button>
 
-                        <button type="button" onclick="switchTab('analytics')" id="nav-analytics" class="nav-item w-full">
-                            <i class="fa-solid fa-chart-pie text-slate-400 w-4"></i>
+                        <button type="button" onclick="switchTab('analytics')" id="nav-analytics" class="nav-item w-full py-1.5">
+                            <i class="fa-solid fa-chart-pie text-slate-400 w-3.5"></i>
                             <span class="flex-1 text-left">สถิติ & Dashboard</span>
                         </button>
                     </nav>
                 </div>
 
-                <div class="pt-4 border-t border-slate-100 space-y-2">
-                    <div class="flex items-center space-x-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
-                        <img id="sidebar-user-avatar" src="" alt="avatar" class="w-9 h-9 rounded-xl object-cover border border-slate-200 bg-white shrink-0" onerror="handleImageError(this, currentUser ? currentUser.id : '')">
-                        <div class="leading-tight truncate text-left">
-                            <span id="sidebar-user-name" class="font-bold text-slate-900 text-xs block truncate">กำลังโหลด...</span>
-                            <span id="sidebar-user-role" class="text-[10px] text-blue-600 font-semibold">พนักงาน</span>
+                <div class="pt-1.5 border-t border-slate-100 space-y-1 shrink-0">
+                    <div class="flex items-center space-x-2 p-1.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <img id="sidebar-user-avatar" src="" alt="avatar" class="w-6 h-6 rounded-lg object-cover border border-slate-200 bg-white shrink-0" onerror="handleImageError(this, currentUser ? currentUser.id : '')">
+                        <div class="leading-tight truncate text-left min-w-0">
+                            <span id="sidebar-user-name" class="font-bold text-slate-900 text-[10px] block truncate">กำลังโหลด...</span>
+                            <span id="sidebar-user-role" class="text-[8px] text-blue-600 font-semibold">พนักงาน</span>
                         </div>
                     </div>
 
-                    <button type="button" onclick="handleLogout()" class="w-full py-2 px-3 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center space-x-2 cursor-pointer">
+                    <button type="button" onclick="handleLogout()" class="w-full py-1 px-2 text-[10px] font-bold text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center space-x-2 cursor-pointer">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         <span>ออกจากระบบ</span>
                     </button>
                 </div>
             </aside>
 
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 max-h-full">
 
                 <!-- TAB 1: DASHBOARD & HOME -->
-                <section id="tab-dashboard" class="tab-view space-y-6">
+                <section id="tab-dashboard" class="tab-view space-y-3">
                     
-                    <div id="admin-bubble-hub" class="hidden space-y-5">
+                    <div id="admin-bubble-hub" class="hidden space-y-3">
                         <div class="flex justify-center sm:justify-end">
-                            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 rounded-2xl p-2.5 sm:px-6 sm:py-3 text-white shadow-md shadow-blue-500/15 flex items-center space-x-3 text-xs border border-white/20">
-                                <div class="px-3 py-1 text-center">
-                                    <span class="block text-[10.5px] text-white/80 font-medium">ทั้งหมด</span>
-                                    <strong class="text-sm sm:text-base font-extrabold tracking-tight" id="hub-stat-total">10 ท่าน</strong>
+                            <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-500 rounded-xl px-4 py-1.5 text-white shadow-sm flex items-center space-x-3 text-xs border border-white/20">
+                                <div class="px-1 text-center">
+                                    <span class="block text-[8px] text-white/80 font-medium">ทั้งหมด</span>
+                                    <strong class="text-xs font-extrabold tracking-tight" id="hub-stat-total">10 ท่าน</strong>
                                 </div>
-                                <div class="h-6 w-px bg-white/25"></div>
-                                <div class="px-3 py-1 text-center">
-                                    <span class="block text-[10.5px] text-white/80 font-medium">อยู่ออฟฟิศ</span>
-                                    <strong class="text-sm sm:text-base font-extrabold text-emerald-300 tracking-tight" id="hub-stat-inoffice">0 ท่าน</strong>
+                                <div class="h-4 w-px bg-white/25"></div>
+                                <div class="px-1 text-center">
+                                    <span class="block text-[8px] text-white/80 font-medium">อยู่ออฟฟิศ</span>
+                                    <strong class="text-xs font-extrabold text-emerald-300 tracking-tight" id="hub-stat-inoffice">0 ท่าน</strong>
                                 </div>
-                                <div class="h-6 w-px bg-white/25"></div>
-                                <div class="px-3 py-1 text-center">
-                                    <span class="block text-[10.5px] text-white/80 font-medium">ไม่อยู่ออฟฟิศ</span>
-                                    <strong class="text-sm sm:text-base font-extrabold text-rose-300 tracking-tight" id="hub-stat-out">0 ท่าน</strong>
+                                <div class="h-4 w-px bg-white/25"></div>
+                                <div class="px-1 text-center">
+                                    <span class="block text-[8px] text-white/80 font-medium">ไม่อยู่ออฟฟิศ</span>
+                                    <strong class="text-xs font-extrabold text-rose-300 tracking-tight" id="hub-stat-out">0 ท่าน</strong>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="relative py-4 px-2">
-                            <div class="absolute top-10 left-12 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
-                            <div class="absolute bottom-10 right-12 w-72 h-72 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none"></div>
-                            <div class="absolute top-1/2 left-1/3 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl pointer-events-none"></div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
-                                <div class="space-y-6 pt-0 sm:pt-4" id="bubble-col-1"></div>
-                                <div class="space-y-6 -mt-0 sm:-mt-3" id="bubble-col-2"></div>
-                                <div class="space-y-6 pt-0 sm:pt-8" id="bubble-col-3"></div>
+                        <div class="relative py-1 px-1">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
+                                <div class="space-y-3" id="bubble-col-1"></div>
+                                <div class="space-y-3" id="bubble-col-2"></div>
+                                <div class="space-y-3" id="bubble-col-3"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div id="admin-back-bar" class="hidden items-center justify-between bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs">
-                        <button type="button" onclick="returnToAdminBubbleHub()" class="inline-flex items-center space-x-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-extrabold text-xs px-4 py-2 rounded-xl transition cursor-pointer pressable border border-slate-200/80">
+                    <div id="admin-back-bar" class="hidden items-center justify-between bg-white border border-slate-200/90 rounded-xl px-3 py-2 shadow-2xs">
+                        <button type="button" onclick="returnToAdminBubbleHub()" class="inline-flex items-center space-x-1.5 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-extrabold text-xs px-3 py-1 rounded-lg transition cursor-pointer pressable border border-slate-200/80">
                             <i class="fa-solid fa-arrow-left text-blue-600"></i>
-                            <span>กลับไปหน้ารวมพนักงาน (ไอคอนฟองน้ำ)</span>
+                            <span>กลับไปหน้ารวมพนักงาน</span>
                         </button>
                         <div class="flex items-center space-x-2 text-xs">
-                            <span class="text-slate-400 font-medium">กำลังดูข้อมูลของ:</span>
-                            <span id="admin-current-inspect-name" class="font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full">-</span>
+                            <span class="text-slate-400 font-medium text-xs">กำลังดูข้อมูลของ:</span>
+                            <span id="admin-current-inspect-name" class="font-extrabold text-blue-600 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full text-xs">-</span>
                         </div>
                     </div>
 
-                    <div id="exec-approval-banner" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white rounded-2xl p-4 shadow-sm items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white">
-                                <i class="fa-solid fa-bell animate-bounce"></i>
+                    <div id="exec-approval-banner" class="hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white rounded-xl px-4 py-2 shadow-2xs items-center justify-between text-xs">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center text-white shrink-0">
+                                <i class="fa-solid fa-bell animate-bounce text-xs"></i>
                             </div>
                             <div>
-                                <h4 class="font-extrabold text-sm" id="banner-pending-title">มีคำขอลางานรอการอนุมัติ 0 รายการ</h4>
-                                <p class="text-xs text-white/90">กรุณาตรวจสอบและดำเนินการเพื่ออัปเดตสถิติลงปฏิทินแบบเรียลไทม์</p>
+                                <h4 class="font-extrabold text-xs" id="banner-pending-title">มีคำขอลางานรอการอนุมัติ 0 รายการ</h4>
                             </div>
                         </div>
-                        <button type="button" onclick="switchTab('approval-center')" class="bg-white text-orange-600 font-bold text-xs px-4 py-2 rounded-xl shadow-xs hover:bg-orange-50 transition cursor-pointer pressable">
+                        <button type="button" onclick="switchTab('approval-center')" class="bg-white text-orange-600 font-bold text-xs px-3 py-1 rounded-lg shadow-2xs hover:bg-orange-50 transition cursor-pointer pressable">
                             เปิดศูนย์อนุมัติ <i class="fa-solid fa-arrow-right ml-1"></i>
                         </button>
                     </div>
 
-                    <!-- BENTO GRID -->
-                    <div id="bento-main-container" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <!-- BENTO GRID (VIEWPORT BALANCED & WELL-PROPORTIONED) -->
+                    <div id="bento-main-container" class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
                         
                         <!-- COLUMN 1 -->
-                        <div class="lg:col-span-4 space-y-5">
-                            <div class="bento-card p-6 space-y-4">
-                                <div class="relative flex flex-col items-center justify-center pt-2 pb-2">
-                                    <div class="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-1.5 bg-gradient-to-tr from-blue-500/20 via-sky-400/20 to-indigo-500/20 shadow-md">
+                        <div class="lg:col-span-4 space-y-3.5">
+                            <div class="bento-card p-4 space-y-2.5">
+                                <div class="relative flex flex-col items-center justify-center pt-1 pb-1">
+                                    <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 bg-gradient-to-tr from-blue-500/20 via-sky-400/20 to-indigo-500/20 shadow-sm">
                                         <div class="w-full h-full rounded-full overflow-hidden bg-slate-100 border-2 border-white shadow-inner flex items-center justify-center">
                                             <img id="bento-profile-avatar" src="" alt="Profile" class="w-full h-full object-cover object-center" onerror="handleImageError(this, displayEmp ? displayEmp.id : '')">
                                         </div>
                                     </div>
-                                    <div class="absolute top-1 right-0 bg-blue-50 border border-blue-200/80 px-3 py-1 rounded-full text-[11px] font-extrabold text-blue-600 font-mono shadow-xs" id="bento-profile-nick">
+                                    <div class="absolute top-0 right-0 bg-blue-50 border border-blue-200/80 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold text-blue-600 font-mono shadow-2xs" id="bento-profile-nick">
                                         NICK
                                     </div>
                                 </div>
 
-                                <div class="space-y-3 text-left">
+                                <div class="space-y-1.5 text-left text-xs">
                                     <div>
-                                        <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Name</span>
-                                        <h2 id="bento-profile-name" class="text-xl font-extrabold text-slate-900 leading-snug">กำลังโหลด...</h2>
+                                        <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Name</span>
+                                        <h2 id="bento-profile-name" class="text-sm font-extrabold text-slate-900 leading-snug">กำลังโหลด...</h2>
                                     </div>
 
-                                    <div>
-                                        <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Position</span>
-                                        <p id="bento-profile-position" class="text-xs font-semibold text-slate-700 mt-0.5">Position</p>
-                                    </div>
-
-                                    <div>
-                                        <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Employee ID</span>
-                                        <p id="bento-profile-id" class="text-xs font-mono font-bold text-slate-600 mt-0.5">1100000</p>
-                                    </div>
-
-                                    <div class="flex items-center justify-between pt-1 border-t border-slate-100">
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
                                         <div>
-                                            <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider block">Joined on</span>
-                                            <p id="bento-profile-start" class="text-xs font-semibold text-slate-700 mt-0.5">-</p>
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Position</span>
+                                            <p id="bento-profile-position" class="text-[10.5px] font-semibold text-slate-700 truncate mt-0.5">Position</p>
                                         </div>
-                                        <div class="flex items-center">
-                                            <button type="button" id="btn-quick-leave" onclick="quickApplyLeaveForCurrent()" title="ส่งคำขอลางาน" class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-xs hover:bg-slate-200 transition cursor-pointer pressable">
+                                        <div>
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Employee ID</span>
+                                            <p id="bento-profile-id" class="text-[10.5px] font-mono font-bold text-slate-600 mt-0.5">1100000</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-1.5 border-t border-slate-100 text-xs">
+                                        <div>
+                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider block">Joined on</span>
+                                            <p id="bento-profile-start" class="text-[10.5px] font-semibold text-slate-700 mt-0.5">-</p>
+                                        </div>
+                                        <div>
+                                            <button type="button" id="btn-quick-leave" onclick="quickApplyLeaveForCurrent()" title="ส่งคำขอลางาน" class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] hover:bg-slate-200 transition cursor-pointer pressable">
                                                 <i class="fa-solid fa-file-pen"></i>
                                             </button>
                                         </div>
@@ -496,35 +487,35 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3.5">
-                                <div class="bg-[#ff4b72] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
-                                    <div class="text-2xl font-black tracking-tight" id="bento-stat-tenure">-</div>
-                                    <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
-                                        <i class="fa-solid fa-clock-rotate-left text-[10px]"></i>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-[#ff4b72] text-white p-3 rounded-2xl shadow-2xs space-y-1 text-left">
+                                    <div class="text-sm font-black tracking-tight" id="bento-stat-tenure">-</div>
+                                    <div class="text-[9px] font-medium text-white/90 flex items-center space-x-1">
+                                        <i class="fa-solid fa-clock-rotate-left text-[7px]"></i>
                                         <span>อายุงานในบริษัท</span>
                                     </div>
                                 </div>
 
-                                <div class="bg-[#2cc56f] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
-                                    <div class="text-2xl font-black tracking-tight" id="bento-stat-vac-rem">0 วัน</div>
-                                    <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
-                                        <i class="fa-solid fa-umbrella-beach text-[10px]"></i>
+                                <div class="bg-[#2cc56f] text-white p-3 rounded-2xl shadow-2xs space-y-1 text-left">
+                                    <div class="text-sm font-black tracking-tight" id="bento-stat-vac-rem">0 วัน</div>
+                                    <div class="text-[9px] font-medium text-white/90 flex items-center space-x-1">
+                                        <i class="fa-solid fa-umbrella-beach text-[7px]"></i>
                                         <span>พักร้อนคงเหลือ (≤20)</span>
                                     </div>
                                 </div>
 
-                                <div class="bg-[#2f66ee] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
-                                    <div class="text-2xl font-black tracking-tight" id="bento-stat-vac-used">0 วัน</div>
-                                    <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
-                                        <i class="fa-solid fa-circle-check text-[10px]"></i>
+                                <div class="bg-[#2f66ee] text-white p-3 rounded-2xl shadow-2xs space-y-1 text-left">
+                                    <div class="text-sm font-black tracking-tight" id="bento-stat-vac-used">0 วัน</div>
+                                    <div class="text-[9px] font-medium text-white/90 flex items-center space-x-1">
+                                        <i class="fa-solid fa-circle-check text-[7px]"></i>
                                         <span>พักร้อนใช้ไปทั้งปี</span>
                                     </div>
                                 </div>
 
-                                <div class="bg-[#f95738] text-white p-4 rounded-2xl shadow-sm space-y-1 text-left">
-                                    <div class="text-2xl font-black tracking-tight" id="bento-stat-sick-used">0 วัน</div>
-                                    <div class="text-[11px] font-medium text-white/90 flex items-center space-x-1">
-                                        <i class="fa-solid fa-bed-pulse text-[10px]"></i>
+                                <div class="bg-[#f95738] text-white p-3 rounded-2xl shadow-2xs space-y-1 text-left">
+                                    <div class="text-sm font-black tracking-tight" id="bento-stat-sick-used">0 วัน</div>
+                                    <div class="text-[9px] font-medium text-white/90 flex items-center space-x-1">
+                                        <i class="fa-solid fa-bed-pulse text-[7px]"></i>
                                         <span>ลาป่วยใช้ไปทั้งปี</span>
                                     </div>
                                 </div>
@@ -532,31 +523,30 @@
                         </div>
 
                         <!-- COLUMN 2 -->
-                        <div class="lg:col-span-5 space-y-5">
+                        <div class="lg:col-span-5 space-y-3.5">
                             
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 
-                                <div class="bento-card p-5 space-y-3 text-center flex flex-col justify-between">
+                                <div class="bento-card p-3.5 space-y-2 text-center flex flex-col justify-between">
                                     <div>
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs font-bold text-slate-800 block text-left">Weekly Attendance</span>
-                                            <span class="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold">สัปดาห์นี้</span>
+                                            <span class="text-[9px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold">สัปดาห์นี้</span>
                                         </div>
-                                        <span class="text-[10px] text-slate-400 block text-left" id="attendance-card-subtitle">อัตราการมาปฏิบัติงานรายบุคคล</span>
                                     </div>
 
-                                    <div class="relative w-44 h-24 mx-auto flex items-end justify-center">
-                                        <svg class="w-44 h-24" viewBox="0 0 100 58">
-                                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="9" stroke-linecap="round" />
-                                            <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="9" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="0" style="transition: stroke-dashoffset 0.8s ease;" />
+                                    <div class="relative w-28 h-14 mx-auto flex items-end justify-center">
+                                        <svg class="w-28 h-14" viewBox="0 0 100 58">
+                                            <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round" />
+                                            <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="8" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="0" style="transition: stroke-dashoffset 0.8s ease;" />
                                         </svg>
                                         <div class="absolute bottom-1 inset-x-0 flex flex-col items-center justify-center pointer-events-none">
-                                            <div class="text-2xl font-black text-slate-900 leading-none" id="gauge-percent-txt">100%</div>
-                                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1" id="gauge-status-txt">Ready</span>
+                                            <div class="text-base font-black text-slate-900 leading-none" id="gauge-percent-txt">100%</div>
+                                            <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider mt-0.5" id="gauge-status-txt">Ready</span>
                                         </div>
                                     </div>
 
-                                    <div class="space-y-1.5 text-[11px] pt-1 border-t border-slate-100">
+                                    <div class="space-y-1 text-[10px] pt-1 border-t border-slate-100 text-left">
                                         <div class="flex items-center justify-between text-slate-600">
                                             <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>ประจำสำนักงาน</span>
                                             <strong id="gauge-in-office-pct">0 วัน (0%)</strong>
@@ -569,89 +559,64 @@
                                             <span class="flex items-center"><span class="w-2 h-2 rounded-full bg-rose-500 mr-1.5"></span>ลาพักร้อน / ลาป่วย</span>
                                             <strong id="gauge-leave-pct" class="text-rose-600">2 วัน (40%)</strong>
                                         </div>
-                                        <div class="flex items-center justify-between pt-1 border-t border-dashed border-slate-200 text-slate-400 text-[10px]">
-                                            <span>รวมทั้งสัปดาห์ (จ.-ศ.)</span>
-                                            <strong id="gauge-total-week-txt" class="text-slate-700 font-bold">5 วันทำการ (100%)</strong>
-                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="bento-card p-5 space-y-3 flex flex-col justify-between">
+                                <div class="bento-card p-3.5 space-y-2 flex flex-col justify-between">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <span class="text-xs font-bold text-slate-800 block">Yearly Working Format</span>
-                                            <span class="text-[10px] text-slate-400 block">สัดส่วนการทำงานทั้งปี</span>
+                                            <span class="text-[9px] text-slate-400 block">สัดส่วนการทำงานทั้งปี (คำนวณถึงปัจจุบัน)</span>
                                         </div>
-                                        <button type="button" onclick="switchTab('calendar-view')" class="text-[11px] text-blue-600 font-bold hover:underline">Details</button>
+                                        <button type="button" onclick="navigateToYearlySummary()" class="text-[10px] text-blue-600 font-bold hover:underline cursor-pointer">Details</button>
                                     </div>
 
-                                    <div class="grid grid-cols-2 gap-2 my-auto text-left">
-                                        <div class="bg-blue-600 text-white p-3 rounded-2xl shadow-sm space-y-1">
-                                            <div class="text-xl font-black" id="wf-card-office-pct">0%</div>
-                                            <span class="text-[10px] font-bold block text-white/90">In-Office (<span id="wf-card-office-days">0</span> วัน)</span>
+                                    <div class="grid grid-cols-2 gap-1.5 my-auto text-left">
+                                        <div class="bg-blue-600 text-white p-2 rounded-xl shadow-2xs space-y-0.5">
+                                            <div class="text-xs font-black" id="wf-card-office-pct">0%</div>
+                                            <span class="text-[8px] font-bold block text-white/90">In-Office (<span id="wf-card-office-days">0</span> ด.)</span>
                                         </div>
 
-                                        <div class="bg-emerald-600 text-white p-3 rounded-2xl shadow-sm space-y-1">
-                                            <div class="text-xl font-black" id="wf-card-remote-pct">0%</div>
-                                            <span class="text-[10px] font-bold block text-white/90">Remote (<span id="wf-card-remote-days">0</span> วัน)</span>
+                                        <div class="bg-emerald-600 text-white p-2 rounded-xl shadow-2xs space-y-0.5">
+                                            <div class="text-xs font-black" id="wf-card-remote-pct">0%</div>
+                                            <span class="text-[8px] font-bold block text-white/90">Remote (<span id="wf-card-remote-days">0</span> ด.)</span>
                                         </div>
 
-                                        <div class="bg-sky-500 text-white p-3 rounded-2xl shadow-sm space-y-1">
-                                            <div class="text-xl font-black" id="wf-card-holiday-pct">0%</div>
-                                            <span class="text-[10px] font-bold block text-white/90">Holiday (<span id="wf-card-holiday-days">0</span> วัน)</span>
+                                        <div class="bg-sky-500 text-white p-2 rounded-xl shadow-2xs space-y-0.5">
+                                            <div class="text-xs font-black" id="wf-card-holiday-pct">0%</div>
+                                            <span class="text-[8px] font-bold block text-white/90">Holiday (<span id="wf-card-holiday-days">0</span> ด.)</span>
                                         </div>
 
-                                        <div class="bg-rose-500 text-white p-3 rounded-2xl shadow-sm space-y-1">
-                                            <div class="text-xl font-black" id="wf-card-sick-pct">0%</div>
-                                            <span class="text-[10px] font-bold block text-white/90">Sick leave (<span id="wf-card-sick-days">0</span> วัน)</span>
+                                        <div class="bg-rose-500 text-white p-2 rounded-xl shadow-2xs space-y-0.5">
+                                            <div class="text-xs font-black" id="wf-card-sick-pct">0%</div>
+                                            <span class="text-[8px] font-bold block text-white/90">Sick leave (<span id="wf-card-sick-days">0</span> ด.)</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="bento-card p-5 space-y-3.5 text-left">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                    <div>
-                                        <h3 class="font-bold text-slate-900 text-sm flex items-center">
-                                            <i class="fa-solid fa-user-slash text-rose-500 mr-2"></i> พนักงานที่ไม่อยู่ออฟฟิศวันนี้
-                                        </h3>
-                                        <p class="text-[11px] text-slate-400 mt-0.5">รวมพักร้อน, ลาป่วย และปฏิบัติงานนอกสถานที่</p>
-                                    </div>
-                                    <span id="today-out-count-pill" class="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">0 คน</span>
+                            <div class="bento-card p-3.5 space-y-1.5 text-left">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                                    <h3 class="font-bold text-slate-900 text-xs flex items-center">
+                                        <i class="fa-solid fa-user-slash text-rose-500 mr-1.5"></i> พนักงานที่ไม่อยู่ออฟฟิศวันนี้
+                                    </h3>
+                                    <span id="today-out-count-pill" class="text-[10px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">0 คน</span>
                                 </div>
 
-                                <div id="bento-today-out-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-                                </div>
-                            </div>
-
-                            <div class="rounded-2xl p-5 text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 shadow-sm relative overflow-hidden flex flex-col justify-between space-y-3 text-left">
-                                <div class="flex items-center justify-between">
-                                    <span class="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">HR Connect Platform</span>
-                                    <span class="text-xs text-white/80"><i class="fa-solid fa-shield-check mr-1"></i>System Active</span>
-                                </div>
-                                <div>
-                                    <h4 class="text-base font-extrabold leading-snug">จัดการวันลา สถิติ และงานภายนอก</h4>
-                                    <p class="text-xs text-white/80 mt-0.5">ส่งคำขอลาออนไลน์ พร้อมระบบตัดเสาร์-อาทิตย์อัตโนมัติ</p>
-                                </div>
-                                <div class="flex items-center justify-between pt-1">
-                                    <div class="flex -space-x-2 overflow-hidden" id="banner-avatars-pile">
-                                    </div>
-                                    <button type="button" onclick="switchTab('request-leave')" class="bg-white text-blue-700 hover:bg-blue-50 font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs transition pressable">
-                                        ยื่นขอลางาน <i class="fa-solid fa-arrow-right ml-1"></i>
-                                    </button>
+                                <div id="bento-today-out-list" class="space-y-1.5 max-h-24 overflow-y-auto pr-1">
                                 </div>
                             </div>
 
                         </div>
 
                         <!-- COLUMN 3 -->
-                        <div class="lg:col-span-3 space-y-5">
+                        <div class="lg:col-span-3 space-y-3.5">
                             
-                            <div class="bento-card p-5 space-y-3">
+                            <div class="bento-card p-3.5 space-y-2">
                                 <div class="flex items-center justify-between text-slate-800">
-                                    <button type="button" onclick="changeMiniCalMonth(-1)" class="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button type="button" onclick="changeMiniCalMonth(-1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-left text-xs"></i></button>
                                     <span id="mini-cal-header-title" class="font-extrabold text-xs text-slate-900">กำลังโหลด...</span>
-                                    <button type="button" onclick="changeMiniCalMonth(1)" class="w-7 h-7 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-right"></i></button>
+                                    <button type="button" onclick="changeMiniCalMonth(1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                                 </div>
 
                                 <div class="grid grid-cols-7 text-center text-[10px] font-bold text-slate-400">
@@ -662,16 +627,16 @@
                                 </div>
                             </div>
 
-                            <div class="bento-card p-5 space-y-3 text-left">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                                    <span class="font-bold text-xs text-slate-900">กำหนดการ & นัดหมาย</span>
-                                    <button type="button" onclick="openAddEventModal()" class="text-blue-600 hover:text-blue-700 text-xs font-bold flex items-center space-x-1">
-                                        <i class="fa-solid fa-plus text-[10px]"></i>
+                            <div class="bento-card p-3.5 space-y-2 text-left">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                                    <span class="font-bold text-xs text-slate-900">กำหนดการประจำสัปดาห์นี้</span>
+                                    <button type="button" onclick="openAddEventModal()" class="text-blue-600 hover:text-blue-700 text-[10px] font-bold flex items-center space-x-1">
+                                        <i class="fa-solid fa-plus text-[8px]"></i>
                                         <span>เพิ่ม</span>
                                     </button>
                                 </div>
 
-                                <div id="bento-schedule-feed" class="space-y-3 text-xs max-h-[360px] overflow-y-auto pr-1">
+                                <div id="bento-schedule-feed" class="space-y-1.5 text-xs max-h-28 overflow-y-auto pr-1">
                                 </div>
                             </div>
 
@@ -680,208 +645,172 @@
                     </div>
                 </section>
 
-                <section id="tab-calendar-view" class="tab-view hidden space-y-5">
-                    <div class="bento-card p-6 space-y-4">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <section id="tab-calendar-view" class="tab-view hidden space-y-3">
+                    <div class="bento-card p-4 space-y-3">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                             <div>
-                                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center">
+                                <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center">
                                     <i class="fa-solid fa-calendar-days text-blue-600 mr-2.5"></i> ปฏิทินพนักงานและกิจกรรมต่าง ๆ
                                 </h2>
-                                <p class="text-xs text-slate-500 mt-0.5">เลือกดูแบบรายเดือน รายสัปดาห์ หรือไทม์ไลน์รายวัน พร้อมมาร์คสีตามประเภท</p>
+                                <p class="text-xs text-slate-500">เลือกดูแบบรายเดือน รายสัปดาห์ หรือไทม์ไลน์รายวัน พร้อมมาร์คสีตามประเภท</p>
                             </div>
 
                             <div class="flex items-center space-x-2">
-                                <div class="bg-slate-100 p-1 rounded-xl flex space-x-1">
-                                    <button type="button" onclick="setCalendarMode('month')" id="cal-mode-btn-month" class="px-3 py-1 rounded-lg bg-white shadow-xs text-blue-600 font-bold text-xs cursor-pointer">เดือน</button>
-                                    <button type="button" onclick="setCalendarMode('week')" id="cal-mode-btn-week" class="px-3 py-1 rounded-lg text-slate-600 font-medium text-xs cursor-pointer">สัปดาห์</button>
-                                    <button type="button" onclick="setCalendarMode('day')" id="cal-mode-btn-day" class="px-3 py-1 rounded-lg text-slate-600 font-medium text-xs cursor-pointer">วัน</button>
+                                <div class="bg-slate-100 p-1 rounded-xl flex space-x-1 text-xs">
+                                    <button type="button" onclick="setCalendarMode('month')" id="cal-mode-btn-month" class="px-3 py-1.5 rounded-lg bg-white shadow-xs text-blue-600 font-bold cursor-pointer text-xs">เดือน</button>
+                                    <button type="button" onclick="setCalendarMode('week')" id="cal-mode-btn-week" class="px-3 py-1.5 rounded-lg text-slate-600 font-medium cursor-pointer text-xs">สัปดาห์</button>
+                                    <button type="button" onclick="setCalendarMode('day')" id="cal-mode-btn-day" class="px-3 py-1.5 rounded-lg text-slate-600 font-medium cursor-pointer text-xs">วัน</button>
                                 </div>
                                 <div class="flex items-center space-x-1">
-                                    <button type="button" onclick="changeCalendarOffset(-1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-left"></i></button>
-                                    <button type="button" onclick="resetCalendarToToday()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">วันนี้</button>
-                                    <button type="button" onclick="changeCalendarOffset(1)" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-right"></i></button>
+                                    <button type="button" onclick="changeCalendarOffset(-1)" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button type="button" onclick="resetCalendarToToday()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">วันนี้</button>
+                                    <button type="button" onclick="changeCalendarOffset(1)" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-right"></i></button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap items-center gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="font-bold text-slate-500 text-[11px] uppercase mr-1">สัญลักษณ์สี:</span>
-                            <span class="inline-flex items-center space-x-1.5 bg-white border border-sky-200 px-3 py-1 rounded-full text-sky-700 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span><span>สีฟ้า: พักร้อน</span></span>
-                            <span class="inline-flex items-center space-x-1.5 bg-white border border-slate-300 px-3 py-1 rounded-full text-slate-700 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span>สีฟ้าหม่น: ลาป่วย</span></span>
-                            <span class="inline-flex items-center space-x-1.5 bg-white border border-emerald-200 px-3 py-1 rounded-full text-emerald-700 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span>สีเขียว: นอกสถานที่ (WFH/DEDE)</span></span>
-                            <span class="inline-flex items-center space-x-1.5 bg-white border border-amber-200 px-3 py-1 rounded-full text-amber-800 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span><span>สีเหลือง: กิจกรรม/ประชุม</span></span>
-                        </div>
-
-                        <div id="calendar-content-box" class="min-h-[440px]"></div>
+                        <div id="calendar-content-box" class="min-h-[320px]"></div>
                     </div>
                 </section>
 
-                <section id="tab-request-leave" class="tab-view hidden max-w-3xl mx-auto space-y-5">
-                    <div class="bento-card p-6 sm:p-8 space-y-5 text-left">
-                        <div class="border-b border-slate-100 pb-4">
-                            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center">
-                                <i class="fa-solid fa-paper-plane text-emerald-600 mr-2.5"></i> แบบฟอร์มยื่นขอลางานออนไลน์
+                <section id="tab-request-leave" class="tab-view hidden max-w-xl mx-auto space-y-3">
+                    <div class="bento-card p-4 space-y-2.5 text-left">
+                        <div class="border-b border-slate-100 pb-2">
+                            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center">
+                                <i class="fa-solid fa-paper-plane text-emerald-600 mr-2"></i> แบบฟอร์มยื่นขอลางานออนไลน์
                             </h2>
-                            <p class="text-xs text-slate-500 mt-0.5">กรอกข้อมูลการลาและตรวจสอบวันลาคงเหลือแบบเรียลไทม์</p>
                         </div>
 
-                        <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-4 text-xs sm:text-sm">
+                        <form id="leave-form" onsubmit="handleLeaveSubmit(event)" class="space-y-2.5 text-xs">
                             <div>
-                                <label class="block font-bold text-slate-700 mb-1.5">ชื่อพนักงาน *</label>
-                                <select id="form-emp-id" required onchange="handleFormEmpChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-blue-500 font-medium">
+                                <label class="block font-bold text-slate-700 mb-1">ชื่อพนักงาน *</label>
+                                <select id="form-emp-id" required onchange="handleFormEmpChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 font-medium text-xs">
                                     <option value="">-- เลือกชื่อพนักงาน --</option>
                                 </select>
                             </div>
 
-                            <div class="bg-slate-50 p-3.5 rounded-2xl grid grid-cols-2 gap-3 text-center border border-slate-100">
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
-                                    <span class="text-[11px] text-slate-400 block font-medium">สิทธิ์พักร้อนคงเหลือ (≤20 วัน)</span>
-                                    <span id="form-vacation-quota-txt" class="font-extrabold text-emerald-600 text-base">0 วัน</span>
+                            <div class="bg-slate-50 p-2.5 rounded-xl grid grid-cols-2 gap-2 text-center border border-slate-100">
+                                <div class="bg-white p-1.5 rounded-lg border">
+                                    <span class="text-[9px] text-slate-400 block font-medium">สิทธิ์พักร้อนคงเหลือ (≤20)</span>
+                                    <span id="form-vacation-quota-txt" class="font-extrabold text-emerald-600 text-xs">0 วัน</span>
                                 </div>
-                                <div class="bg-white p-2.5 rounded-xl border border-slate-100 shadow-2xs">
-                                    <span class="text-[11px] text-slate-400 block font-medium">สิทธิ์ลาป่วยคงเหลือ</span>
-                                    <span id="form-sick-quota-txt" class="font-extrabold text-rose-600 text-base">30 วัน</span>
+                                <div class="bg-white p-1.5 rounded-lg border">
+                                    <span class="text-[9px] text-slate-400 block font-medium">สิทธิ์ลาป่วยคงเหลือ</span>
+                                    <span id="form-sick-quota-txt" class="font-extrabold text-rose-600 text-xs">30 วัน</span>
                                 </div>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-700 mb-1.5">ประเภทการลา / ภารกิจ *</label>
-                                <div class="grid grid-cols-3 gap-2.5">
-                                    <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
+                                <label class="block font-bold text-slate-700 mb-1">ประเภทการลา / ภารกิจ *</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <label class="border rounded-xl p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
                                         <input type="radio" name="leave_type" value="ลาพักร้อน" checked onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
-                                        <i class="fa-solid fa-umbrella-beach text-sky-600 text-base mb-1"></i>
-                                        <span class="font-bold text-xs">1. ลาพักร้อน</span>
+                                        <i class="fa-solid fa-umbrella-beach text-sky-600 text-xs mb-1"></i>
+                                        <span class="font-bold text-[10px]">ลาพักร้อน</span>
                                     </label>
-                                    <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
+                                    <label class="border rounded-xl p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
                                         <input type="radio" name="leave_type" value="ลาป่วย" onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
-                                        <i class="fa-solid fa-bed-pulse text-slate-600 text-base mb-1"></i>
-                                        <span class="font-bold text-xs">2. ลาป่วย</span>
+                                        <i class="fa-solid fa-bed-pulse text-slate-600 text-xs mb-1"></i>
+                                        <span class="font-bold text-[10px]">ลาป่วย</span>
                                     </label>
-                                    <label class="border border-slate-200 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
+                                    <label class="border rounded-xl p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
                                         <input type="radio" name="leave_type" value="ทำงานนอกสถานที่" onchange="toggleLeaveTypeFields(); calculateDays();" class="hidden">
-                                        <i class="fa-solid fa-briefcase text-emerald-600 text-base mb-1"></i>
-                                        <span class="font-bold text-xs">3. นอกสถานที่</span>
+                                        <i class="fa-solid fa-briefcase text-emerald-600 text-xs mb-1"></i>
+                                        <span class="font-bold text-[10px]">นอกสถานที่</span>
                                     </label>
                                 </div>
                             </div>
 
-                            <div id="wrapper-other-leave-detail" class="hidden bg-emerald-50 border border-emerald-200 p-3.5 rounded-xl space-y-1.5">
-                                <label class="block font-bold text-emerald-950 text-xs">ระบุภารกิจหรือสถานที่ (เช่น Work at DEDE office, WFH) *</label>
-                                <input type="text" id="form-other-type-detail" placeholder="เช่น Work at DEDE office, WFH" class="w-full bg-white border border-emerald-300 rounded-lg p-2 text-xs">
+                            <div id="wrapper-other-leave-detail" class="hidden bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl space-y-1">
+                                <label class="block font-bold text-emerald-950 text-[10.5px]">ระบุภารกิจหรือสถานที่ (เช่น Work at DEDE office, WFH) *</label>
+                                <input type="text" id="form-other-type-detail" placeholder="เช่น Work at DEDE office, WFH" class="w-full bg-white border border-emerald-300 rounded-lg p-1.5 text-xs">
                             </div>
 
-                            <div class="grid grid-cols-3 gap-2.5">
-                                <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                                    <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions()" class="hidden">
-                                    <span class="font-bold text-xs text-slate-800">1.0 วัน</span>
-                                    <span class="text-[10px] text-slate-400">เต็มวัน (8 ชม.)</span>
-                                </label>
-                                <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                                    <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions()" class="hidden">
-                                    <span class="font-bold text-xs text-slate-800">0.5 วัน</span>
-                                    <span class="text-[10px] text-slate-400">ครึ่งวัน (4 ชม.)</span>
-                                </label>
-                                <label class="border border-slate-200 rounded-xl p-2.5 flex flex-col items-center justify-center cursor-pointer has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50">
-                                    <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions()" class="hidden">
-                                    <span class="font-bold text-xs text-slate-800">0.25 วัน</span>
-                                    <span class="text-[10px] text-slate-400">ธุระ (2 ชม.)</span>
-                                </label>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                 <div>
                                     <label class="block font-bold text-slate-700 mb-1">ตั้งแต่วันที่ *</label>
-                                    <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white">
+                                    <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs">
                                 </div>
                                 <div id="wrapper-end-date">
                                     <label class="block font-bold text-slate-700 mb-1">ถึงวันที่ *</label>
-                                    <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white">
+                                    <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs">
                                 </div>
                             </div>
 
-                            <div class="bg-slate-50 border border-slate-100 p-3 rounded-xl flex justify-between items-center text-xs">
-                                <span class="font-medium text-slate-600">จำนวนวันทำการที่คำนวณได้:</span>
-                                <span id="form-day-count" class="font-extrabold text-blue-600 text-sm">1 วัน</span>
-                            </div>
-
-                            <div id="leave-quota-warning" class="hidden bg-rose-50 border border-rose-200 text-rose-700 p-3 rounded-xl text-xs font-bold">
-                                ไม่สามารถลาเกินสิทธิ์คงเหลือได้
+                            <div class="bg-slate-50 border border-slate-100 p-2.5 rounded-xl flex justify-between items-center text-xs">
+                                <span class="font-medium text-slate-600">จำนวนวันทำการ:</span>
+                                <span id="form-day-count" class="font-extrabold text-blue-600 text-xs">1 วัน</span>
                             </div>
 
                             <div>
                                 <label class="block font-bold text-slate-700 mb-1">เหตุผลการลา / ช่องทางติดต่อ *</label>
-                                <textarea id="form-reason" rows="3" required placeholder="เช่น ติดต่อธุระส่วนตัว / โทร 081-xxx-xxxx" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:bg-white"></textarea>
+                                <textarea id="form-reason" rows="2" required placeholder="เช่น ติดต่อธุระส่วนตัว / โทร 081-xxx-xxxx" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs"></textarea>
                             </div>
 
-                            <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-md transition pressable">
-                                <i class="fa-solid fa-paper-plane mr-1.5"></i> ส่งใบลาเพื่อขออนุมัติ
+                            <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition pressable text-xs">
+                                <i class="fa-solid fa-paper-plane mr-1"></i> ส่งใบลาเพื่อขออนุมัติ
                             </button>
                         </form>
                     </div>
                 </section>
 
-                <section id="tab-approval-center" class="tab-view hidden space-y-4">
-                    <div class="bento-card p-6 space-y-4 text-left">
-                        <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight flex items-center">
-                                    <i class="fa-regular fa-circle-check text-rose-500 mr-2.5"></i> ศูนย์พิจารณาอนุมัติวันลา
-                                </h2>
-                                <p class="text-xs text-slate-500 mt-0.5" id="approval-center-subtitle">รายการคำขอลางาน</p>
-                            </div>
+                <section id="tab-approval-center" class="tab-view hidden space-y-3">
+                    <div class="bento-card p-4 space-y-2.5 text-left">
+                        <div class="border-b border-slate-100 pb-2">
+                            <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center">
+                                <i class="fa-regular fa-circle-check text-rose-500 mr-2"></i> ศูนย์พิจารณาอนุมัติวันลา
+                            </h2>
                         </div>
-
-                        <div id="approval-list" class="space-y-3"></div>
+                        <div id="approval-list" class="space-y-2"></div>
                     </div>
                 </section>
 
-                <section id="tab-summary-table" class="tab-view hidden space-y-4">
-                    <div class="bento-card p-6 space-y-4 text-left">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                <section id="tab-summary-table" class="tab-view hidden space-y-3">
+                    <div class="bento-card p-4 space-y-3 text-left">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 border-b border-slate-100 pb-2">
                             <div>
                                 <div class="flex items-center space-x-2">
-                                    <h2 class="text-xl font-extrabold text-slate-900 tracking-tight" id="summary-table-header-title">สรุปตารางวันลาของพนักงาน</h2>
-                                    <span id="badge-lock-status" class="bg-slate-100 text-slate-600 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">ดูอย่างเดียว</span>
+                                    <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight" id="summary-table-header-title">สรุปตารางวันลาของพนักงาน</h2>
+                                    <span id="badge-lock-status" class="bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full">ดูอย่างเดียว</span>
                                 </div>
-                                <p class="text-xs text-slate-500 mt-0.5">ยอดสะสมและประวัติการลาประจำปี (พักร้อนสะสมได้สูงสุดไม่เกิน 20 วัน)</p>
                             </div>
 
                             <div class="flex items-center space-x-2">
-                                <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ, ตำแหน่ง..." class="pl-3 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 w-48">
-                                <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition flex items-center space-x-1.5 cursor-pointer">
+                                <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ, ตำแหน่ง..." class="pl-3 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 w-44">
+                                <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition flex items-center space-x-1 cursor-pointer">
                                     <i class="fa-solid fa-file-excel"></i>
-                                    <span>ส่งออก Excel</span>
+                                    <span>Excel</span>
                                 </button>
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner relative max-h-[600px]">
-                            <table class="w-full text-left text-[11px] sm:text-xs border-collapse whitespace-nowrap min-w-[1600px]">
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl shadow-inner relative max-h-[380px]">
+                            <table class="w-full text-left text-[11px] border-collapse whitespace-nowrap min-w-[1600px]">
                                 <thead>
                                     <tr class="bg-slate-900 text-white text-center font-bold divide-x divide-slate-800 border-b border-slate-800 sticky top-0 z-20">
-                                        <th rowspan="3" class="p-2.5 w-10 sticky left-0 z-30 bg-slate-950">ลำดับ</th>
-                                        <th rowspan="3" class="p-2.5 w-20">รหัส</th>
-                                        <th rowspan="3" class="p-2.5 min-w-[180px] sticky left-10 z-30 bg-slate-950">ชื่อ - นามสกุล</th>
-                                        <th rowspan="3" class="p-2.5 min-w-[180px]">ตำแหน่ง</th>
-                                        <th rowspan="3" class="p-2.5">วันเกิด</th>
-                                        <th rowspan="3" class="p-2.5">วันเริ่มงาน</th>
-                                        <th rowspan="3" class="p-2.5 bg-purple-900/90 text-purple-100 min-w-[85px]">ทบวันพักร้อน<br><span class="text-[10px] font-normal">สะสมปีก่อน</span></th>
-                                        <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน (เพิ่มเดือนละ 1 วันทบได้)</th>
-                                        <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">ลาป่วย (ปีละไม่เกิน 30 วัน)</th>
-                                        <th rowspan="3" class="p-2.5 bg-pink-900/90 text-pink-100 min-w-[75px]">ทำงานนอกสถานที่<br>(รวมทั้งปี)</th>
-                                        <th rowspan="3" class="p-2.5 min-w-[130px]">หมายเหตุ / สถานะ</th>
+                                        <th rowspan="3" class="p-2 w-10 sticky left-0 z-30 bg-slate-950">ลำดับ</th>
+                                        <th rowspan="3" class="p-2 w-16">รหัส</th>
+                                        <th rowspan="3" class="p-2 min-w-[160px] sticky left-10 z-30 bg-slate-950">ชื่อ - นามสกุล</th>
+                                        <th rowspan="3" class="p-2 min-w-[150px]">ตำแหน่ง</th>
+                                        <th rowspan="3" class="p-2">วันเกิด</th>
+                                        <th rowspan="3" class="p-2">วันเริ่มงาน</th>
+                                        <th rowspan="3" class="p-2 bg-purple-900/90 text-purple-100 min-w-[75px]">ทบวันพักร้อน</th>
+                                        <th colspan="27" class="p-1.5 bg-amber-900/90 text-amber-100">ลาพักร้อน</th>
+                                        <th colspan="13" class="p-1.5 bg-emerald-900/90 text-emerald-100">ลาป่วย</th>
+                                        <th rowspan="3" class="p-2 bg-pink-900/90 text-pink-100 min-w-[70px]">นอกสถานที่</th>
+                                        <th rowspan="3" class="p-2 min-w-[110px]">หมายเหตุ</th>
                                     </tr>
-                                    <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[33px] z-10">
-                                        <th colspan="24" class="p-1.5 bg-amber-50 text-amber-900">เพิ่ม (+1/ด.) & ใช้ลาประจำเดือน (ม.ค. - ธ.ค.)</th>
-                                        <th rowspan="2" class="p-2 bg-amber-200 text-amber-950 font-bold min-w-[70px]">รวมเพิ่ม</th>
-                                        <th rowspan="2" class="p-2 bg-rose-200 text-rose-950 font-bold min-w-[70px]">รวมใช้</th>
-                                        <th rowspan="2" class="p-2 bg-yellow-300 text-yellow-950 font-bold min-w-[70px]">คงเหลือ</th>
-                                        <th colspan="12" class="p-1.5 bg-emerald-50 text-emerald-900">รายเดือน (ม.ค. - ธ.ค.)</th>
-                                        <th rowspan="2" class="p-2 bg-emerald-200 text-emerald-950 font-bold min-w-[70px]">รวมป่วย</th>
+                                    <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[28px] z-10">
+                                        <th colspan="24" class="p-1 bg-amber-50 text-amber-900">เพิ่ม (+1/ด.) & ใช้ลาประจำเดือน</th>
+                                        <th rowspan="2" class="p-1.5 bg-amber-200 text-amber-950 font-bold">รวมเพิ่ม</th>
+                                        <th rowspan="2" class="p-1.5 bg-rose-200 text-rose-950 font-bold">รวมใช้</th>
+                                        <th rowspan="2" class="p-1.5 bg-yellow-300 text-yellow-950 font-bold">คงเหลือ</th>
+                                        <th colspan="12" class="p-1 bg-emerald-50 text-emerald-900">รายเดือน</th>
+                                        <th rowspan="2" class="p-1.5 bg-emerald-200 text-emerald-950 font-bold">รวมป่วย</th>
                                     </tr>
-                                    <tr class="bg-slate-50 text-slate-600 text-[10px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[65px] z-10">
-                                        <th class="p-1">+</th><th class="p-1">ม.ค.</th><th class="p-1">+</th><th class="p-1">ก.พ.</th><th class="p-1">+</th><th class="p-1">มี.ค.</th><th class="p-1">+</th><th class="p-1">เม.ย.</th><th class="p-1">+</th><th class="p-1">พ.ค.</th><th class="p-1">+</th><th class="p-1">มิ.ย.</th><th class="p-1">+</th><th class="p-1">ก.ค.</th><th class="p-1">+</th><th class="p-1">ส.ค.</th><th class="p-1">+</th><th class="p-1">ก.ย.</th><th class="p-1">+</th><th class="p-1">ต.ค.</th><th class="p-1">+</th><th class="p-1">พ.ย.</th><th class="p-1">+</th><th class="p-1">ธ.ค.</th>
-                                        <th class="p-1">ม.ค.</th><th class="p-1">ก.พ.</th><th class="p-1">มี.ค.</th><th class="p-1">เม.ย.</th><th class="p-1">พ.ค.</th><th class="p-1">มิ.ย.</th><th class="p-1">ก.ค.</th><th class="p-1">ส.ค.</th><th class="p-1">ก.ย.</th><th class="p-1">ต.ค.</th><th class="p-1">พ.ย.</th><th class="p-1">ธ.ค.</th>
+                                    <tr class="bg-slate-50 text-slate-600 text-[9px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[52px] z-10">
+                                        <th class="p-0.5">+</th><th class="p-0.5">ม.ค.</th><th class="p-0.5">+</th><th class="p-0.5">ก.พ.</th><th class="p-0.5">+</th><th class="p-0.5">มี.ค.</th><th class="p-0.5">+</th><th class="p-0.5">เม.ย.</th><th class="p-0.5">+</th><th class="p-0.5">พ.ค.</th><th class="p-0.5">+</th><th class="p-0.5">มิ.ย.</th><th class="p-0.5">+</th><th class="p-0.5">ก.ค.</th><th class="p-0.5">+</th><th class="p-0.5">ส.ค.</th><th class="p-0.5">+</th><th class="p-0.5">ก.ย.</th><th class="p-0.5">+</th><th class="p-0.5">ต.ค.</th><th class="p-0.5">+</th><th class="p-0.5">พ.ย.</th><th class="p-0.5">+</th><th class="p-0.5">ธ.ค.</th>
+                                        <th class="p-0.5">ม.ค.</th><th class="p-0.5">ก.พ.</th><th class="p-0.5">มี.ค.</th><th class="p-0.5">เม.ย.</th><th class="p-0.5">พ.ค.</th><th class="p-0.5">มิ.ย.</th><th class="p-0.5">ก.ค.</th><th class="p-0.5">ส.ค.</th><th class="p-0.5">ก.ย.</th><th class="p-0.5">ต.ค.</th><th class="p-0.5">พ.ย.</th><th class="p-0.5">ธ.ค.</th>
                                     </tr>
                                 </thead>
                                 <tbody id="summary-table-body" class="divide-y divide-slate-200 bg-white"></tbody>
@@ -890,102 +819,48 @@
                     </div>
                 </section>
 
-                <section id="tab-directory" class="tab-view hidden space-y-6">
-                    <div class="bento-card p-6 sm:p-8 space-y-8 text-left">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-6">
+                <section id="tab-directory" class="tab-view hidden space-y-3">
+                    <div class="bento-card p-4 space-y-3 text-left">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-2">
                             <div>
-                                <span class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider inline-block mb-2">PCBK Organization</span>
-                                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center">
-                                    <i class="fa-solid fa-users-rectangle text-blue-600 mr-3"></i> ทำเนียบบุคลากรองค์กร
+                                <h2 class="text-xs sm:text-sm font-extrabold text-slate-900 tracking-tight flex items-center">
+                                    <i class="fa-solid fa-users-rectangle text-blue-600 mr-2"></i> ทำเนียบบุคลากรองค์กร
                                 </h2>
-                                <p class="text-xs sm:text-sm text-slate-500 mt-1">ทำเนียบรายชื่อ คณะผู้บริหาร และพนักงาน พร้อมข้อมูลอายุงานในองค์กร</p>
                             </div>
-                            <div class="relative w-full md:w-72">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
-                                <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส, ตำแหน่ง..." class="w-full pl-10 pr-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium">
+                            <div class="relative w-full md:w-56">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                                <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
                             </div>
                         </div>
 
-                        <!-- Executive Board -->
-                        <div class="space-y-4">
-                            <div class="flex items-center space-x-2 text-xs font-black text-slate-400 uppercase tracking-wider">
-                                <i class="fa-solid fa-crown text-amber-500"></i>
-                                <span>คณะผู้บริหารระดับสูง (Executive Board)</span>
-                            </div>
-                            <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+                        <div class="space-y-1.5">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Executive Board</span>
+                            <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
                         </div>
 
-                        <!-- Staff Grid -->
-                        <div class="space-y-4 pt-4 border-t border-slate-100">
-                            <div class="flex items-center space-x-2 text-xs font-black text-slate-400 uppercase tracking-wider">
-                                <i class="fa-solid fa-user-tie text-blue-500"></i>
-                                <span>พนักงานประจำการ (Employee & Operations)</span>
-                            </div>
-                            <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+                        <div class="space-y-1.5 pt-2 border-t border-slate-100">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Employee & Operations</span>
+                            <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
                         </div>
                     </div>
                 </section>
 
-                <section id="tab-analytics" class="tab-view hidden space-y-5">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="bento-card p-5 flex items-center space-x-4 text-left">
-                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-building-user"></i>
-                            </div>
-                            <div>
-                                <span class="text-[11px] font-bold text-slate-400 block uppercase">ประจำสำนักงานวันนี้</span>
-                                <div class="flex items-baseline space-x-2">
-                                    <h3 class="text-2xl font-extrabold text-slate-900" id="analytics-in-office-count">0 คน</h3>
-                                    <span class="text-xs font-bold text-blue-600" id="analytics-in-office-pct">(0%)</span>
-                                </div>
-                                <span class="text-[10px] text-slate-500">พร้อมปฏิบัติงานในสำนักงาน</span>
-                            </div>
-                        </div>
-
-                        <div class="bento-card p-5 flex items-center space-x-4 text-left">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-laptop-house"></i>
-                            </div>
-                            <div>
-                                <span class="text-[11px] font-bold text-slate-400 block uppercase">WFH / ปฏิบัติงานภายนอก</span>
-                                <div class="flex items-baseline space-x-2">
-                                    <h3 class="text-2xl font-extrabold text-slate-900" id="analytics-remote-count">0 คน</h3>
-                                    <span class="text-xs font-bold text-emerald-600" id="analytics-remote-pct">(0%)</span>
-                                </div>
-                                <span class="text-[10px] text-slate-500">Work at DEDE / WFH</span>
-                            </div>
-                        </div>
-
-                        <div class="bento-card p-5 flex items-center space-x-4 text-left">
-                            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-umbrella-beach"></i>
-                            </div>
-                            <div>
-                                <span class="text-[11px] font-bold text-slate-400 block uppercase">ลางานวันนี้ (Leave)</span>
-                                <div class="flex items-baseline space-x-2">
-                                    <h3 class="text-2xl font-extrabold text-slate-900" id="analytics-leave-count">0 คน</h3>
-                                    <span class="text-xs font-bold text-rose-600" id="analytics-leave-pct">(0%)</span>
-                                </div>
-                                <span class="text-[10px] text-slate-500">พักร้อน / ลาป่วย</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                        <div class="lg:col-span-7 bento-card p-6 space-y-4 text-left">
-                            <h3 class="font-bold text-slate-900 text-sm flex items-center">
-                                <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i> สถิติการลางานและปฏิบัติงานรายเดือน (ม.ค. - ธ.ค.)
+                <section id="tab-analytics" class="tab-view hidden space-y-3">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
+                        <div class="lg:col-span-7 bento-card p-4 space-y-2 text-left">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center">
+                                <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i> สถิติการลางานรายเดือน
                             </h3>
-                            <div class="h-64 relative w-full">
+                            <div class="h-44 relative w-full">
                                 <canvas id="monthlyTrendBarChart"></canvas>
                             </div>
                         </div>
 
-                        <div class="lg:col-span-5 bento-card p-6 space-y-4 text-left">
-                            <h3 class="font-bold text-slate-900 text-sm flex items-center">
+                        <div class="lg:col-span-5 bento-card p-4 space-y-2 text-left">
+                            <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center">
                                 <i class="fa-solid fa-chart-pie text-indigo-600 mr-2"></i> สัดส่วนประเภททั้งหมด
                             </h3>
-                            <div class="h-64 relative w-full flex items-center justify-center">
+                            <div class="h-44 relative w-full flex items-center justify-center">
                                 <canvas id="leaveDistributionDonutChart"></canvas>
                             </div>
                         </div>
@@ -996,40 +871,40 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-2xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 transform translate-y-20 opacity-0 z-50 flex items-center space-x-2">
         <i class="fa-solid fa-circle-check text-emerald-400"></i>
         <span id="toast-message">ทำรายการสำเร็จ</span>
     </div>
 
     <!-- Event Add Modal -->
     <div id="event-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-[28px] max-w-md w-full p-6 shadow-2xl border border-slate-100 text-left space-y-4 text-xs">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-extrabold text-slate-900 text-sm flex items-center"><i class="fa-solid fa-calendar-plus text-amber-500 mr-2"></i> เพิ่มกิจกรรม / การประชุม</h3>
-                <button type="button" onclick="closeEventModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+        <div class="bg-white rounded-[24px] max-w-sm w-full p-5 shadow-2xl border border-slate-100 text-left space-y-3 text-xs">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 class="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center"><i class="fa-solid fa-calendar-plus text-amber-500 mr-2"></i> เพิ่มกิจกรรม</h3>
+                <button type="button" onclick="closeEventModal()" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-xs"></i></button>
             </div>
-            <form onsubmit="handleSaveEvent(event)" class="space-y-3">
+            <form onsubmit="handleSaveEvent(event)" class="space-y-2.5">
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">วันที่จัดกิจกรรม *</label>
-                    <input type="date" id="event-input-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                    <label class="block font-bold text-slate-700 mb-1">วันที่จัด *</label>
+                    <input type="date" id="event-input-date" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">เวลาเริ่ม *</label>
-                        <input type="time" id="event-input-start" value="10:00" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                        <label class="block font-bold text-slate-700 mb-1">เริ่ม *</label>
+                        <input type="time" id="event-input-start" value="10:00" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs">
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-700 mb-1">ถึงเวลา *</label>
-                        <input type="time" id="event-input-end" value="12:00" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                        <label class="block font-bold text-slate-700 mb-1">ถึง *</label>
+                        <input type="time" id="event-input-end" value="12:00" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs">
                     </div>
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-700 mb-1">หัวข้อกิจกรรม / การประชุม *</label>
-                    <input type="text" id="event-input-title" required placeholder="เช่น ประชุมร่วมกับ DEDE" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5">
+                    <label class="block font-bold text-slate-700 mb-1">หัวข้อ *</label>
+                    <input type="text" id="event-input-title" required placeholder="เช่น ประชุม DEDE" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeEventModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold">ยกเลิก</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-bold">บันทึก</button>
+                    <button type="button" onclick="closeEventModal()" class="bg-slate-100 px-3.5 py-1.5 rounded-xl font-bold">ยกเลิก</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-1.5 rounded-xl font-bold">บันทึก</button>
                 </div>
             </form>
         </div>
@@ -1037,19 +912,19 @@
 
     <!-- Event Detail Modal -->
     <div id="event-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-[28px] max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center space-y-4 text-xs">
+        <div class="bg-white rounded-[24px] max-w-xs w-full p-5 shadow-2xl border border-slate-100 text-center space-y-3 text-xs">
             <div class="flex justify-end">
-                <button type="button" onclick="closeEventDetailModal()" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="closeEventDetailModal()" class="w-6 h-6 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center"><i class="fa-solid fa-xmark text-xs"></i></button>
             </div>
-            <div class="flex flex-col items-center space-y-2">
-                <img id="modal-event-avatar" src="" alt="Avatar" class="w-16 h-16 rounded-full object-cover border-2 shadow-sm bg-white" onerror="handleImageError(this, '')">
-                <h3 id="modal-event-name" class="font-extrabold text-slate-900 text-sm">ชื่อพนักงาน</h3>
+            <div class="flex flex-col items-center space-y-1.5">
+                <img id="modal-event-avatar" src="" alt="Avatar" class="w-12 h-12 rounded-full object-cover border bg-white shadow-2xs" onerror="handleImageError(this, '')">
+                <h3 id="modal-event-name" class="font-extrabold text-slate-900 text-xs sm:text-sm">พนักงาน</h3>
                 <p id="modal-event-time" class="text-xs font-semibold text-slate-600">🕒 10:00 - 12:00 น.</p>
-                <div class="w-full bg-slate-50 p-3 rounded-xl text-left border border-slate-100">
-                    <span class="text-[10px] text-slate-400 block font-bold uppercase">รายละเอียด / ภารกิจ:</span>
+                <div class="w-full bg-slate-50 p-2.5 rounded-xl text-left border border-slate-100">
+                    <span class="text-[9px] text-slate-400 block font-bold uppercase">รายละเอียด:</span>
                     <p id="modal-event-title" class="font-bold text-slate-800 text-xs mt-0.5 break-words">-</p>
                 </div>
-                <div id="modal-event-action-container" class="pt-2 w-full flex justify-center space-x-2"></div>
+                <div id="modal-event-action-container" class="pt-1 w-full flex justify-center space-x-2"></div>
             </div>
         </div>
     </div>
@@ -1058,9 +933,9 @@
         const ADMIN_PASSWORD = "pcbk2026";
 
         const EMPLOYEE_NICKNAMES = {
-            "1101001": "",       /* ดร.ชัยศักดิ์ ไม่มีชื่อเล่น */
-            "1102003": "MAC",    /* ดร.ลลนา (MAC) */
-            "1102033": "ICE",    /* คุณภัคชนก (ICE) */
+            "1101001": "",
+            "1102003": "MAC",
+            "1102033": "ICE",
             "1104008": "KAI",
             "1103020": "CHAIYO",
             "1103059": "PANYA",
@@ -1211,14 +1086,7 @@
                     handleFormEmpChange();
                 }
             }
-
-            const formSection = document.getElementById('tab-request-leave');
-            if (formSection) {
-                formSection.scrollIntoView({ behavior: 'smooth' });
-            }
-
-            const nick = getEmployeeNickname(targetEmp.id);
-            showToast(`เปิดแบบฟอร์มขอลางานสำหรับ: ${formatDisplayName(targetEmp)} ${nick ? `(${nick})` : ''}`);
+            showToast(`เปิดแบบฟอร์มขอลางานสำหรับ: ${formatDisplayName(targetEmp)}`);
         }
 
         function handleImageError(imgElement, empId) {
@@ -1337,12 +1205,11 @@
             renderAllViews();
         };
 
-        // ================= AUTOMATIC MONTHLY ACCRUAL LOGIC =================
         function checkAndApplyMonthlyAccrual() {
             try {
                 const liveNow = new Date();
                 const currentYear = liveNow.getFullYear();
-                const currentMonth = liveNow.getMonth(); // 0 = มกราคม, 1 = กุมภาพันธ์, ... 11 = ธันวาคม
+                const currentMonth = liveNow.getMonth();
 
                 const lastAccruedYear = parseInt(localStorage.getItem('pcbk_last_accrued_year') || currentYear, 10);
                 const lastAccruedMonth = parseInt(localStorage.getItem('pcbk_last_accrued_month') || currentMonth, 10);
@@ -1370,9 +1237,7 @@
                     localStorage.setItem('pcbk_last_accrued_month', currentMonth);
                     saveAllToCloud();
                 }
-            } catch (err) {
-                console.error("Error in automatic monthly accrual check: ", err);
-            }
+            } catch (err) {}
         }
 
         async function saveAllToCloud() {
@@ -1500,7 +1365,7 @@
             const lockBadge = document.getElementById('badge-lock-status');
             if (lockBadge) {
                 lockBadge.innerText = isAdmin ? 'โหมดแก้ไข (Admin)' : 'ดูอย่างเดียว';
-                lockBadge.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full' : 'bg-slate-100 text-slate-600 text-[11px] font-semibold px-2.5 py-0.5 rounded-full';
+                lockBadge.className = isAdmin ? 'bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full' : 'bg-slate-100 text-slate-600 text-[10px] font-semibold px-2 py-0.5 rounded-full';
             }
         }
 
@@ -1583,41 +1448,36 @@
                         inOfficeCount++;
                     }
 
-                    const animClass = `bubble-anim-${(index % 4) + 1}`;
+                    const animClass = `bubble-anim-${(index % 2) + 1}`;
 
                     const bubbleHtml = `
-                        <div class="sponge-bubble-card p-5 ${animClass} relative overflow-hidden group" onclick="selectEmployeeFromHub('${emp.id}')">
-                            <div class="absolute -top-10 -right-10 w-24 h-24 bg-gradient-to-bl from-blue-400/15 via-indigo-300/10 to-transparent rounded-full pointer-events-none group-hover:scale-150 transition duration-500"></div>
-
-                            <div class="flex items-start space-x-3.5 relative z-10">
+                        <div class="sponge-bubble-card p-3.5 ${animClass} relative overflow-hidden group" onclick="selectEmployeeFromHub('${emp.id}')">
+                            <div class="flex items-start space-x-2.5 relative z-10">
                                 <div class="relative shrink-0">
-                                    <div class="w-16 h-16 rounded-full p-1 bg-gradient-to-tr from-blue-500/30 to-indigo-500/20 shadow-sm">
+                                    <div class="w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-blue-500/30 to-indigo-500/20 shadow-sm">
                                         <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-full object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
                                     </div>
-                                    <span class="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full ${statusDot} border-2 border-white shadow-xs"></span>
+                                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${statusDot} border-2 border-white shadow-xs"></span>
                                 </div>
 
                                 <div class="min-w-0 flex-1 leading-snug text-left">
                                     <div class="flex items-center justify-between gap-1">
-                                        <h4 class="font-extrabold text-slate-900 text-sm truncate group-hover:text-blue-600 transition">${formatDisplayName(emp)}</h4>
-                                        <span class="text-[10px] font-black font-mono text-blue-600 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full shrink-0 shadow-2xs">${nick ? `@${nick}` : 'PCBK'}</span>
+                                        <h4 class="font-extrabold text-slate-900 text-xs truncate group-hover:text-blue-600 transition">${formatDisplayName(emp)}</h4>
+                                        <span class="text-[8.5px] font-black font-mono text-blue-600 bg-blue-50 border border-blue-200 px-1.5 py-0.2 rounded-full shrink-0">${nick ? `@${nick}` : 'PCBK'}</span>
                                     </div>
-                                    <p class="text-[11px] text-slate-500 truncate mt-0.5 font-medium">${emp.position}</p>
-                                    <span class="inline-block mt-1.5 text-[9.5px] font-bold px-2.5 py-0.5 rounded-full border ${statusBadgeClass}">${statusLabel}</span>
+                                    <p class="text-[9.5px] text-slate-500 truncate mt-0.5 font-medium">${emp.position}</p>
+                                    <span class="inline-block mt-1 text-[8.5px] font-bold px-2 py-0.2 rounded-full border ${statusBadgeClass}">${statusLabel}</span>
                                 </div>
                             </div>
 
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 relative z-10">
+                            <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[9.5px] text-slate-500 relative z-10">
                                 <div>
-                                    <span class="text-[10px] text-slate-400 block font-medium">พักร้อนคงเหลือ</span>
+                                    <span class="text-[8.5px] text-slate-400 block">พักร้อนเหลือ</span>
                                     <strong class="text-emerald-600 font-extrabold">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
                                 </div>
                                 <div class="text-right">
-                                    <span class="text-[10px] text-slate-400 block font-medium">อายุงาน</span>
+                                    <span class="text-[8.5px] text-slate-400 block">อายุงาน</span>
                                     <strong class="text-slate-700 font-bold">${tenure}</strong>
-                                </div>
-                                <div class="w-7 h-7 rounded-full bg-slate-50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-slate-400 text-xs transition shrink-0 ml-1">
-                                    <i class="fa-solid fa-arrow-right"></i>
                                 </div>
                             </div>
                         </div>
@@ -1677,15 +1537,36 @@
                 const topSel = document.getElementById('exec-inspect-select');
                 if (topSel) topSel.value = emp.id;
 
-                const subTitle = document.getElementById('attendance-card-subtitle');
-                const nick = getEmployeeNickname(emp.id);
-                if (subTitle) subTitle.innerText = `ข้อมูลของ: ${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}`;
-
                 renderAdminBubbleHub();
                 renderBentoProfileCard();
                 renderBentoStats();
-                showToast(`แสดงข้อมูลของ: ${formatDisplayName(emp)}`);
             }
+        }
+
+        function navigateToYearlySummary(empIdToHighlight = null) {
+            const targetEmp = empIdToHighlight ? employees.find(e => String(e.id) === String(empIdToHighlight)) : (displayEmp || currentUser || employees[0]);
+            if (!targetEmp) return;
+            switchTab('summary-table');
+            
+            setTimeout(() => {
+                const searchInp = document.getElementById('search-emp');
+                if (searchInp) {
+                    searchInp.value = "";
+                    renderSummaryTable();
+                    
+                    const rows = document.querySelectorAll('#summary-table-body tr');
+                    rows.forEach(r => {
+                        if (r.innerText.includes(targetEmp.name)) {
+                            r.classList.add('my-row-highlight');
+                            r.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        } else {
+                            r.classList.remove('my-row-highlight');
+                        }
+                    });
+                }
+            }, 50);
+
+            showToast(`แสดงตารางสรุปวันลาพร้อมไฮไลต์ของ: ${formatDisplayName(targetEmp)}`);
         }
 
         function switchTab(tabId) {
@@ -1754,7 +1635,7 @@
             const badge = document.getElementById('sidebar-pending-badge');
             if (badge) {
                 badge.innerText = pendingCount;
-                badge.className = pendingCount > 0 ? 'bg-rose-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse' : 'bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded-full font-bold';
+                badge.className = pendingCount > 0 ? 'bg-rose-500 text-white text-[8px] px-1.5 py-0.2 rounded-full font-bold animate-pulse' : 'bg-slate-200 text-slate-600 text-[8px] px-1.5 py-0.2 rounded-full font-bold';
             }
 
             const banner = document.getElementById('exec-approval-banner');
@@ -1857,7 +1738,6 @@
             const gaugeInOffice = document.getElementById('gauge-in-office-pct');
             const gaugeOffsite = document.getElementById('gauge-offsite-pct');
             const gaugeLeave = document.getElementById('gauge-leave-pct');
-            const gaugeTotalWeek = document.getElementById('gauge-total-week-txt');
 
             if (gaugePctTxt) gaugePctTxt.innerText = `${attendancePct}%`;
             if (gaugeStatusTxt) gaugeStatusTxt.innerText = `ปฏิบัติงาน ${workingDaysTotal}/5 วัน`;
@@ -1869,31 +1749,66 @@
             if (gaugeInOffice) gaugeInOffice.innerText = `${weekInOfficeDays} วัน (${inOfficePct}%)`;
             if (gaugeOffsite) gaugeOffsite.innerText = `${weekOffsiteDays} วัน (${offsitePct}%)`;
             if (gaugeLeave) gaugeLeave.innerText = `${weekLeaveDays} วัน (${leavePct}%)`;
-            if (gaugeTotalWeek) gaugeTotalWeek.innerText = `5 วันทำการ (100%)`;
 
-            // Working format breakdown for the entire year across 4 types
-            let totalVacUsedYear = 0;
-            if (emp.vacationUsedMonths) totalVacUsedYear = emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            // Yearly Working Format calculated from Jan 1 up to current live date excluding weekends and company holidays
+            const startOfYear = new Date(d.yearAD, 0, 1);
+            let netWorkingDaysYTD = 0;
+            let curDateCalc = new Date(startOfYear);
+            curDateCalc.setHours(0,0,0,0);
+            const todayMidnight = new Date(d.liveNow);
+            todayMidnight.setHours(0,0,0,0);
 
-            let totalSickUsedYear = 0;
-            if (emp.sickMonths) totalSickUsedYear = emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            // Company holidays list for 2026 (or dynamic)
+            const holidays2026 = [
+                "2026-01-01", "2026-03-03", "2026-04-06", "2026-04-13", "2026-04-14", 
+                "2026-04-15", "2026-05-01", "2026-05-04", "2026-06-03", "2026-07-28", 
+                "2026-08-12", "2026-10-13", "2026-10-23", "2026-12-05", "2026-12-10", "2026-12-31"
+            ];
 
-            let offsiteFromRequests = 0;
+            while (curDateCalc <= todayMidnight) {
+                const dayW = curDateCalc.getDay();
+                const isoStr = `${curDateCalc.getFullYear()}-${String(curDateCalc.getMonth()+1).padStart(2,'0')}-${String(curDateCalc.getDate()).padStart(2,'0')}`;
+                // Exclude Saturday (6), Sunday (0), and holidays
+                if (dayW !== 0 && dayW !== 6 && !holidays2026.includes(isoStr)) {
+                    netWorkingDaysYTD++;
+                }
+                curDateCalc.setDate(curDateCalc.getDate() + 1);
+            }
+            netWorkingDaysYTD = Math.max(1, netWorkingDaysYTD);
+
+            let totalVacUsedYTD = 0;
+            let totalSickUsedYTD = 0;
+            let totalRemoteYTD = 0;
+
+            const currentMonthIdx = d.liveNow.getMonth();
+            if (emp.vacationUsedMonths) {
+                for (let m = 0; m <= currentMonthIdx; m++) {
+                    totalVacUsedYTD += parseFloat(emp.vacationUsedMonths[m]) || 0;
+                }
+            }
+            if (emp.sickMonths) {
+                for (let m = 0; m <= currentMonthIdx; m++) {
+                    totalSickUsedYTD += parseFloat(emp.sickMonths[m]) || 0;
+                }
+            }
+
             requests.forEach(r => {
                 if (String(r.empId) === String(emp.id) && (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && !isRejectedStatus(r.status)) {
-                    offsiteFromRequests += (parseFloat(r.days) || 0);
+                    const reqMonth = new Date(r.startDate).getMonth();
+                    if (reqMonth <= currentMonthIdx) {
+                        totalRemoteYTD += (parseFloat(r.days) || 0);
+                    }
                 }
             });
             const tableOffsite = parseFloat(emp.otherLeaveDays) || 0;
-            const totalRemoteYear = Math.max(tableOffsite, offsiteFromRequests);
+            if (totalRemoteYTD === 0 && tableOffsite > 0) totalRemoteYTD = tableOffsite;
 
-            const totalWorkingDaysYear = 240; // ~240 working days per year
-            const inOfficeYear = Math.max(0, totalWorkingDaysYear - totalVacUsedYear - totalSickUsedYear - totalRemoteYear);
+            const inOfficeYTD = Math.max(0, netWorkingDaysYTD - totalVacUsedYTD - totalSickUsedYTD - totalRemoteYTD);
 
-            const officeRatioYear = Math.round((inOfficeYear / totalWorkingDaysYear) * 100);
-            const remoteRatioYear = Math.round((totalRemoteYear / totalWorkingDaysYear) * 100);
-            const holidayRatioYear = Math.round((totalVacUsedYear / totalWorkingDaysYear) * 100);
-            const sickRatioYear = Math.round((totalSickUsedYear / totalWorkingDaysYear) * 100);
+            const officeRatioYTD = Math.round((inOfficeYTD / netWorkingDaysYTD) * 100);
+            const remoteRatioYTD = Math.round((totalRemoteYTD / netWorkingDaysYTD) * 100);
+            const holidayRatioYTD = Math.round((totalVacUsedYTD / netWorkingDaysYTD) * 100);
+            const sickRatioYTD = Math.round((totalSickUsedYTD / netWorkingDaysYTD) * 100);
 
             const wfOfficePct = document.getElementById('wf-card-office-pct');
             const wfOfficeDays = document.getElementById('wf-card-office-days');
@@ -1904,21 +1819,18 @@
             const wfSickPct = document.getElementById('wf-card-sick-pct');
             const wfSickDays = document.getElementById('wf-card-sick-days');
 
-            if (wfOfficePct) wfOfficePct.innerText = `${officeRatioYear}%`;
-            if (wfOfficeDays) wfOfficeDays.innerText = inOfficeYear;
-            if (wfRemotePct) wfRemotePct.innerText = `${remoteRatioYear}%`;
-            if (wfRemoteDays) wfRemoteDays.innerText = totalRemoteYear;
-            if (wfHolidayPct) wfHolidayPct.innerText = `${holidayRatioYear}%`;
-            if (wfHolidayDays) wfHolidayDays.innerText = totalVacUsedYear;
-            if (wfSickPct) wfSickPct.innerText = `${sickRatioYear}%`;
-            if (wfSickDays) wfSickDays.innerText = totalSickUsedYear;
+            if (wfOfficePct) wfOfficePct.innerText = `${Math.min(100, Math.max(0, officeRatioYTD))}%`;
+            if (wfOfficeDays) wfOfficeDays.innerText = inOfficeYTD;
+            if (wfRemotePct) wfRemotePct.innerText = `${Math.min(100, Math.max(0, remoteRatioYTD))}%`;
+            if (wfRemoteDays) wfRemoteDays.innerText = totalRemoteYTD;
+            if (wfHolidayPct) wfHolidayPct.innerText = `${Math.min(100, Math.max(0, holidayRatioYTD))}%`;
+            if (wfHolidayDays) wfHolidayDays.innerText = totalVacUsedYTD;
+            if (wfSickPct) wfSickPct.innerText = `${Math.min(100, Math.max(0, sickRatioYTD))}%`;
+            if (wfSickDays) wfSickDays.innerText = totalSickUsedYTD;
 
-            const pile = document.getElementById('banner-avatars-pile');
-            if (pile) {
-                pile.innerHTML = '';
-                employees.slice(0, 4).forEach(e => {
-                    pile.innerHTML += `<img src="${getEmployeeAvatar(e.id)}" alt="${e.name}" class="w-7 h-7 rounded-full border-2 border-white object-cover bg-white" onerror="handleImageError(this, '${e.id}')">`;
-                });
+            const detailsBtn = document.querySelector('button[onclick*="navigateToYearlySummary"]');
+            if (detailsBtn) {
+                detailsBtn.setAttribute('onclick', `navigateToYearlySummary('${emp.id}')`);
             }
 
             updateCompanyAnalyticsOverview(d);
@@ -1971,10 +1883,8 @@
 
             if (outToday.length === 0) {
                 container.innerHTML = `
-                    <div class="py-6 text-center text-slate-400 space-y-1">
-                        <i class="fa-solid fa-circle-check text-2xl text-emerald-500 mb-1"></i>
-                        <p class="font-bold text-slate-700 text-xs">วันนี้บุคลากรมาปฏิบัติงานครบถ้วน</p>
-                        <p class="text-[10px]">ไม่มีการลาหรือทำงานนอกสถานที่</p>
+                    <div class="py-1 text-center text-slate-400 space-y-0.5">
+                        <p class="font-bold text-slate-700 text-[9px]">มาปฏิบัติงานครบถ้วน</p>
                     </div>
                 `;
                 return;
@@ -1993,19 +1903,16 @@
                     title = (m && m[1]) ? m[1].trim() : (r.reason || 'นอกสถานที่');
                 }
 
-                const animClass = (idx % 2 === 0) ? 'mini-sponge-float-1' : 'mini-sponge-float-2';
-                const formattedDays = formatLeaveNumber(r.days);
-
                 container.innerHTML += `
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-2.5 flex items-center justify-between hover:bg-slate-100/60 transition shadow-2xs ${animClass}">
-                        <div class="flex items-center space-x-2.5 min-w-0">
-                            <img src="${getEmployeeAvatar(r.empId)}" alt="${r.empName}" class="w-8 h-8 rounded-xl object-cover border border-slate-200 bg-white shrink-0" onerror="handleImageError(this, '${r.empId}')">
+                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-1 flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-1.5 min-w-0">
+                            <img src="${getEmployeeAvatar(r.empId)}" alt="${r.empName}" class="w-4.5 h-4.5 rounded-md object-cover border bg-white shrink-0" onerror="handleImageError(this, '${r.empId}')">
                             <div class="truncate leading-tight">
-                                <span class="font-bold text-slate-900 text-xs block truncate">${formatDisplayName(emp) || r.empName} ${nick ? `(${nick})` : ''}</span>
-                                <span class="text-[10px] text-slate-500 truncate block">${title}</span>
+                                <span class="font-bold text-slate-900 text-[9px] block truncate">${formatDisplayName(emp) || r.empName} ${nick ? `(${nick})` : ''}</span>
+                                <span class="text-[7px] text-slate-500 truncate block">${title}</span>
                             </div>
                         </div>
-                        <span class="text-[10px] ${badgeColor} border px-2.5 py-0.5 rounded-md font-bold shrink-0">${formattedDays} วัน</span>
+                        <span class="text-[7px] ${badgeColor} border px-1.5 py-0.2 rounded font-bold shrink-0">${formatLeaveNumber(r.days)} วัน</span>
                     </div>
                 `;
             });
@@ -2030,7 +1937,7 @@
             if (startDay === -1) startDay = 6;
 
             for (let i = 0; i < startDay; i++) {
-                container.innerHTML += `<div class="h-7"></div>`;
+                container.innerHTML += `<div class="h-4"></div>`;
             }
 
             for (let day = 1; day <= totalDays; day++) {
@@ -2045,23 +1952,17 @@
                 const hasEvent = items.some(it => !it.isRequest);
 
                 let dotHtml = '';
-                if (hasLeave && hasEvent) dotHtml = `<span class="flex space-x-0.5 justify-center mt-0.5"><span class="w-1 h-1 rounded-full bg-blue-600"></span><span class="w-1 h-1 rounded-full bg-amber-500"></span></span>`;
-                else if (hasLeave) dotHtml = `<span class="w-1 h-1 rounded-full bg-blue-600 mx-auto block mt-0.5"></span>`;
-                else if (hasEvent) dotHtml = `<span class="w-1 h-1 rounded-full bg-amber-500 mx-auto block mt-0.5"></span>`;
+                if (hasLeave && hasEvent) dotHtml = `<span class="flex space-x-0.5 justify-center"><span class="w-0.5 h-0.5 rounded-full bg-blue-600"></span><span class="w-0.5 h-0.5 rounded-full bg-amber-500"></span></span>`;
+                else if (hasLeave) dotHtml = `<span class="w-0.5 h-0.5 rounded-full bg-blue-600 mx-auto block"></span>`;
+                else if (hasEvent) dotHtml = `<span class="w-0.5 h-0.5 rounded-full bg-amber-500 mx-auto block"></span>`;
 
                 container.innerHTML += `
-                    <div class="h-7 flex flex-col items-center justify-center rounded-lg cursor-pointer transition ${isToday ? 'bg-blue-600 text-white font-black' : (isWeekend ? 'text-rose-400 font-medium' : 'text-slate-700 hover:bg-slate-100')}" onclick="jumpToCalendarDay(${year}, ${month}, ${day})">
-                        <span class="text-[11px] leading-none">${day}</span>
+                    <div class="h-4 flex flex-col items-center justify-center rounded-lg cursor-pointer transition ${isToday ? 'bg-blue-600 text-white font-black' : (isWeekend ? 'text-rose-400 font-medium' : 'text-slate-700 hover:bg-slate-100')}" onclick="calendarBaseDate = new Date(${year}, ${month}, ${day}); setCalendarMode('day'); switchTab('calendar-view');">
+                        <span class="text-[8px] leading-none">${day}</span>
                         ${dotHtml}
                     </div>
                 `;
             }
-        }
-
-        function jumpToCalendarDay(year, month, day) {
-            calendarBaseDate = new Date(year, month, day);
-            setCalendarMode('day');
-            switchTab('calendar-view');
         }
 
         function changeMiniCalMonth(offset) {
@@ -2075,50 +1976,59 @@
             container.innerHTML = '';
 
             const d = getLiveDateData();
-            const upcoming = [];
+            
+            const currentDayOfWeek = d.liveNow.getDay();
+            const daysToFriday = (5 - currentDayOfWeek + 7) % 7;
+            const fridayDate = new Date(d.liveNow);
+            fridayDate.setDate(d.liveNow.getDate() + daysToFriday);
+            const fridayIso = `${fridayDate.getFullYear()}-${String(fridayDate.getMonth() + 1).padStart(2, '0')}-${String(fridayDate.getDate()).padStart(2, '0')}`;
+
+            const weeklyItems = [];
 
             events.forEach(ev => {
-                if (ev.date >= d.iso) upcoming.push({ ...ev, type: 'meeting', sortDate: ev.date });
+                if (ev.date >= d.iso && ev.date <= fridayIso) {
+                    weeklyItems.push({ ...ev, type: 'meeting', sortDate: ev.date });
+                }
             });
 
             requests.forEach(r => {
-                if (r.endDate >= d.iso && !isRejectedStatus(r.status)) {
-                    upcoming.push({
+                if (r.endDate >= d.iso && r.startDate <= fridayIso && !isRejectedStatus(r.status)) {
+                    weeklyItems.push({
                         id: r.id,
                         empName: r.empName,
                         empId: r.empId,
                         title: r.type,
-                        date: r.startDate,
+                        date: r.startDate < d.iso ? d.iso : r.startDate,
                         startTime: '08:30',
                         endTime: '17:30',
                         type: 'leave',
-                        sortDate: r.startDate,
+                        sortDate: r.startDate < d.iso ? d.iso : r.startDate,
                         isRequest: true,
                         reason: r.reason || '-'
                     });
                 }
             });
 
-            upcoming.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+            weeklyItems.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
 
-            if (upcoming.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs italic">ไม่มีกิจกรรมหรือนัดหมายเร็วๆ นี้</div>`;
+            if (weeklyItems.length === 0) {
+                container.innerHTML = `<div class="text-center py-2 text-slate-400 text-[9px] italic">ไม่มีกำหนดการจากวันนี้ถึงวันศุกร์นี้</div>`;
                 return;
             }
 
-            upcoming.slice(0, 5).forEach(item => {
+            weeklyItems.forEach(item => {
                 const isMeet = item.type === 'meeting';
                 const dateParts = item.date.split('-');
                 const dayMonth = `${parseInt(dateParts[2])} ${getLiveDateData().thaiMonthsShort[parseInt(dateParts[1]) - 1]}`;
 
-                const isLong = item.title.length > 18;
-                let titleContent = `<span class="font-bold text-slate-800 text-xs block truncate">${item.title}</span>`;
+                const isLong = item.title.length > 16;
+                let titleContent = `<span class="font-bold text-slate-800 text-[9px] block truncate">${item.title}</span>`;
                 if (isLong) {
                     titleContent = `
                         <div class="marquee-wrapper">
                             <div class="marquee-track">
-                                <span class="font-bold text-slate-800 text-xs inline-block mr-12">${item.title}</span>
-                                <span class="font-bold text-slate-800 text-xs inline-block mr-12">${item.title}</span>
+                                <span class="font-bold text-slate-800 text-[9px] inline-block mr-12">${item.title}</span>
+                                <span class="font-bold text-slate-800 text-[9px] inline-block mr-12">${item.title}</span>
                             </div>
                         </div>
                     `;
@@ -2127,17 +2037,16 @@
                 const clickAttr = item.isRequest ? `openItemDetailModal('${item.id}', true)` : `openItemDetailModal('${item.id}', false)`;
 
                 container.innerHTML += `
-                    <div onclick="${clickAttr}" class="flex items-center space-x-2.5 p-2 rounded-xl hover:bg-slate-50 transition border border-slate-100 cursor-pointer">
-                        <div class="text-center shrink-0 w-10">
-                            <span class="text-[10px] text-slate-400 font-bold block leading-none">${dayMonth}</span>
-                            <span class="text-[9px] text-slate-600 font-mono font-medium mt-0.5 block">${item.startTime || '08:30'}</span>
+                    <div onclick="${clickAttr}" class="flex items-center space-x-1.5 p-1 rounded-xl hover:bg-slate-50 transition border border-slate-100 cursor-pointer text-[9px]">
+                        <div class="text-center shrink-0 w-6">
+                            <span class="text-[7px] text-slate-400 font-bold block leading-none">${dayMonth}</span>
+                            <span class="text-[6.5px] text-slate-600 font-mono mt-0.5 block">${item.startTime || '08:30'}</span>
                         </div>
-                        <div class="h-6 w-0.5 ${isMeet ? 'bg-amber-400' : 'bg-blue-500'} rounded-full shrink-0"></div>
+                        <div class="h-3 w-0.5 ${isMeet ? 'bg-amber-400' : 'bg-blue-500'} rounded-full shrink-0"></div>
                         <div class="min-w-0 flex-1 leading-tight overflow-hidden">
                             ${titleContent}
-                            <span class="text-[10px] text-slate-400 block truncate">${item.empName}</span>
+                            <span class="text-[7.5px] text-slate-400 block truncate">${item.empName}</span>
                         </div>
-                        <i class="fa-solid ${isMeet ? 'fa-video text-amber-500' : 'fa-calendar-check text-blue-500'} text-xs shrink-0 ml-1"></i>
                     </div>
                 `;
             });
@@ -2253,8 +2162,8 @@
             ['month', 'week', 'day'].forEach(m => {
                 const btn = document.getElementById(`cal-mode-btn-${m}`);
                 if (btn) {
-                    if (m === mode) btn.className = "px-3 py-1 rounded-lg bg-white shadow-xs text-blue-600 font-bold text-xs cursor-pointer";
-                    else btn.className = "px-3 py-1 rounded-lg text-slate-600 font-medium text-xs cursor-pointer";
+                    if (m === mode) btn.className = "px-2.5 py-1 rounded-lg bg-white shadow-xs text-blue-600 font-bold text-xs cursor-pointer";
+                    else btn.className = "px-2.5 py-1 rounded-lg text-slate-600 font-medium text-xs cursor-pointer";
                 }
             });
             renderInteractiveCalendar();
@@ -2289,20 +2198,20 @@
                 const thaiDays = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสฯ', 'ศุกร์', 'เสาร์'];
 
                 let html = `
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between font-bold text-slate-800 text-sm">
-                            <span><i class="fa-regular fa-calendar mr-2 text-blue-600"></i>${d.thaiMonthsFull[month]} ${year + 543}</span>
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between font-bold text-slate-800 text-xs">
+                            <span><i class="fa-regular fa-calendar mr-1.5 text-blue-600"></i>${d.thaiMonthsFull[month]} ${year + 543}</span>
                         </div>
-                        <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-500 bg-slate-50 p-2 rounded-xl">
+                        <div class="grid grid-cols-7 gap-1 text-center text-[8.5px] font-bold text-slate-500 bg-slate-50 p-1 rounded-xl">
                 `;
                 thaiDays.forEach((day, idx) => {
                     const isWk = (idx === 0 || idx === 6);
                     html += `<div class="${isWk ? 'text-rose-500 font-extrabold' : ''}">${day}</div>`;
                 });
-                html += `</div><div class="grid grid-cols-7 gap-2">`;
+                html += `</div><div class="grid grid-cols-7 gap-1">`;
 
                 for (let i = 0; i < startDayIndex; i++) {
-                    html += `<div class="bg-slate-50/40 rounded-xl min-h-[90px] border border-dashed border-slate-200/50"></div>`;
+                    html += `<div class="bg-slate-50/40 rounded-lg min-h-[42px] border border-dashed border-slate-200/50"></div>`;
                 }
 
                 for (let day = 1; day <= totalDays; day++) {
@@ -2315,17 +2224,16 @@
                     let avatars = '';
                     items.forEach(it => {
                         avatars += `
-                            <img src="${getEmployeeAvatar(it.empId)}" alt="${it.empName}" title="${it.empName} - ${it.title}" class="w-6 h-6 rounded-full object-cover border-2 ${it.borderColor} bg-white shadow-2xs hover:scale-110 transition cursor-pointer" onclick="openItemDetailModal('${it.id}', ${it.isRequest})" onerror="handleImageError(this, '${it.empId}')">
+                            <img src="${getEmployeeAvatar(it.empId)}" alt="${it.empName}" title="${it.empName} - ${it.title}" class="w-3 h-3 rounded-full object-cover border ${it.borderColor} bg-white shadow-2xs hover:scale-110 transition cursor-pointer" onclick="openItemDetailModal('${it.id}', ${it.isRequest})" onerror="handleImageError(this, '${it.empId}')">
                         `;
                     });
 
                     html += `
-                        <div class="rounded-xl p-2 min-h-[90px] border ${isToday ? 'border-blue-500 bg-blue-50/30' : (isWeekend ? 'bg-slate-100/70 border-slate-200' : 'bg-white border-slate-200/80')} flex flex-col justify-between text-xs">
+                        <div class="rounded-lg p-0.5 min-h-[42px] border ${isToday ? 'border-blue-500 bg-blue-50/30' : (isWeekend ? 'bg-slate-100/70 border-slate-200' : 'bg-white border-slate-200/80')} flex flex-col justify-between text-xs">
                             <div class="flex justify-between items-center">
-                                <span class="font-extrabold ${isToday ? 'text-blue-600 bg-blue-100 px-1.5 py-0.2 rounded' : (isWeekend ? 'text-rose-500' : 'text-slate-700')}">${day}</span>
-                                ${isWeekend ? '<span class="text-[9px] bg-slate-200 text-slate-600 px-1 rounded">หยุด</span>' : ''}
+                                <span class="font-extrabold text-[8.5px] ${isToday ? 'text-blue-600 bg-blue-100 px-0.5 rounded' : (isWeekend ? 'text-rose-500' : 'text-slate-700')}">${day}</span>
                             </div>
-                            <div class="flex flex-wrap gap-1 pt-1">
+                            <div class="flex flex-wrap gap-0.5 pt-0.5">
                                 ${avatars}
                             </div>
                         </div>
@@ -2344,14 +2252,14 @@
                 const startThai = `${startOfWeek.getDate()} ${d.thaiMonthsShort[startOfWeek.getMonth()]}`;
                 const endThai = `${endOfWeek.getDate()} ${d.thaiMonthsShort[endOfWeek.getMonth()]} ${endOfWeek.getFullYear() + 543}`;
 
-                const thaiDayNames = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+                const thaiDayNames = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
 
                 let html = `
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between font-bold text-slate-800 text-sm">
-                            <span class="flex items-center"><i class="fa-solid fa-calendar-week mr-2 text-blue-600"></i> สัปดาห์: ${startThai} – ${endThai}</span>
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between font-bold text-slate-800 text-xs">
+                            <span><i class="fa-solid fa-calendar-week mr-1.5 text-blue-600"></i> สัปดาห์: ${startThai} – ${endThai}</span>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-7 gap-3">
+                        <div class="grid grid-cols-1 md:grid-cols-7 gap-1">
                 `;
 
                 for (let i = 0; i < 7; i++) {
@@ -2364,19 +2272,16 @@
 
                     let itemsHtml = '';
                     if (items.length === 0) {
-                        itemsHtml = `<div class="text-[10px] text-slate-400 italic py-6 text-center">${isWk ? 'วันหยุดสุดสัปดาห์' : 'ไม่มีกิจกรรม / ลางาน'}</div>`;
+                        itemsHtml = `<div class="text-[8.5px] text-slate-400 italic py-2 text-center">ไม่มีกิจกรรม</div>`;
                     } else {
                         items.forEach(it => {
                             const nick = getEmployeeNickname(it.empId);
                             const displayName = nick ? `${it.empName} (${nick})` : it.empName;
                             itemsHtml += `
-                                <div onclick="openItemDetailModal('${it.id}', ${it.isRequest})" class="p-2 rounded-xl ${it.bgLight} border ${it.borderColor} space-y-1 cursor-pointer hover:shadow-xs hover:scale-[1.02] transition">
-                                    <div class="flex items-center space-x-1.5">
-                                        <img src="${getEmployeeAvatar(it.empId)}" alt="${it.empName}" class="w-5 h-5 rounded-full object-cover shrink-0 bg-white" onerror="handleImageError(this, '${it.empId}')">
-                                        <span class="font-bold text-[10.5px] truncate">${displayName}</span>
-                                    </div>
-                                    <div class="text-[10px] font-medium leading-tight truncate">
-                                        ${it.isRequest ? it.title : `🕒 ${it.startTime} - ${it.title}`}
+                                <div onclick="openItemDetailModal('${it.id}', ${it.isRequest})" class="p-1 rounded-lg ${it.bgLight} border ${it.borderColor} space-y-0.5 cursor-pointer hover:scale-[1.01] transition text-[9px]">
+                                    <div class="flex items-center space-x-1">
+                                        <img src="${getEmployeeAvatar(it.empId)}" alt="${it.empName}" class="w-2.5 h-2.5 rounded-full object-cover bg-white" onerror="handleImageError(this, '${it.empId}')">
+                                        <span class="font-bold truncate">${displayName}</span>
                                     </div>
                                 </div>
                             `;
@@ -2384,21 +2289,19 @@
                     }
 
                     html += `
-                        <div class="rounded-2xl p-3 border flex flex-col ${isToday ? 'border-blue-500 bg-blue-50/20 shadow-xs' : (isWk ? 'bg-slate-100/70 border-slate-200' : 'bg-white border-slate-200/80')} min-h-[260px]">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                        <div class="rounded-xl p-1 border flex flex-col ${isToday ? 'border-blue-500 bg-blue-50/20' : (isWk ? 'bg-slate-100/70 border-slate-200' : 'bg-white border-slate-200/80')} min-h-[100px]">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5 mb-1 text-xs">
                                 <div>
-                                    <span class="block text-[10px] font-bold ${isWk ? 'text-rose-500' : 'text-slate-400'}">${thaiDayNames[i]}</span>
-                                    <span class="text-sm font-extrabold ${isToday ? 'text-blue-600' : 'text-slate-800'}">${dayDate.getDate()}</span>
+                                    <span class="block text-[7px] font-bold ${isWk ? 'text-rose-500' : 'text-slate-400'}">${thaiDayNames[i]}</span>
+                                    <span class="font-extrabold text-[10.5px] ${isToday ? 'text-blue-600' : 'text-slate-800'}">${dayDate.getDate()}</span>
                                 </div>
-                                ${isToday ? '<span class="text-[9px] bg-blue-600 text-white font-bold px-1.5 py-0.5 rounded-full">วันนี้</span>' : (isWk ? '<span class="text-[9px] bg-slate-200 text-slate-600 font-bold px-1.5 py-0.5 rounded-full">หยุด</span>' : '')}
                             </div>
-                            <div class="space-y-1.5 flex-1 overflow-y-auto pr-0.5">
+                            <div class="space-y-0.5 flex-1 overflow-y-auto">
                                 ${itemsHtml}
                             </div>
                         </div>
                     `;
                 }
-
                 html += `</div></div>`;
                 container.innerHTML = html;
             } else if (calendarMode === 'day') {
@@ -2406,7 +2309,6 @@
                 const isToday = targetIso === d.iso;
                 const thaiDayFullNames = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
                 const dayIndex = calendarBaseDate.getDay();
-                const isWk = (dayIndex === 0 || dayIndex === 6);
                 const fullDayTitle = `${thaiDayFullNames[dayIndex]}ที่ ${calendarBaseDate.getDate()} ${d.thaiMonthsFull[calendarBaseDate.getMonth()]} พ.ศ. ${calendarBaseDate.getFullYear() + 543}`;
                 const items = getItemsForDate(targetIso);
 
@@ -2414,61 +2316,39 @@
                 let eventsList = items.filter(it => !it.isRequest);
 
                 let dayHtml = `
-                    <div class="space-y-5">
-                        <div class="bg-gradient-to-r ${isToday ? 'from-blue-600 to-indigo-600' : 'from-slate-800 to-slate-900'} rounded-2xl p-5 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
-                            <div class="space-y-1">
-                                <div class="flex items-center space-x-2">
-                                    <h3 class="text-base sm:text-lg font-extrabold tracking-tight">${fullDayTitle}</h3>
-                                    ${isToday ? '<span class="bg-white/20 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full backdrop-blur-md">วันนี้</span>' : ''}
-                                    ${isWk ? '<span class="bg-rose-500/80 text-white text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">วันหยุดบริษัท</span>' : ''}
-                                </div>
-                                <p class="text-xs text-white/80">สรุปการลางาน การทำงานนอกสถานที่ และกิจกรรมนัดหมายประจำวัน</p>
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-gradient-to-r ${isToday ? 'from-blue-600 to-indigo-600' : 'from-slate-800 to-slate-900'} rounded-xl p-2 text-white flex items-center justify-between shadow-2xs">
+                            <div>
+                                <h3 class="font-extrabold text-xs">${fullDayTitle}</h3>
+                                <p class="text-[9px] text-white/80">สรุปการลางาน และกิจกรรมนัดหมายประจำวัน</p>
                             </div>
-                            <div class="flex items-center space-x-2 shrink-0">
-                                <button type="button" onclick="openAddEventModal()" class="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center space-x-1.5 cursor-pointer">
-                                    <i class="fa-solid fa-plus text-blue-600"></i>
-                                    <span>เพิ่มกิจกรรมวันนี้</span>
-                                </button>
-                            </div>
+                            <button type="button" onclick="openAddEventModal()" class="bg-white text-slate-900 hover:bg-slate-100 font-extrabold text-[9.5px] px-2.5 py-1 rounded-lg shadow-2xs cursor-pointer">
+                                <i class="fa-solid fa-plus text-blue-600 mr-1"></i> เพิ่มกิจกรรม
+                            </button>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                            <div class="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 space-y-3">
-                                <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
-                                    <h4 class="font-extrabold text-xs text-slate-800 flex items-center">
-                                        <i class="fa-solid fa-user-slash mr-2 text-rose-500"></i> รายการลางาน & ปฏิบัติงานนอกสถานที่ (${leavesList.length})
-                                    </h4>
-                                    <span class="text-[10px] text-slate-400">พักร้อน / ป่วย / นอกสถานที่</span>
-                                </div>
-
-                                <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                            <div class="border border-slate-200/90 rounded-xl p-1.5 bg-slate-50/50 space-y-1">
+                                <h4 class="font-extrabold text-[10px] text-slate-800 flex items-center">
+                                    <i class="fa-solid fa-user-slash mr-1 text-rose-500"></i> ลางาน & นอกสถานที่ (${leavesList.length})
+                                </h4>
+                                <div class="space-y-1 max-h-[110px] overflow-y-auto pr-1">
                 `;
 
                 if (leavesList.length === 0) {
-                    dayHtml += `
-                        <div class="p-8 text-center text-slate-400 space-y-1">
-                            <i class="fa-solid fa-circle-check text-2xl text-emerald-500"></i>
-                            <p class="text-xs font-bold text-slate-700">ไม่มีรายการลางานในวันนี้</p>
-                            <p class="text-[11px]">${isWk ? 'เป็นวันหยุดสุดสัปดาห์' : 'บุคลากรพร้อมปฏิบัติงานในสำนักงานครบถ้วน'}</p>
-                        </div>
-                    `;
+                    dayHtml += `<div class="p-1 text-center text-slate-400 text-[9.5px] italic">ไม่มีรายการลางานในวันนี้</div>`;
                 } else {
                     leavesList.forEach(lv => {
-                        const nick = getEmployeeNickname(lv.empId);
-                        const displayName = nick ? `${lv.empName} (${nick})` : lv.empName;
                         dayHtml += `
-                            <div onclick="openItemDetailModal('${lv.id}', true)" class="bg-white rounded-xl p-3.5 border ${lv.borderColor} hover:shadow-xs transition cursor-pointer flex items-center justify-between gap-3">
-                                <div class="flex items-center space-x-3 min-w-0">
-                                    <img src="${getEmployeeAvatar(lv.empId)}" alt="${lv.empName}" class="w-10 h-10 rounded-xl object-cover bg-white shrink-0 border border-slate-200" onerror="handleImageError(this, '${lv.empId}')">
+                            <div onclick="openItemDetailModal('${lv.id}', true)" class="bg-white rounded-lg p-1 border ${lv.borderColor} hover:shadow-2xs transition cursor-pointer flex items-center justify-between">
+                                <div class="flex items-center space-x-1 min-w-0">
+                                    <img src="${getEmployeeAvatar(lv.empId)}" alt="${lv.empName}" class="w-4.5 h-4.5 rounded object-cover bg-white shrink-0 border" onerror="handleImageError(this, '${lv.empId}')">
                                     <div class="min-w-0 leading-tight">
-                                        <span class="font-bold text-xs text-slate-900 block truncate">${displayName}</span>
-                                        <span class="text-[11px] text-slate-600 font-semibold block truncate mt-0.5">${lv.title}</span>
-                                        <span class="text-[10px] text-slate-400 block truncate">เหตุผล: ${lv.reason}</span>
+                                        <span class="font-bold text-[9.5px] text-slate-900 block truncate">${lv.empName}</span>
+                                        <span class="text-[8.5px] text-slate-600 block truncate">${lv.title}</span>
                                     </div>
                                 </div>
-                                <div class="text-right shrink-0">
-                                    <span class="inline-block text-[10px] font-bold px-2.5 py-1 rounded-full ${lv.bgLight} border ${lv.borderColor}">${lv.days} วัน</span>
-                                </div>
+                                <span class="text-[8.5px] font-bold px-1.5 py-0.2 rounded ${lv.bgLight} shrink-0">${lv.days} วัน</span>
                             </div>
                         `;
                     });
@@ -2478,57 +2358,34 @@
                                 </div>
                             </div>
 
-                            <div class="border border-slate-200/90 rounded-2xl p-4 bg-slate-50/50 space-y-3">
-                                <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
-                                    <h4 class="font-extrabold text-xs text-slate-800 flex items-center">
-                                        <i class="fa-solid fa-calendar-check mr-2 text-amber-500"></i> กิจกรรมและการประชุมประจำวัน (${eventsList.length})
-                                    </h4>
-                                    <span class="text-[10px] text-slate-400">กำหนดการ & นัดหมาย</span>
-                                </div>
-
-                                <div class="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+                            <div class="border border-slate-200/90 rounded-xl p-1.5 bg-slate-50/50 space-y-1">
+                                <h4 class="font-extrabold text-[10px] text-slate-800 flex items-center">
+                                    <i class="fa-solid fa-calendar-check mr-1 text-amber-500"></i> กิจกรรม & ประชุม (${eventsList.length})
+                                </h4>
+                                <div class="space-y-1 max-h-[110px] overflow-y-auto pr-1">
                 `;
 
                 if (eventsList.length === 0) {
-                    dayHtml += `
-                        <div class="p-8 text-center text-slate-400 space-y-1">
-                            <i class="fa-regular fa-calendar text-2xl text-slate-300"></i>
-                            <p class="text-xs font-bold text-slate-700">ไม่มีกิจกรรมหรือนัดหมายในวันนี้</p>
-                            <p class="text-[11px]">สามารถกดปุ่ม "เพิ่มกิจกรรมวันนี้" เพื่อบันทึกนัดหมายใหม่</p>
-                        </div>
-                    `;
+                    dayHtml += `<div class="p-1 text-center text-slate-400 text-[9.5px] italic">ไม่มีนัดหมายในวันนี้</div>`;
                 } else {
                     eventsList.forEach(ev => {
-                        const nick = getEmployeeNickname(ev.empId);
-                        const displayName = nick ? `${ev.empName} (${nick})` : ev.empName;
                         dayHtml += `
-                            <div onclick="openItemDetailModal('${ev.id}', false)" class="bg-white rounded-xl p-3.5 border border-amber-300 hover:shadow-xs transition cursor-pointer flex items-center justify-between gap-3">
-                                <div class="flex items-center space-x-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex flex-col items-center justify-center shrink-0">
-                                        <i class="fa-solid fa-clock text-xs"></i>
-                                        <span class="text-[9px] font-bold font-mono mt-0.5">${ev.startTime}</span>
+                            <div onclick="openItemDetailModal('${ev.id}', false)" class="bg-white rounded-lg p-1 border border-amber-300 hover:shadow-2xs transition cursor-pointer flex items-center justify-between">
+                                <div class="flex items-center space-x-1 min-w-0">
+                                    <div class="w-4.5 h-4.5 rounded bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center shrink-0">
+                                        <span class="text-[7px] font-bold font-mono">${ev.startTime}</span>
                                     </div>
                                     <div class="min-w-0 leading-tight">
-                                        <span class="font-bold text-xs text-slate-900 block truncate">${ev.title}</span>
-                                        <span class="text-[11px] text-slate-500 block truncate mt-0.5">ผู้บันทึก: ${displayName}</span>
-                                        <span class="text-[10px] text-amber-700 font-mono block">เวลา: ${ev.startTime} - ${ev.endTime} น.</span>
+                                        <span class="font-bold text-[9.5px] text-slate-900 block truncate">${ev.title}</span>
+                                        <span class="text-[8px] text-slate-500 block truncate">ผู้บันทึก: ${ev.empName}</span>
                                     </div>
-                                </div>
-                                <div class="shrink-0">
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">นัดหมาย</span>
                                 </div>
                             </div>
                         `;
                     });
                 }
 
-                dayHtml += `
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                `;
+                dayHtml += `</div></div></div></div>`;
                 container.innerHTML = dayHtml;
             }
         }
@@ -2548,12 +2405,7 @@
                 nameEl.innerText = formatNameWithNickname(req.empName, req.empId);
                 timeEl.innerText = `📅 ${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
                 titleEl.innerText = `${req.type}\nเหตุผล: ${req.reason || '-'}`;
-
-                let actions = '';
-                if (isExecutiveOrAdmin() && !isApprovedStatus(req.status)) {
-                    actions += `<button type="button" onclick="approveLeaveRequest('${req.id}'); closeEventDetailModal();" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs">อนุมัติทันที</button>`;
-                }
-                actionContainer.innerHTML = actions;
+                actionContainer.innerHTML = '';
             } else {
                 const ev = events.find(e => e.id === itemId);
                 if (!ev) return;
@@ -2646,19 +2498,19 @@
 
                 let rowHtml = `
                     <tr class="${rowClass} transition text-slate-800 divide-x divide-slate-200">
-                        <td class="p-2 text-center font-bold text-slate-500 sticky left-0 z-10 bg-white">${displayIndex + 1}</td>
-                        <td class="p-2 text-center font-mono text-slate-600">${e.id}</td>
-                        <td class="p-2 font-bold text-slate-900 sticky left-10 z-10 bg-white shadow-r">
+                        <td class="p-1.5 text-center font-bold text-slate-500 sticky left-0 z-10 bg-white">${displayIndex + 1}</td>
+                        <td class="p-1.5 text-center font-mono text-slate-600">${e.id}</td>
+                        <td class="p-1.5 font-bold text-slate-900 sticky left-10 z-10 bg-white shadow-r">
                             ${displayNameWithNick}
-                            ${isCurrentLoggedIn ? '<span class="ml-1.5 bg-rose-200 text-rose-900 text-[9px] px-1 rounded font-bold">คุณ</span>' : ''}
+                            ${isCurrentLoggedIn ? '<span class="ml-1 bg-rose-200 text-rose-900 text-[8px] px-1 rounded font-bold">คุณ</span>' : ''}
                         </td>
-                        <td class="p-2 text-slate-600 text-[11px]">${e.position}</td>
-                        <td class="p-2 text-center text-slate-500">${e.dob || '-'}</td>
-                        <td class="p-2 text-center text-slate-500">${e.startDate || '-'}</td>
+                        <td class="p-1.5 text-slate-600 text-[10px]">${e.position}</td>
+                        <td class="p-1.5 text-center text-slate-500">${e.dob || '-'}</td>
+                        <td class="p-1.5 text-center text-slate-500">${e.startDate || '-'}</td>
                         <td class="p-1 text-center font-bold bg-purple-50 text-purple-900">
                             <input type="number" step="0.25" min="0" value="${e.carryVacation || 0}" ${inputAttr}
                                 onchange="updateEmpField(${empIndex}, 'carryVacation', this.value)"
-                                class="w-12 text-center bg-transparent rounded p-0.5 font-bold">
+                                class="w-10 text-center bg-transparent rounded p-0.5 font-bold">
                         </td>
                 `;
 
@@ -2669,20 +2521,20 @@
                         <td class="p-0 text-center bg-amber-50/40">
                             <input type="number" step="0.25" min="0" value="${addVal > 0 ? addVal : ''}" placeholder="0" ${inputAttr}
                                 onchange="updateVacAccruedMonth(${empIndex}, ${m}, this.value)"
-                                class="w-8 text-center text-[10px] bg-transparent">
+                                class="w-7 text-center text-[10px] bg-transparent">
                         </td>
                         <td class="p-0 text-center ${usedVal > 0 ? 'bg-amber-100/60' : ''}">
                             <input type="number" step="0.25" min="0" value="${usedVal > 0 ? usedVal : ''}" placeholder="-" ${inputAttr}
                                 onchange="updateVacUsedMonth(${empIndex}, ${m}, this.value)"
-                                class="w-9 text-center text-[11px] font-semibold bg-transparent">
+                                class="w-7 text-center text-[10px] font-semibold bg-transparent">
                         </td>
                     `;
                 }
 
                 rowHtml += `
-                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950">${totalAccrued}</td>
-                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800">${totalVacationUsed}</td>
-                    <td class="p-2 text-center font-extrabold text-xs bg-yellow-300 text-slate-900">${remainingVacation}</td>
+                    <td class="p-1.5 text-center font-bold bg-amber-100 text-amber-950">${totalAccrued}</td>
+                    <td class="p-1.5 text-center font-bold bg-rose-100 text-rose-800">${totalVacationUsed}</td>
+                    <td class="p-1.5 text-center font-extrabold text-xs bg-yellow-300 text-slate-900">${remainingVacation}</td>
                 `;
 
                 for (let m = 0; m < 12; m++) {
@@ -2691,22 +2543,22 @@
                         <td class="p-0 text-center ${sickVal > 0 ? 'bg-emerald-100/60' : 'bg-emerald-50/20'}">
                             <input type="number" step="0.25" min="0" value="${sickVal > 0 ? sickVal : ''}" placeholder="-" ${inputAttr}
                                 onchange="updateSickMonth(${empIndex}, ${m}, this.value)"
-                                class="w-9 text-center text-[11px] bg-transparent">
+                                class="w-7 text-center text-[10px] bg-transparent">
                         </td>
                     `;
                 }
 
                 rowHtml += `
-                    <td class="p-2 text-center font-bold bg-emerald-100 text-emerald-900">${totalSickUsed}</td>
+                    <td class="p-1.5 text-center font-bold bg-emerald-100 text-emerald-900">${totalSickUsed}</td>
                     <td class="p-1 text-center font-bold bg-pink-100 text-pink-950">
                         <input type="number" step="0.25" min="0" value="${finalOtherUsed > 0 ? finalOtherUsed : ''}" placeholder="0" ${inputAttr}
                             onchange="updateEmpField(${empIndex}, 'otherLeaveDays', this.value)"
-                            class="w-10 text-center text-[11px] font-bold bg-transparent">
+                            class="w-9 text-center text-[10px] font-bold bg-transparent">
                     </td>
                     <td class="p-1 text-xs">
                         <input type="text" value="${e.note || ''}" placeholder="${isAdmin ? 'หมายเหตุ' : '-'}" ${inputAttr}
                             onchange="updateEmpField(${empIndex}, 'note', this.value)"
-                            class="w-full text-xs text-slate-600 bg-transparent p-1">
+                            class="w-full text-[10px] text-slate-600 bg-transparent p-0.5">
                     </td>
                 </tr>`;
 
@@ -2780,38 +2632,14 @@
             else otherDiv.classList.add('hidden');
         }
 
-        function toggleDurationOptions() {
-            const dur = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
-            const endWrapper = document.getElementById('wrapper-end-date');
-            const startInp = document.getElementById('form-start-date');
-            const endInp = document.getElementById('form-end-date');
-            if (dur === 'HALF' || dur === 'QUARTER') {
-                endWrapper.classList.add('opacity-50', 'pointer-events-none');
-                if (startInp && endInp) endInp.value = startInp.value;
-            } else {
-                endWrapper.classList.remove('opacity-50', 'pointer-events-none');
-            }
-            calculateDays();
-        }
-
         function calculateDays() {
-            const dur = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
             const countEl = document.getElementById('form-day-count');
+            const s = document.getElementById('form-start-date')?.value;
+            const e = document.getElementById('form-end-date')?.value;
             let days = 1;
-
-            if (dur === 'HALF') {
-                days = 0.5;
-                if (countEl) countEl.innerText = '0.5 วัน (4 ชม.)';
-            } else if (dur === 'QUARTER') {
-                days = 0.25;
-                if (countEl) countEl.innerText = '0.25 วัน (2 ชม.)';
-            } else {
-                const s = document.getElementById('form-start-date')?.value;
-                const e = document.getElementById('form-end-date')?.value;
-                if (s && e) {
-                    days = countWorkingDays(s, e);
-                    if (countEl) countEl.innerText = `${days} วันทำการ (ตัดเสาร์-อาทิตย์)`;
-                }
+            if (s && e) {
+                days = countWorkingDays(s, e);
+                if (countEl) countEl.innerText = `${days} วันทำการ (ตัดเสาร์-อาทิตย์)`;
             }
             return days;
         }
@@ -2827,10 +2655,8 @@
 
             const days = calculateDays();
             let type = document.querySelector('input[name="leave_type"]:checked')?.value || 'ลาพักร้อน';
-            const dur = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
             const startDate = document.getElementById('form-start-date').value;
-            let endDate = document.getElementById('form-end-date').value;
-            if (dur === 'HALF' || dur === 'QUARTER') endDate = startDate;
+            const endDate = document.getElementById('form-end-date').value;
             let reason = document.getElementById('form-reason').value;
 
             if (type === 'ทำงานนอกสถานที่') {
@@ -2869,7 +2695,7 @@
             if (!canManage && currentUser) visible = requests.filter(r => String(r.empId) === String(currentUser.id));
 
             if (visible.length === 0) {
-                container.innerHTML = `<div class="p-10 text-center text-slate-400 text-xs italic">ยังไม่มีคำขอลางานในระบบ</div>`;
+                container.innerHTML = `<div class="p-4 text-center text-slate-400 text-xs italic">ยังไม่มีคำขอลางานในระบบ</div>`;
                 return;
             }
 
@@ -2881,19 +2707,18 @@
                 const statusBadge = isApp ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">อนุมัติแล้ว</span>' : isRej ? '<span class="bg-rose-100 text-rose-800 text-[10px] px-2 py-0.5 rounded-full font-bold">ไม่อนุมัติ</span>' : '<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">รออนุมัติ</span>';
 
                 container.innerHTML += `
-                    <div class="bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                        <div class="space-y-1">
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                        <div class="space-y-0.5">
                             <div class="flex items-center space-x-2">
-                                <span class="font-extrabold text-slate-900 text-xs">${r.empName}</span>
+                                <span class="font-extrabold text-slate-900">${r.empName}</span>
                                 ${statusBadge}
                             </div>
-                            <div class="text-xs text-slate-600"><strong class="text-blue-600">${r.type}</strong> (${r.days} วัน) | ${r.startDate} ถึง ${r.endDate}</div>
-                            <p class="text-[11px] text-slate-500 bg-slate-50 p-2 rounded-lg"><strong>เหตุผล / ติดต่อ:</strong> ${r.reason}</p>
+                            <div class="text-slate-600"><strong class="text-blue-600">${r.type}</strong> (${r.days} วัน) | ${r.startDate} ถึง ${r.endDate}</div>
                         </div>
                         <div class="flex items-center space-x-2 shrink-0">
                             ${(canManage && isPend) ? `
-                                <button type="button" onclick="approveLeaveRequest('${r.id}')" class="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-emerald-700">อนุมัติ</button>
-                                <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="bg-rose-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-rose-700">ปฏิเสธ</button>
+                                <button type="button" onclick="approveLeaveRequest('${r.id}')" class="bg-emerald-600 text-white font-bold px-2.5 py-1 rounded-lg text-xs hover:bg-emerald-700">อนุมัติ</button>
+                                <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="bg-rose-600 text-white font-bold px-2.5 py-1 rounded-lg text-xs hover:bg-rose-700">ปฏิเสธ</button>
                             ` : ''}
                         </div>
                     </div>
@@ -2961,31 +2786,14 @@
                 const quotas = getEmpRemainingQuotas(emp.id);
 
                 execGrid.innerHTML += `
-                    <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-600 text-white rounded-[24px] p-6 shadow-lg relative overflow-hidden flex flex-col justify-between space-y-4">
-                        <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                        <div class="flex items-start space-x-4 relative z-10">
-                            <div class="w-20 h-20 rounded-2xl p-1 bg-white/20 backdrop-blur-md shadow-md shrink-0">
-                                <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-xl object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
-                            </div>
-                            <div class="min-w-0 flex-1 leading-snug text-left">
-                                <div class="flex items-center justify-between">
-                                    <span class="bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider">Executive Board</span>
-                                    <span class="text-xs font-mono text-white/80">ID: ${emp.id}</span>
-                                </div>
-                                <h3 class="text-lg font-extrabold mt-1 truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h3>
-                                <p class="text-xs text-white/90 truncate font-medium">${emp.position}</p>
-                            </div>
+                    <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-600 text-white rounded-xl p-3 shadow-xs flex items-center space-x-2.5 text-xs">
+                        <div class="w-10 h-10 rounded-lg p-0.5 bg-white/20 shrink-0">
+                            <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-md object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
                         </div>
-
-                        <div class="grid grid-cols-2 gap-2 pt-3 border-t border-white/20 text-xs relative z-10 text-center">
-                            <div class="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
-                                <span class="text-[10px] text-white/70 block">อายุงาน</span>
-                                <strong class="font-bold text-emerald-300">${tenure}</strong>
-                            </div>
-                            <div class="bg-white/10 rounded-xl p-2 backdrop-blur-xs">
-                                <span class="text-[10px] text-white/70 block">พักร้อนคงเหลือ</span>
-                                <strong class="font-bold text-amber-300">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
-                            </div>
+                        <div class="min-w-0 flex-1 leading-tight text-left">
+                            <h3 class="font-extrabold text-xs truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h3>
+                            <p class="text-[9.5px] text-white/90 truncate">${emp.position}</p>
+                            <span class="text-[8.5px] text-amber-300 font-bold mt-0.5 block">พักร้อนเหลือ: ${formatLeaveNumber(quotas.vacRem)} วัน</span>
                         </div>
                     </div>
                 `;
@@ -2997,30 +2805,19 @@
                 const quotas = getEmpRemainingQuotas(emp.id);
 
                 staffGrid.innerHTML += `
-                    <div class="bento-card p-5 space-y-4 text-left flex flex-col justify-between">
-                        <div class="flex items-start space-x-3.5">
-                            <div class="w-14 h-14 rounded-2xl p-0.5 bg-slate-100 border border-slate-200 shadow-2xs shrink-0 overflow-hidden">
-                                <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-xl object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
+                    <div class="bento-card p-2.5 space-y-1 text-left flex flex-col justify-between text-xs">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-7 h-7 rounded-lg bg-slate-100 border shrink-0 overflow-hidden">
+                                <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
                             </div>
                             <div class="min-w-0 flex-1 leading-tight">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[10px] font-mono text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full">#${emp.id}</span>
-                                    ${nick ? `<span class="text-[10px] font-black text-slate-400">@${nick}</span>` : ''}
-                                </div>
-                                <h4 class="font-extrabold text-slate-900 text-xs truncate mt-1">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h4>
-                                <p class="text-[11px] text-slate-500 truncate mt-0.5 font-medium">${emp.position}</p>
+                                <h4 class="font-extrabold text-slate-900 text-[10.5px] truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h4>
+                                <p class="text-[8.5px] text-slate-500 truncate mt-0.5">${emp.position}</p>
                             </div>
                         </div>
-
-                        <div class="space-y-2 pt-2 border-t border-slate-100 text-[11px]">
-                            <div class="flex items-center justify-between text-slate-600">
-                                <span class="text-slate-400">อายุงาน PCBK:</span>
-                                <strong class="text-slate-800 font-bold">${tenure}</strong>
-                            </div>
-                            <div class="flex items-center justify-between text-slate-600">
-                                <span class="text-slate-400">พักร้อนคงเหลือ:</span>
-                                <strong class="text-emerald-600 font-extrabold">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
-                            </div>
+                        <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[8.5px]">
+                            <span class="text-slate-400">อายุงาน: ${tenure}</span>
+                            <strong class="text-emerald-600 font-bold">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
                         </div>
                     </div>
                 `;
@@ -3053,6 +2850,17 @@
                     }
                     const off = parseFloat(e.otherLeaveDays) || 0;
                     totalOff += off;
+                    if (off > 0) {
+                        offsiteMonthly[8] += off;
+                    }
+                });
+
+                requests.forEach(r => {
+                    if ((r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && !isRejectedStatus(r.status)) {
+                        const mIdx = new Date(r.startDate).getMonth() || 0;
+                        offsiteMonthly[mIdx] += (parseFloat(r.days) || 0);
+                        totalOff += (parseFloat(r.days) || 0);
+                    }
                 });
 
                 const barCanvas = document.getElementById('monthlyTrendBarChart');
@@ -3072,7 +2880,7 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } }
                         }
                     });
                 }
@@ -3095,13 +2903,11 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                            plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } }
                         }
                     });
                 }
-            } catch (err) {
-                console.warn(err);
-            }
+            } catch (err) {}
         }
 
         function exportSummaryToExcel() {
@@ -3149,7 +2955,7 @@
             setTimeout(() => {
                 t.classList.remove('translate-y-0', 'opacity-100');
                 t.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            }, 2500);
         }
     </script>
 </body>
