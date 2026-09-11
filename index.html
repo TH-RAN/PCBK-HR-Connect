@@ -575,27 +575,31 @@
                                 <div class="bento-card p-5 space-y-3 flex flex-col justify-between">
                                     <div class="flex items-center justify-between">
                                         <div>
-                                            <span class="text-xs font-bold text-slate-800 block">Working format</span>
-                                            <span class="text-[10px] text-slate-400 block">สัดส่วนสถานที่ทำงาน</span>
+                                            <span class="text-xs font-bold text-slate-800 block">Yearly Working Format</span>
+                                            <span class="text-[10px] text-slate-400 block">สัดส่วนการทำงานทั้งปี</span>
                                         </div>
                                         <button type="button" onclick="switchTab('calendar-view')" class="text-[11px] text-blue-600 font-bold hover:underline">Details</button>
                                     </div>
 
-                                    <div class="flex items-end gap-3 my-auto h-40 pb-0.5">
-                                        <div id="workformat-offsite-bar" class="flex-1 bg-[#2cc56f] text-white rounded-2xl p-3 flex flex-col justify-between text-left shadow-sm transition-all duration-700 ease-out" style="height: 105px;">
-                                            <div class="text-2xl font-black" id="workformat-offsite-txt">0%</div>
-                                            <div>
-                                                <span class="text-[11px] font-bold block leading-tight">Remote</span>
-                                                <span class="text-[9px] text-white/80" id="workformat-offsite-days">0 วันสะสม</span>
-                                            </div>
+                                    <div class="grid grid-cols-2 gap-2 my-auto text-left">
+                                        <div class="bg-blue-600 text-white p-3 rounded-2xl shadow-sm space-y-1">
+                                            <div class="text-xl font-black" id="wf-card-office-pct">0%</div>
+                                            <span class="text-[10px] font-bold block text-white/90">In-Office (<span id="wf-card-office-days">0</span> วัน)</span>
                                         </div>
 
-                                        <div id="workformat-office-bar" class="flex-1 bg-[#2f66ee] text-white rounded-2xl p-3 flex flex-col justify-between text-left shadow-sm transition-all duration-700 ease-out" style="height: 156px;">
-                                            <div class="text-2xl font-black" id="workformat-office-txt">100%</div>
-                                            <div>
-                                                <span class="text-[11px] font-bold block leading-tight">In-Office</span>
-                                                <span class="text-[9px] text-white/80" id="workformat-office-days">ประจำการที่ออฟฟิศ</span>
-                                            </div>
+                                        <div class="bg-emerald-600 text-white p-3 rounded-2xl shadow-sm space-y-1">
+                                            <div class="text-xl font-black" id="wf-card-remote-pct">0%</div>
+                                            <span class="text-[10px] font-bold block text-white/90">Remote (<span id="wf-card-remote-days">0</span> วัน)</span>
+                                        </div>
+
+                                        <div class="bg-sky-500 text-white p-3 rounded-2xl shadow-sm space-y-1">
+                                            <div class="text-xl font-black" id="wf-card-holiday-pct">0%</div>
+                                            <span class="text-[10px] font-bold block text-white/90">Holiday (<span id="wf-card-holiday-days">0</span> วัน)</span>
+                                        </div>
+
+                                        <div class="bg-rose-500 text-white p-3 rounded-2xl shadow-sm space-y-1">
+                                            <div class="text-xl font-black" id="wf-card-sick-pct">0%</div>
+                                            <span class="text-[10px] font-bold block text-white/90">Sick leave (<span id="wf-card-sick-days">0</span> วัน)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1296,12 +1300,14 @@
 
         window.addEventListener('DOMContentLoaded', async () => {
             loadInitialData();
+            checkAndApplyMonthlyAccrual();
             checkAutoLogin();
             if (window._pendingCloudData) {
                 window.handleIncomingCloudData(window._pendingCloudData);
                 window._pendingCloudData = null;
-            } else {
-                await syncFromFirebase();
+            } else if (window.loadFromFirebase) {
+                const cloudData = await window.loadFromFirebase();
+                if (cloudData) window.handleIncomingCloudData(cloudData);
             }
             renderAllViews();
         });
@@ -1327,10 +1333,41 @@
             renderAllViews();
         };
 
-        async function syncFromFirebase() {
-            if (window.loadFromFirebase) {
-                const data = await window.loadFromFirebase();
-                if (data) window.handleIncomingCloudData(data);
+        // ================= AUTOMATIC MONTHLY ACCRUAL LOGIC =================
+        function checkAndApplyMonthlyAccrual() {
+            try {
+                const liveNow = new Date();
+                const currentYear = liveNow.getFullYear();
+                const currentMonth = liveNow.getMonth(); // 0 = มกราคม, 1 = กุมภาพันธ์, ... 11 = ธันวาคม
+
+                const lastAccruedYear = parseInt(localStorage.getItem('pcbk_last_accrued_year') || currentYear, 10);
+                const lastAccruedMonth = parseInt(localStorage.getItem('pcbk_last_accrued_month') || currentMonth, 10);
+
+                if (currentYear > lastAccruedYear || (currentYear === lastAccruedYear && currentMonth > lastAccruedMonth)) {
+                    let targetYear = lastAccruedYear;
+                    let targetMonth = lastAccruedMonth;
+
+                    while (targetYear < currentYear || (targetYear === currentYear && targetMonth < currentMonth)) {
+                        targetMonth++;
+                        if (targetMonth > 11) {
+                            targetMonth = 0;
+                            targetYear++;
+                        }
+
+                        employees.forEach(emp => {
+                            if (!emp.vacationAccrued || emp.vacationAccrued.length !== 12) {
+                                emp.vacationAccrued = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0];
+                            }
+                            emp.vacationAccrued[targetMonth] = 1;
+                        });
+                    }
+
+                    localStorage.setItem('pcbk_last_accrued_year', currentYear);
+                    localStorage.setItem('pcbk_last_accrued_month', currentMonth);
+                    saveAllToCloud();
+                }
+            } catch (err) {
+                console.error("Error in automatic monthly accrual check: ", err);
             }
         }
 
@@ -1830,6 +1867,13 @@
             if (gaugeLeave) gaugeLeave.innerText = `${weekLeaveDays} วัน (${leavePct}%)`;
             if (gaugeTotalWeek) gaugeTotalWeek.innerText = `5 วันทำการ (100%)`;
 
+            // Working format breakdown for the entire year across 4 types
+            let totalVacUsedYear = 0;
+            if (emp.vacationUsedMonths) totalVacUsedYear = emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+
+            let totalSickUsedYear = 0;
+            if (emp.sickMonths) totalSickUsedYear = emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+
             let offsiteFromRequests = 0;
             requests.forEach(r => {
                 if (String(r.empId) === String(emp.id) && (r.type.includes('นอกสถานที่') || r.type.includes('ลาอื่นๆ') || r.type.includes('WFH') || r.type.includes('DEDE')) && !isRejectedStatus(r.status)) {
@@ -1837,34 +1881,33 @@
                 }
             });
             const tableOffsite = parseFloat(emp.otherLeaveDays) || 0;
-            const totalOffsiteRecorded = Math.max(tableOffsite, offsiteFromRequests);
+            const totalRemoteYear = Math.max(tableOffsite, offsiteFromRequests);
 
-            const benchmarkWorkDays = 20;
-            const remoteRatio = Math.min(100, Math.round((totalOffsiteRecorded / benchmarkWorkDays) * 100));
-            const officeRatio = 100 - remoteRatio;
+            const totalWorkingDaysYear = 240; // ~240 working days per year
+            const inOfficeYear = Math.max(0, totalWorkingDaysYear - totalVacUsedYear - totalSickUsedYear - totalRemoteYear);
 
-            const wfOffice = document.getElementById('workformat-office-txt');
-            const wfOffsite = document.getElementById('workformat-offsite-txt');
-            const wfOfficeDays = document.getElementById('workformat-office-days');
-            const wfOffsiteDays = document.getElementById('workformat-offsite-days');
-            const wfOffsiteBar = document.getElementById('workformat-offsite-bar');
-            const wfOfficeBar = document.getElementById('workformat-office-bar');
+            const officeRatioYear = Math.round((inOfficeYear / totalWorkingDaysYear) * 100);
+            const remoteRatioYear = Math.round((totalRemoteYear / totalWorkingDaysYear) * 100);
+            const holidayRatioYear = Math.round((totalVacUsedYear / totalWorkingDaysYear) * 100);
+            const sickRatioYear = Math.round((totalSickUsedYear / totalWorkingDaysYear) * 100);
 
-            if (wfOffice) wfOffice.innerText = `${officeRatio}%`;
-            if (wfOffsite) wfOffsite.innerText = `${remoteRatio}%`;
-            if (wfOfficeDays) wfOfficeDays.innerText = `ประจำการที่ออฟฟิศ`;
-            if (wfOffsiteDays) wfOffsiteDays.innerText = `${totalOffsiteRecorded} วันสะสม`;
+            const wfOfficePct = document.getElementById('wf-card-office-pct');
+            const wfOfficeDays = document.getElementById('wf-card-office-days');
+            const wfRemotePct = document.getElementById('wf-card-remote-pct');
+            const wfRemoteDays = document.getElementById('wf-card-remote-days');
+            const wfHolidayPct = document.getElementById('wf-card-holiday-pct');
+            const wfHolidayDays = document.getElementById('wf-card-holiday-days');
+            const wfSickPct = document.getElementById('wf-card-sick-pct');
+            const wfSickDays = document.getElementById('wf-card-sick-days');
 
-            const minBarHeight = 92;
-            const maxBarHeight = 156;
-            if (wfOffsiteBar) {
-                const calculatedOffsiteHeight = Math.round(minBarHeight + (maxBarHeight - minBarHeight) * (remoteRatio / 100));
-                wfOffsiteBar.style.height = `${calculatedOffsiteHeight}px`;
-            }
-            if (wfOfficeBar) {
-                const calculatedOfficeHeight = Math.round(minBarHeight + (maxBarHeight - minBarHeight) * (officeRatio / 100));
-                wfOfficeBar.style.height = `${calculatedOfficeHeight}px`;
-            }
+            if (wfOfficePct) wfOfficePct.innerText = `${officeRatioYear}%`;
+            if (wfOfficeDays) wfOfficeDays.innerText = inOfficeYear;
+            if (wfRemotePct) wfRemotePct.innerText = `${remoteRatioYear}%`;
+            if (wfRemoteDays) wfRemoteDays.innerText = totalRemoteYear;
+            if (wfHolidayPct) wfHolidayPct.innerText = `${holidayRatioYear}%`;
+            if (wfHolidayDays) wfHolidayDays.innerText = totalVacUsedYear;
+            if (wfSickPct) wfSickPct.innerText = `${sickRatioYear}%`;
+            if (wfSickDays) wfSickDays.innerText = totalSickUsedYear;
 
             const pile = document.getElementById('banner-avatars-pile');
             if (pile) {
