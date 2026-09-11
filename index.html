@@ -237,6 +237,48 @@
             0% { transform: translateX(0%); }
             100% { transform: translateX(-50%); }
         }
+
+        @keyframes todayOutDukdik1 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-3px) rotate(-1deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(-2px) rotate(1deg); }
+        }
+        @keyframes todayOutDukdik2 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(2px) rotate(0.8deg); }
+            50% { transform: translateY(-3px) rotate(-0.8deg); }
+            75% { transform: translateY(1px) rotate(0.4deg); }
+        }
+        @keyframes nameBounceGlow {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); color: #2563eb; }
+        }
+        @keyframes pulseDotLive {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.35); opacity: 0.7; }
+        }
+
+        .today-out-item-1 {
+            animation: todayOutDukdik1 3.2s ease-in-out infinite;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .today-out-item-2 {
+            animation: todayOutDukdik2 3.6s ease-in-out infinite 0.5s;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .today-out-item-1:hover, .today-out-item-2:hover {
+            animation-play-state: paused;
+            transform: translateY(-4px) scale(1.025) !important;
+            box-shadow: 0 8px 20px -4px rgba(244, 63, 94, 0.18), 0 0 0 1.5px rgba(244, 63, 94, 0.25);
+        }
+        .today-out-animated-name {
+            display: inline-block;
+            animation: nameBounceGlow 2.8s ease-in-out infinite;
+        }
+        .today-out-live-dot {
+            animation: pulseDotLive 1.8s ease-in-out infinite;
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen p-3 sm:p-5 flex items-center justify-center antialiased">
@@ -1901,16 +1943,23 @@
                     title = (m && m[1]) ? m[1].trim() : (r.reason || 'นอกสถานที่');
                 }
 
+                const animClass = (idx % 2 === 0) ? 'today-out-item-1' : 'today-out-item-2';
+
                 container.innerHTML += `
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-2 flex items-center justify-between text-xs">
-                        <div class="flex items-center space-x-2 min-w-0">
-                            <img src="${getEmployeeAvatar(r.empId)}" alt="${r.empName}" class="w-6 h-6 rounded-lg object-cover border bg-white shrink-0" onerror="handleImageError(this, '${r.empId}')">
+                    <div class="bg-gradient-to-r from-slate-50 via-white to-rose-50/30 border border-slate-200/90 rounded-2xl p-2.5 flex items-center justify-between text-xs shadow-2xs ${animClass} cursor-pointer">
+                        <div class="flex items-center space-x-2.5 min-w-0">
+                            <div class="relative shrink-0">
+                                <img src="${getEmployeeAvatar(r.empId)}" alt="${r.empName}" class="w-8 h-8 rounded-xl object-cover border-2 border-white bg-white shadow-xs" onerror="handleImageError(this, '${r.empId}')">
+                                <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${isOffsite ? 'bg-emerald-500' : isSick ? 'bg-amber-500' : 'bg-rose-500'} border-2 border-white today-out-live-dot"></span>
+                            </div>
                             <div class="truncate leading-tight">
-                                <span class="font-bold text-slate-900 text-xs block truncate">${formatDisplayName(emp) || r.empName} ${nick ? `(${nick})` : ''}</span>
-                                <span class="text-[10px] text-slate-500 truncate block">${title}</span>
+                                <span class="font-extrabold text-slate-900 text-xs block truncate today-out-animated-name">
+                                    ${formatDisplayName(emp) || r.empName} ${nick ? `(${nick})` : ''}
+                                </span>
+                                <span class="text-[10.5px] text-slate-500 font-medium truncate block mt-0.5">${title}</span>
                             </div>
                         </div>
-                        <span class="text-[10px] ${badgeColor} border px-2 py-0.5 rounded font-bold shrink-0">${formatLeaveNumber(r.days)} วัน</span>
+                        <span class="text-[10px] ${badgeColor} border px-2.5 py-1 rounded-xl font-extrabold shrink-0 shadow-2xs">${formatLeaveNumber(r.days)} วัน</span>
                     </div>
                 `;
             });
