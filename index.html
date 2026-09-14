@@ -573,8 +573,14 @@
 
                                     <div class="relative w-32 h-16 mx-auto flex items-end justify-center">
                                         <svg class="w-32 h-16" viewBox="0 0 100 58">
+                                            <!-- Base track -->
                                             <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round" />
-                                            <path id="gauge-progress-arc" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="8" stroke-linecap="round" stroke-dasharray="125.66" stroke-dashoffset="0" style="transition: stroke-dashoffset 0.8s ease;" />
+                                            <!-- Leave / Sick Arc (Red/Rose) -->
+                                            <path id="gauge-arc-leave" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#f43f5e" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 125.66" stroke-dashoffset="0" style="transition: stroke-dasharray 0.8s ease;" />
+                                            <!-- WFH / Offsite Arc (Blue) -->
+                                            <path id="gauge-arc-offsite" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" stroke-dasharray="0 125.66" stroke-dashoffset="0" style="transition: stroke-dasharray 0.8s ease;" />
+                                            <!-- In-Office Arc (Green) -->
+                                            <path id="gauge-arc-office" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#2cc56f" stroke-width="8" stroke-linecap="round" stroke-dasharray="125.66 125.66" stroke-dashoffset="0" style="transition: stroke-dasharray 0.8s ease;" />
                                         </svg>
                                         <div class="absolute bottom-1 inset-x-0 flex flex-col items-center justify-center pointer-events-none">
                                             <div class="text-lg font-black text-slate-900 leading-none" id="gauge-percent-txt">100%</div>
@@ -1779,19 +1785,53 @@
             const leavePct = Math.round((weekLeaveDays / 5) * 100);
 
             const gaugePctTxt = document.getElementById('gauge-percent-txt');
-            const gaugeArc = document.getElementById('gauge-progress-arc');
             const gaugeStatusTxt = document.getElementById('gauge-status-txt');
             const gaugeInOffice = document.getElementById('gauge-in-office-pct');
             const gaugeOffsite = document.getElementById('gauge-offsite-pct');
             const gaugeLeave = document.getElementById('gauge-leave-pct');
 
+            const arcOffice = document.getElementById('gauge-arc-office');
+            const arcOffsite = document.getElementById('gauge-arc-offsite');
+            const arcLeave = document.getElementById('gauge-arc-leave');
+
             if (gaugePctTxt) gaugePctTxt.innerText = `${attendancePct}%`;
             if (gaugeStatusTxt) gaugeStatusTxt.innerText = `ปฏิบัติงาน ${workingDaysTotal}/5 วัน`;
-            if (gaugeArc) {
-                const totalLength = 125.66;
-                const offset = totalLength * (1 - (attendancePct / 100));
-                gaugeArc.style.strokeDashoffset = Math.max(0, Math.min(totalLength, offset));
+
+            const totalLength = 125.66;
+            const lenOffice = Math.min(totalLength, (weekInOfficeDays / 5) * totalLength);
+            const lenOffsite = Math.min(totalLength, ((weekInOfficeDays + weekOffsiteDays) / 5) * totalLength);
+            const lenLeave = Math.min(totalLength, ((weekInOfficeDays + weekOffsiteDays + weekLeaveDays) / 5) * totalLength);
+
+            if (arcLeave) {
+                if (weekLeaveDays > 0) {
+                    arcLeave.style.display = 'inline';
+                    arcLeave.setAttribute('stroke-dasharray', `${lenLeave} ${totalLength}`);
+                } else {
+                    arcLeave.style.display = 'none';
+                    arcLeave.setAttribute('stroke-dasharray', `0 ${totalLength}`);
+                }
             }
+
+            if (arcOffsite) {
+                if (weekOffsiteDays > 0) {
+                    arcOffsite.style.display = 'inline';
+                    arcOffsite.setAttribute('stroke-dasharray', `${lenOffsite} ${totalLength}`);
+                } else {
+                    arcOffsite.style.display = 'none';
+                    arcOffsite.setAttribute('stroke-dasharray', `0 ${totalLength}`);
+                }
+            }
+
+            if (arcOffice) {
+                if (weekInOfficeDays > 0) {
+                    arcOffice.style.display = 'inline';
+                    arcOffice.setAttribute('stroke-dasharray', `${lenOffice} ${totalLength}`);
+                } else {
+                    arcOffice.style.display = 'none';
+                    arcOffice.setAttribute('stroke-dasharray', `0 ${totalLength}`);
+                }
+            }
+
             if (gaugeInOffice) gaugeInOffice.innerText = `${weekInOfficeDays} วัน (${inOfficePct}%)`;
             if (gaugeOffsite) gaugeOffsite.innerText = `${weekOffsiteDays} วัน (${offsitePct}%)`;
             if (gaugeLeave) gaugeLeave.innerText = `${weekLeaveDays} วัน (${leavePct}%)`;
