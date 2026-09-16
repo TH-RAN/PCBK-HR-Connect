@@ -179,14 +179,6 @@
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-16px) rotate(-2deg); }
         }
-        @keyframes spongeFloat3 {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(1deg); }
-        }
-        @keyframes spongeFloat4 {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-14px) rotate(-1.5deg); }
-        }
 
         .bubble-anim-1 { animation: spongeFloat1 4.2s ease-in-out infinite; }
         .bubble-anim-2 { animation: spongeFloat2 5.0s ease-in-out infinite 0.6s; }
@@ -254,8 +246,8 @@
 </head>
 <body class="text-slate-800 min-h-screen p-3 sm:p-5 flex items-center justify-center antialiased">
 
-    <!-- LOGIN MODAL -->
-    <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <!-- LOGIN MODAL (Version 260910.7.0.4) -->
+    <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-[32px] max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center space-y-5 relative">
             <div class="flex flex-col items-center justify-center">
                 <div class="w-16 h-16 bg-white border border-slate-100 rounded-2xl flex items-center justify-center mb-2 shadow-sm overflow-hidden p-1.5">
@@ -270,7 +262,7 @@
                     <label class="block font-bold text-slate-600 uppercase tracking-wider mb-1.5">รหัสพนักงาน / ADMIN KEY</label>
                     <div class="relative">
                         <i class="fa-solid fa-id-badge absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
-                        <input type="text" id="login-input-code" required placeholder="เช่น 1104055 หรือ pcbk2026" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 font-mono tracking-wider transition">
+                        <input type="text" id="login-input-code" required placeholder="เช่น 1102055 หรือ pcbk2026" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 font-mono tracking-wider transition">
                     </div>
                 </div>
 
@@ -293,20 +285,15 @@
 
             <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-3 flex flex-col items-center justify-center space-y-1">
                 <span>PCBK Personnel Management Platform</span>
-                <span class="font-mono font-medium">version 260910.8.0.0</span>
+                <span class="font-mono font-medium">version 260910.7.0.4</span>
             </div>
         </div>
     </div>
 
-    <!-- MAIN APP WINDOW -->
     <div class="app-window w-full max-w-[1440px] min-h-[900px] flex flex-col overflow-hidden">
         
         <div class="h-11 border-b border-slate-100 px-5 flex items-center justify-between bg-white select-none shrink-0">
             <div class="flex items-center space-x-2">
-                <span class="w-3 h-3 rounded-full bg-[#ff5f56] inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block"></span>
-                <span class="w-3 h-3 rounded-full bg-[#27c93f] inline-block"></span>
-                <div class="h-4 w-px bg-slate-200 mx-2"></div>
                 <div class="flex items-center space-x-1.5">
                     <img src="LOGO PCBK API - 1.png" alt="Logo" class="h-5 w-auto object-contain" onerror="this.src='LOGO%20PCBK%20API%20-%201.png';">
                     <span class="text-xs font-extrabold text-slate-800">PCBK Connect</span>
@@ -321,7 +308,7 @@
                 </div>
 
                 <div class="flex items-center space-x-2 text-xs text-slate-500">
-                    <span id="topbar-live-date" class="font-medium text-xs">10 ก.ย. 2569</span>
+                    <span id="topbar-live-date" class="font-medium text-xs">16 ก.ย. 2569</span>
                 </div>
             </div>
         </div>
@@ -456,13 +443,13 @@
                         </button>
                     </div>
 
-                    <!-- RESTRUCTURED BENTO GRID FOR IMMEDIATE VISIBILITY -->
+                    <!-- BENTO GRID (EXACTLY 6 CARDS AS REQUESTED) -->
                     <div id="bento-main-container" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                         
-                        <!-- COLUMN LEFT (SPAN 7): Profile, Today Out, Mini Calendar & Weekly Schedule -->
+                        <!-- COLUMN LEFT (SPAN 7) -->
                         <div class="lg:col-span-7 space-y-5">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <!-- Profile Card -->
+                                <!-- Card 1: Profile Card -->
                                 <div class="bento-card p-5 space-y-3">
                                     <div class="flex items-center space-x-3">
                                         <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 shadow-sm shrink-0">
@@ -487,7 +474,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Mini Calendar -->
+                                <!-- Card 2: Mini Calendar -->
                                 <div class="bento-card p-5 space-y-2">
                                     <div class="flex items-center justify-between text-slate-800">
                                         <button type="button" onclick="changeMiniCalMonth(-1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
@@ -501,7 +488,7 @@
                                 </div>
                             </div>
 
-                            <!-- Today Out List -->
+                            <!-- Card 3: Today Out List -->
                             <div class="bento-card p-5 space-y-2.5 text-left">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                                     <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center">
@@ -512,7 +499,7 @@
                                 <div id="bento-today-out-list" class="space-y-2 max-h-32 overflow-y-auto pr-1"></div>
                             </div>
 
-                            <!-- Weekly Schedule Feed -->
+                            <!-- Card 4: Weekly Schedule Feed -->
                             <div class="bento-card p-5 space-y-3 text-left">
                                 <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                                     <span class="font-bold text-xs sm:text-sm text-slate-900"><i class="fa-solid fa-calendar-week mr-1.5 text-blue-600"></i> กำหนดการประจำสัปดาห์นี้</span>
@@ -525,10 +512,10 @@
                             </div>
                         </div>
 
-                        <!-- COLUMN RIGHT (SPAN 5): Analytics Charts & Attendance Gauges -->
+                        <!-- COLUMN RIGHT (SPAN 5) -->
                         <div class="lg:col-span-5 space-y-5">
                             
-                            <!-- Weekly Attendance Gauge Card -->
+                            <!-- Card 5: Weekly Attendance Gauge Card -->
                             <div class="bento-card p-5 space-y-3 text-center flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold text-slate-800 block text-left">Weekly Attendance</span>
@@ -564,7 +551,7 @@
                                 </div>
                             </div>
 
-                            <!-- Yearly Working Format -->
+                            <!-- Card 6: Yearly Working Format -->
                             <div class="bento-card p-5 space-y-3 flex flex-col justify-between">
                                 <div class="flex items-center justify-between">
                                     <div>
@@ -591,16 +578,6 @@
                                         <div class="text-base sm:text-lg font-black" id="wf-card-sick-pct">0%</div>
                                         <span class="text-[9.5px] font-bold block text-white/90">Sick leave (<span id="wf-card-sick-days">0</span> ด.)</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Monthly Trend Chart -->
-                            <div class="bento-card p-5 space-y-3 text-left">
-                                <h3 class="font-bold text-slate-900 text-xs flex items-center">
-                                    <i class="fa-solid fa-chart-column text-blue-600 mr-2"></i> สถิติการลางานรายเดือน
-                                </h3>
-                                <div class="h-44 relative w-full">
-                                    <canvas id="monthlyTrendBarChart"></canvas>
                                 </div>
                             </div>
 
@@ -741,7 +718,7 @@
                             <div>
                                 <div class="flex items-center space-x-2">
                                     <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight" id="summary-table-header-title">สรุปตารางวันลาของพนักงาน</h2>
-                                    <span id="badge-lock-status" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">ดูอย่างเดียว</span>
+                                    <span id="badge-lock-status" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">โหมดแก้ไข (Admin)</span>
                                 </div>
                             </div>
 
@@ -1306,26 +1283,36 @@
         }
 
         function checkAutoLogin() {
-            const remembered = localStorage.getItem('pcbk_device_auth_code');
-            if (remembered) {
-                performLogin(remembered, false);
+            const rememberedId = localStorage.getItem('pcbk_device_auth_code');
+            if (rememberedId) {
+                performLogin(rememberedId, false);
             } else {
-                const m = document.getElementById('login-modal');
-                if (m) m.classList.remove('hidden');
+                const loginModal = document.getElementById('login-modal');
+                if (loginModal) {
+                    loginModal.classList.remove('hidden');
+                }
             }
         }
 
         function handleLoginSubmit(e) {
             e.preventDefault();
-            const code = document.getElementById('login-input-code')?.value.trim();
-            const remember = document.getElementById('login-remember-me')?.checked || false;
-            if (!performLogin(code, remember)) {
-                document.getElementById('login-error-msg')?.classList.remove('hidden');
+            const codeInput = document.getElementById('login-input-code');
+            const errorBox = document.getElementById('login-error-msg');
+            const code = codeInput ? codeInput.value.trim() : '';
+            const rememberMe = document.getElementById('login-remember-me')?.checked || false;
+
+            if (errorBox) errorBox.classList.add('hidden');
+
+            if (performLogin(code, rememberMe)) {
+                // Done
+            } else {
+                if (errorBox) errorBox.classList.remove('hidden');
             }
         }
 
-        function performLogin(code, remember) {
+        function performLogin(code, saveToDevice) {
             if (!code) return false;
+
             const trimmed = String(code).trim();
             if (trimmed === ADMIN_PASSWORD) {
                 isAdmin = true;
@@ -1333,20 +1320,31 @@
                 adminViewMode = 'hub';
                 displayEmp = employees.find(e => String(e.id) === "1102055") || employees[0];
             } else {
-                const found = employees.find(e => String(e.id).trim().toLowerCase() === trimmed.toLowerCase());
-                if (!found) return false;
-                currentUser = found;
-                displayEmp = found;
+                const foundEmp = employees.find(e => String(e.id).trim().toLowerCase() === trimmed.toLowerCase());
+                if (!foundEmp) return false;
+                currentUser = foundEmp;
+                displayEmp = foundEmp;
                 isAdmin = false;
                 adminViewMode = 'detail';
             }
 
-            if (remember) localStorage.setItem('pcbk_device_auth_code', trimmed);
-            document.getElementById('login-modal')?.remove();
+            if (saveToDevice) {
+                localStorage.setItem('pcbk_device_auth_code', trimmed);
+            }
 
-            setupRoleBasedViews();
-            renderAllViews();
-            showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+
+            try {
+                setupRoleBasedViews();
+                renderAllViews();
+                switchTab('dashboard');
+                showToast(`ยินดีต้อนรับคุณ ${formatDisplayName(currentUser)}`);
+            } catch (err) {
+                console.error(err);
+            }
             return true;
         }
 
@@ -1670,7 +1668,8 @@
         }
 
         function renderProfileTab() {
-            const emp = currentUser && currentUser.id !== 'ADMIN' ? currentUser : (displayEmp || employees[0]);
+            if (!currentUser) return;
+            const emp = displayEmp || currentUser || employees[0];
             if (!emp) return;
 
             const nameEl = document.getElementById('profile-card-name');
@@ -2459,7 +2458,8 @@
                 timeEl.innerText = `🕒 ${ev.startTime} - ${ev.endTime} น. (${ev.date})`;
                 titleEl.innerText = ev.title;
                 
-                if (isAdmin) {
+                const canEdit = isAdmin || (currentUser && String(currentUser.id) === String(ev.empId));
+                if (canEdit) {
                     actionContainer.innerHTML = `
                         <button type="button" onclick="deleteEventFromModal('${ev.id}')" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition cursor-pointer">
                             <i class="fa-solid fa-trash-can mr-1"></i> ลบกิจกรรมนี้
@@ -2492,10 +2492,12 @@
             const endTime = document.getElementById('event-input-end').value;
             const title = document.getElementById('event-input-title').value;
 
+            const targetEmp = displayEmp || currentUser || employees[0];
+
             const newEvent = {
                 id: `EVT-${Date.now().toString().slice(-4)}`,
-                empId: currentUser ? currentUser.id : '1102055',
-                empName: currentUser ? formatDisplayName(currentUser) : 'รัญชน์ (GIFT)',
+                empId: targetEmp.id,
+                empName: formatDisplayName(targetEmp),
                 date, startTime, endTime, title
             };
 
@@ -2507,10 +2509,6 @@
         }
 
         async function deleteEventFromModal(eventId) {
-            if (!isAdmin) {
-                showToast("เฉพาะ Admin เท่านั้นที่สามารถลบกิจกรรมได้");
-                return;
-            }
             events = events.filter(e => e.id !== eventId);
             await saveAllToCloud();
             closeEventDetailModal();
@@ -2822,8 +2820,8 @@
                                 <button type="button" onclick="approveLeaveRequest('${r.id}')" class="bg-emerald-600 text-white font-bold px-3.5 py-1.5 rounded-lg text-xs hover:bg-emerald-700">อนุมัติ</button>
                                 <button type="button" onclick="rejectLeaveRequest('${r.id}')" class="bg-rose-600 text-white font-bold px-3.5 py-1.5 rounded-lg text-xs hover:bg-rose-700">ปฏิเสธ</button>
                             ` : ''}
-                            ${isAdmin ? `
-                                <button type="button" onclick="deleteLeaveRequest('${r.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-3 py-1.5 rounded-lg text-xs border border-rose-200" title="ลบรายการ (Admin)">
+                            ${canManage ? `
+                                <button type="button" onclick="deleteLeaveRequest('${r.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold px-3 py-1.5 rounded-lg text-xs border border-rose-200" title="ลบรายการ">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             ` : ''}
@@ -2869,7 +2867,7 @@
         }
 
         async function deleteLeaveRequest(reqId) {
-            if (!isAdmin) return;
+            if (!isExecutiveOrAdmin()) return;
             requests = requests.filter(r => r.id !== reqId);
             await saveAllToCloud();
             renderAllViews();
