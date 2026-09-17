@@ -17,7 +17,6 @@
     <!-- SheetJS for Excel Import/Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Firebase SDK (v10 Modular) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -179,9 +178,19 @@
             0%, 100% { transform: translateY(0px) rotate(0deg); }
             50% { transform: translateY(-16px) rotate(-2deg); }
         }
+        @keyframes spongeFloat3 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+        }
+        @keyframes spongeFloat4 {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-14px) rotate(-1.5deg); }
+        }
 
         .bubble-anim-1 { animation: spongeFloat1 4.2s ease-in-out infinite; }
         .bubble-anim-2 { animation: spongeFloat2 5.0s ease-in-out infinite 0.6s; }
+        .bubble-anim-3 { animation: spongeFloat3 4.6s ease-in-out infinite 1.2s; }
+        .bubble-anim-4 { animation: spongeFloat4 5.4s ease-in-out infinite 1.8s; }
 
         .sponge-bubble-card {
             background: rgba(255, 255, 255, 0.88);
@@ -221,12 +230,10 @@
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-4px); }
         }
-
         @keyframes gentleBubbleFloat2 {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-5px); }
         }
-
         @keyframes pulseDotLive {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.3); opacity: 0.7; }
@@ -246,7 +253,6 @@
 </head>
 <body class="text-slate-800 min-h-screen p-3 sm:p-5 flex items-center justify-center antialiased">
 
-    <!-- LOGIN MODAL (Version 260910.7.0.4) -->
     <div id="login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-[32px] max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center space-y-5 relative">
             <div class="flex flex-col items-center justify-center">
@@ -386,7 +392,6 @@
 
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 max-h-full">
 
-                <!-- TAB 1: DASHBOARD & HOME -->
                 <section id="tab-dashboard" class="tab-view space-y-5">
                     
                     <div id="admin-bubble-hub" class="hidden space-y-4">
@@ -443,38 +448,57 @@
                         </button>
                     </div>
 
-                    <!-- BENTO GRID (EXACTLY 6 CARDS AS REQUESTED) -->
+                    <!-- BENTO GRID (EXACTLY 6 CARDS) -->
                     <div id="bento-main-container" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
                         
                         <!-- COLUMN LEFT (SPAN 7) -->
                         <div class="lg:col-span-7 space-y-5">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <!-- Card 1: Profile Card -->
-                                <div class="bento-card p-5 space-y-3">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-blue-500/20 to-indigo-500/20 shadow-sm shrink-0">
-                                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-100 border-2 border-white shadow-inner flex items-center justify-center">
-                                                <img id="bento-profile-avatar" src="" alt="Profile" class="w-full h-full object-cover object-center" onerror="handleImageError(this, displayEmp ? displayEmp.id : '')">
+                                <!-- Card 1: Prominent Profile Card with Clean Non-Duplicated Quotas -->
+                                <div class="bento-card p-5 space-y-4 bg-gradient-to-br from-white via-white to-blue-50/40 relative overflow-hidden flex flex-col justify-between">
+                                    <div class="flex flex-col items-center justify-center text-center space-y-2">
+                                        <div class="relative inline-block">
+                                            <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-lg">
+                                                <div class="w-full h-full rounded-full overflow-hidden bg-slate-100 border-2 border-white shadow-inner flex items-center justify-center">
+                                                    <img id="bento-profile-avatar" src="" alt="Profile" class="w-full h-full object-cover object-center scale-105" onerror="handleImageError(this, displayEmp ? displayEmp.id : '')">
+                                                </div>
                                             </div>
+                                            <span id="bento-profile-nick" class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white border-2 border-white px-3 py-0.5 rounded-full text-[10px] font-black font-mono shadow-md uppercase tracking-wider">GIFT</span>
                                         </div>
-                                        <div class="min-w-0 flex-1">
-                                            <div class="flex items-center space-x-1.5">
-                                                <span id="bento-profile-nick" class="bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full text-[9px] font-extrabold text-blue-600 font-mono">NICK</span>
-                                                <span id="bento-profile-id" class="text-[10px] text-slate-400 font-mono">1100000</span>
-                                            </div>
-                                            <h2 id="bento-profile-name" class="text-sm font-extrabold text-slate-900 truncate mt-0.5">กำลังโหลด...</h2>
-                                            <p id="bento-profile-position" class="text-[11px] text-slate-500 truncate">Position</p>
+
+                                        <div class="space-y-0.5 w-full">
+                                            <h2 id="bento-profile-name" class="text-base sm:text-lg font-black text-slate-900 truncate leading-tight">กำลังโหลด...</h2>
+                                            <p id="bento-profile-position" class="text-[11px] text-slate-600 font-semibold truncate">Position</p>
+                                            <span id="bento-profile-id" class="inline-block text-[10px] text-slate-400 font-mono font-bold bg-slate-100 px-2.5 py-0.5 rounded-full mt-1">1102055</span>
                                         </div>
                                     </div>
-                                    <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px] text-slate-600">
-                                        <span>อายุงาน: <strong id="bento-stat-tenure" class="text-slate-800">-</strong></span>
-                                        <button type="button" onclick="quickApplyLeaveForCurrent()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold px-3 py-1 rounded-xl transition cursor-pointer">
-                                            <i class="fa-solid fa-file-pen mr-1"></i> ยื่นใบลา
+
+                                    <!-- Clean Quota Display Boxes (No text duplication) -->
+                                    <div class="grid grid-cols-2 gap-2.5 pt-1 border-t border-slate-100 text-center text-xs">
+                                        <div class="bg-amber-50/90 border border-amber-200 rounded-2xl p-3 shadow-2xs space-y-0.5">
+                                            <span class="text-[10px] text-amber-800 font-bold block uppercase tracking-wide">ลาพักร้อน</span>
+                                            <div id="bento-box-vacation" class="text-[11px] font-bold text-amber-900 leading-snug">
+                                                ใช้ไป 0 วัน<br>เหลือสิทธิ์ 0 วัน
+                                            </div>
+                                        </div>
+                                        <div class="bg-rose-50/90 border border-rose-200 rounded-2xl p-3 shadow-2xs space-y-0.5">
+                                            <span class="text-[10px] text-rose-800 font-bold block uppercase tracking-wide">ลาป่วย</span>
+                                            <div id="bento-box-sick" class="text-[11px] font-bold text-rose-900 leading-snug">
+                                                ใช้ไป 0 วัน<br>เหลือสิทธิ์ 30 วัน
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pt-1 text-[11px] text-slate-600">
+                                        <span>อายุงาน: <strong id="bento-stat-tenure" class="text-slate-900 font-bold">-</strong></span>
+                                        <button type="button" onclick="quickApplyLeaveForCurrent()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-xs cursor-pointer flex items-center space-x-1">
+                                            <i class="fa-solid fa-file-pen text-[10px]"></i>
+                                            <span>ยื่นใบลา</span>
                                         </button>
                                     </div>
                                 </div>
 
-                                <!-- Card 2: Mini Calendar -->
+                                <!-- Card 2: Perfectly Proportioned Mini Calendar -->
                                 <div class="bento-card p-5 space-y-2">
                                     <div class="flex items-center justify-between text-slate-800">
                                         <button type="button" onclick="changeMiniCalMonth(-1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
@@ -683,7 +707,6 @@
                                 <span id="form-day-count" class="font-extrabold text-blue-600 text-sm">1 วัน</span>
                             </div>
 
-                            <!-- Quota Warning banner -->
                             <div id="leave-quota-warning" class="hidden bg-rose-50 border border-rose-300 text-rose-700 p-3 rounded-xl text-xs font-bold flex items-center space-x-2">
                                 <i class="fa-solid fa-triangle-exclamation text-base"></i>
                                 <span id="leave-quota-warning-txt">ไม่สามารถลาเกินสิทธิ์วันลาที่เหลืออยู่ได้</span>
@@ -814,7 +837,6 @@
                     </div>
                 </section>
 
-                <!-- TAB: PROFILE -->
                 <section id="tab-profile" class="tab-view hidden max-w-3xl mx-auto space-y-5">
                     <div class="bg-white rounded-[32px] border border-slate-200/90 shadow-lg p-6 sm:p-8 space-y-6">
                         <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 border-b border-slate-100 pb-6 text-center sm:text-left">
@@ -1738,6 +1760,30 @@
 
             const tenureEl = document.getElementById('bento-stat-tenure');
             if (tenureEl) tenureEl.innerText = calculateWorkTenure(emp.startDate);
+
+            // Populate the 2 Quota Display Boxes (Vacation & Sick ONLY) without text duplication
+            const quotas = getEmpRemainingQuotas(emp.id);
+            
+            let totalVacUsed = 0;
+            if (emp.vacationUsedMonths) {
+                totalVacUsed = emp.vacationUsedMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            }
+
+            let totalSickUsed = 0;
+            if (emp.sickMonths) {
+                totalSickUsed = emp.sickMonths.reduce((a, b) => a + (parseFloat(b) || 0), 0);
+            }
+            const totalSickRem = Math.max(0, 30 - totalSickUsed);
+
+            const boxVac = document.getElementById('bento-box-vacation');
+            const boxSick = document.getElementById('bento-box-sick');
+
+            if (boxVac) {
+                boxVac.innerHTML = `ใช้ไป ${formatLeaveNumber(totalVacUsed)} วัน<br>เหลือสิทธิ์ ${formatLeaveNumber(quotas.vacRem)} วัน`;
+            }
+            if (boxSick) {
+                boxSick.innerHTML = `ใช้ไป ${formatLeaveNumber(totalSickUsed)} วัน<br>เหลือสิทธิ์ ${formatLeaveNumber(totalSickRem)} วัน`;
+            }
         }
 
         function renderBentoStats() {
