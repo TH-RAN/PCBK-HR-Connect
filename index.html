@@ -298,10 +298,11 @@
 
     <div class="app-window w-full max-w-[1440px] min-h-[900px] flex flex-col overflow-hidden">
         
+        <!-- Header Bar -->
         <div class="h-11 border-b border-slate-100 px-5 flex items-center justify-between bg-white select-none shrink-0">
             <div class="flex items-center space-x-2">
                 <div class="flex items-center space-x-1.5">
-                    <!-- Removed duplicate top-left logo and title to eliminate clutter -->
+                    <!-- Cleaned header to prevent duplication -->
                 </div>
             </div>
 
@@ -320,6 +321,7 @@
 
         <div class="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f7f8fc]">
             
+            <!-- Sidebar Navigation -->
             <aside class="w-full md:w-64 bg-white border-r border-slate-100 p-4 flex flex-col justify-between shrink-0 space-y-3">
                 <div class="space-y-3">
                     <div class="flex items-center space-x-3 px-1">
@@ -389,6 +391,7 @@
                 </div>
             </aside>
 
+            <!-- Main Workspace -->
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 max-h-full">
 
                 <section id="tab-dashboard" class="tab-view space-y-5">
@@ -453,7 +456,7 @@
                         <!-- COLUMN LEFT (SPAN 7) -->
                         <div class="lg:col-span-7 space-y-5">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <!-- Card 1: Prominent Profile Card with Clean Non-Duplicated Quotas -->
+                                <!-- Card 1: Profile Card with Clean Non-Duplicated Quotas -->
                                 <div class="bento-card p-5 space-y-4 bg-gradient-to-br from-white via-white to-blue-50/40 relative overflow-hidden flex flex-col justify-between">
                                     <div class="flex flex-col items-center justify-center text-center space-y-2">
                                         <div class="relative inline-block">
@@ -472,7 +475,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Clean Quota Display Boxes (No text duplication) -->
                                     <div class="grid grid-cols-2 gap-2.5 pt-1 border-t border-slate-100 text-center text-xs">
                                         <div class="bg-amber-50/90 border border-amber-200 rounded-2xl p-3 shadow-2xs space-y-0.5">
                                             <span class="text-[10px] text-amber-800 font-bold block uppercase tracking-wide">ลาพักร้อน</span>
@@ -497,7 +499,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Card 2: Perfectly Proportioned Mini Calendar -->
+                                <!-- Card 2: Mini Calendar -->
                                 <div class="bento-card p-5 space-y-2">
                                     <div class="flex items-center justify-between text-slate-800">
                                         <button type="button" onclick="changeMiniCalMonth(-1)" class="w-6 h-6 rounded-full hover:bg-slate-100 flex items-center justify-center text-xs text-slate-500 cursor-pointer"><i class="fa-solid fa-chevron-left"></i></button>
@@ -587,19 +589,19 @@
                                 <div class="grid grid-cols-2 gap-2 my-auto text-left">
                                     <div class="bg-blue-600 text-white p-3 rounded-2xl shadow-2xs space-y-1">
                                         <div class="text-base sm:text-lg font-black" id="wf-card-office-pct">0%</div>
-                                        <span class="text-[9.5px] font-bold block text-white/90">In-Office (<span id="wf-card-office-days">0</span> ด.)</span>
+                                        <span class="text-[9.5px] font-bold block text-white/90">In-Office (<span id="wf-card-office-days">0</span> วัน)</span>
                                     </div>
                                     <div class="bg-emerald-600 text-white p-3 rounded-2xl shadow-2xs space-y-1">
                                         <div class="text-base sm:text-lg font-black" id="wf-card-remote-pct">0%</div>
-                                        <span class="text-[9.5px] font-bold block text-white/90">Remote (<span id="wf-card-remote-days">0</span> ด.)</span>
+                                        <span class="text-[9.5px] font-bold block text-white/90">Remote (<span id="wf-card-remote-days">0</span> วัน)</span>
                                     </div>
                                     <div class="bg-sky-500 text-white p-3 rounded-2xl shadow-2xs space-y-1">
                                         <div class="text-base sm:text-lg font-black" id="wf-card-holiday-pct">0%</div>
-                                        <span class="text-[9.5px] font-bold block text-white/90">Holiday (<span id="wf-card-holiday-days">0</span> ด.)</span>
+                                        <span class="text-[9.5px] font-bold block text-white/90">Annual Leave (<span id="wf-card-holiday-days">0</span> วัน)</span>
                                     </div>
                                     <div class="bg-rose-500 text-white p-3 rounded-2xl shadow-2xs space-y-1">
                                         <div class="text-base sm:text-lg font-black" id="wf-card-sick-pct">0%</div>
-                                        <span class="text-[9.5px] font-bold block text-white/90">Sick leave (<span id="wf-card-sick-days">0</span> ด.)</span>
+                                        <span class="text-[9.5px] font-bold block text-white/90">Sick leave (<span id="wf-card-sick-days">0</span> วัน)</span>
                                     </div>
                                 </div>
                             </div>
@@ -688,6 +690,55 @@
                             <div id="wrapper-other-leave-detail" class="hidden bg-emerald-50 border border-emerald-200 p-3 rounded-xl space-y-1">
                                 <label class="block font-bold text-emerald-950 text-xs">ระบุภารกิจหรือสถานที่ (เช่น Work at DEDE office, WFH) *</label>
                                 <input type="text" id="form-other-type-detail" placeholder="เช่น Work at DEDE office, WFH" class="w-full bg-white border border-emerald-300 rounded-xl p-2 text-xs sm:text-sm">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">ระยะเวลาการลา *</label>
+                                <div class="grid grid-cols-3 gap-2.5">
+                                    <label class="border rounded-2xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
+                                        <input type="radio" name="leave_duration_type" value="FULL" checked onchange="toggleDurationOptions(); calculateDays();" class="hidden">
+                                        <span class="font-extrabold text-xs text-slate-800">1.0 วัน</span>
+                                        <span class="text-[9.5px] text-slate-500">เต็มวัน (8 ชม.)</span>
+                                    </label>
+                                    <label class="border rounded-2xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
+                                        <input type="radio" name="leave_duration_type" value="HALF" onchange="toggleDurationOptions(); calculateDays();" class="hidden">
+                                        <span class="font-extrabold text-xs text-slate-800">0.5 วัน</span>
+                                        <span class="text-[9.5px] text-slate-500">ครึ่งวัน (4 ชม.)</span>
+                                    </label>
+                                    <label class="border rounded-2xl p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50/50 transition">
+                                        <input type="radio" name="leave_duration_type" value="QUARTER" onchange="toggleDurationOptions(); calculateDays();" class="hidden">
+                                        <span class="font-extrabold text-xs text-slate-800">0.25 วัน</span>
+                                        <span class="text-[9.5px] text-slate-500">ลา 2 ชม.</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="option-half-day" class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl space-y-2">
+                                <label class="block font-bold text-amber-900 text-xs">เลือกช่วงเวลาครึ่งวัน *</label>
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <label class="bg-white border border-amber-300 rounded-xl p-2.5 flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="half_day_period" value="ครึ่งวันเช้า (08:30 - 12:30 น.)" checked class="text-blue-600">
+                                        <span>🌅 ครึ่งวันเช้า (08:30 - 12:30 น.)</span>
+                                    </label>
+                                    <label class="bg-white border border-amber-300 rounded-xl p-2.5 flex items-center space-x-2 cursor-pointer">
+                                        <input type="radio" name="half_day_period" value="ครึ่งวันบ่าย (13:30 - 17:30 น.)" class="text-blue-600">
+                                        <span>🌤️ ครึ่งวันบ่าย (13:30 - 17:30 น.)</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="option-quarter-day" class="hidden bg-purple-50 border border-purple-200 p-3 rounded-xl space-y-2">
+                                <label class="block font-bold text-purple-900 text-xs">ระบุช่วงเวลาลางาน 2 ชั่วโมง *</label>
+                                <div class="grid grid-cols-2 gap-3 text-xs">
+                                    <div>
+                                        <label class="block text-slate-600 text-[11px] mb-1">ตั้งแต่เวลา</label>
+                                        <input type="time" id="quarter-start-time" value="10:00" class="w-full bg-white border border-purple-300 rounded-xl p-2.5">
+                                    </div>
+                                    <div>
+                                        <label class="block text-slate-600 text-[11px] mb-1">ถึงเวลา</label>
+                                        <input type="time" id="quarter-end-time" value="12:00" class="w-full bg-white border border-purple-300 rounded-xl p-2.5">
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1087,6 +1138,18 @@
             return `${empId}.jpg`;
         }
 
+        function handleImageError(imgElement, empId) {
+            if (!imgElement) return;
+            if (imgElement.src && imgElement.src.endsWith('.jpg')) {
+                imgElement.src = `${empId}.png`;
+            } else {
+                const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
+                imgElement.src = femaleIds.includes(String(empId))
+                    ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_${empId}&backgroundColor=ffd5dc`
+                    : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff`;
+            }
+        }
+
         function quickApplyLeaveForCurrent() {
             const targetEmp = displayEmp || currentUser || employees[0];
             if (!targetEmp) return;
@@ -1101,18 +1164,6 @@
                 }
             }
             showToast(`เปิดแบบฟอร์มขอลางานสำหรับ: ${formatDisplayName(targetEmp)}`);
-        }
-
-        function handleImageError(imgElement, empId) {
-            if (!imgElement) return;
-            if (imgElement.src && imgElement.src.endsWith('.jpg')) {
-                imgElement.src = `${empId}.png`;
-            } else {
-                const femaleIds = ["1102003", "1104008", "1102049", "1102050", "1102055"];
-                imgElement.src = femaleIds.includes(String(empId))
-                    ? `https://api.dicebear.com/7.x/adventurer/svg?seed=woman_${empId}&backgroundColor=ffd5dc`
-                    : `https://api.dicebear.com/7.x/adventurer/svg?seed=man_${empId}&backgroundColor=d1f4ff`;
-            }
         }
 
         function getStartDateTimestamp(startDateStr) {
@@ -1760,7 +1811,6 @@
             const tenureEl = document.getElementById('bento-stat-tenure');
             if (tenureEl) tenureEl.innerText = calculateWorkTenure(emp.startDate);
 
-            // Populate the 2 Quota Display Boxes (Vacation & Sick ONLY) without text duplication
             const quotas = getEmpRemainingQuotas(emp.id);
             
             let totalVacUsed = 0;
@@ -2741,14 +2791,52 @@
             else otherDiv.classList.add('hidden');
         }
 
+        function toggleDurationOptions() {
+            const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
+            const halfDiv = document.getElementById('option-half-day');
+            const quarterDiv = document.getElementById('option-quarter-day');
+            const endDateWrapper = document.getElementById('wrapper-end-date');
+            const startDateInput = document.getElementById('form-start-date');
+            const endDateInput = document.getElementById('form-end-date');
+
+            if (durType === 'HALF') {
+                if (halfDiv) halfDiv.classList.remove('hidden');
+                if (quarterDiv) quarterDiv.classList.add('hidden');
+                if (endDateWrapper) endDateWrapper.classList.add('opacity-50', 'pointer-events-none');
+                if (startDateInput && endDateInput) endDateInput.value = startDateInput.value;
+            } else if (durType === 'QUARTER') {
+                if (halfDiv) halfDiv.classList.add('hidden');
+                if (quarterDiv) quarterDiv.classList.remove('hidden');
+                if (endDateWrapper) endDateWrapper.classList.add('opacity-50', 'pointer-events-none');
+                if (startDateInput && endDateInput) endDateInput.value = startDateInput.value;
+            } else {
+                if (halfDiv) halfDiv.classList.add('hidden');
+                if (quarterDiv) quarterDiv.classList.add('hidden');
+                if (endDateWrapper) endDateWrapper.classList.remove('opacity-50', 'pointer-events-none');
+            }
+            calculateDays();
+        }
+
         function calculateDays() {
+            const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
             const countEl = document.getElementById('form-day-count');
-            const s = document.getElementById('form-start-date')?.value;
-            const e = document.getElementById('form-end-date')?.value;
             let days = 1;
-            if (s && e) {
-                days = countWorkingDays(s, e);
-                if (countEl) countEl.innerText = `${days} วันทำการ (ตัดเสาร์-อาทิตย์)`;
+
+            if (durType === 'HALF') {
+                days = 0.5;
+                if (countEl) countEl.innerText = '0.5 วัน (ครึ่งวัน 4 ชั่วโมง)';
+            } else if (durType === 'QUARTER') {
+                days = 0.25;
+                const startTime = document.getElementById('quarter-start-time')?.value || '10:00';
+                const endTime = document.getElementById('quarter-end-time')?.value || '12:00';
+                if (countEl) countEl.innerText = `0.25 วัน (ลา 2 ชั่วโมง : ${startTime} - ${endTime} น.)`;
+            } else {
+                const s = document.getElementById('form-start-date')?.value;
+                const e = document.getElementById('form-end-date')?.value;
+                if (s && e) {
+                    days = countWorkingDays(s, e);
+                    if (countEl) countEl.innerText = `${days} วันทำการ (ตัดเสาร์-อาทิตย์)`;
+                }
             }
 
             const empId = document.getElementById('form-emp-id')?.value;
@@ -2798,15 +2886,25 @@
                 return;
             }
 
-            const days = calculateDays();
+            const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
+            let days = calculateDays();
             let type = document.querySelector('input[name="leave_type"]:checked')?.value || 'ลาพักร้อน';
             const startDate = document.getElementById('form-start-date').value;
-            const endDate = document.getElementById('form-end-date').value;
+            let endDate = (durType === 'HALF' || durType === 'QUARTER') ? startDate : document.getElementById('form-end-date').value;
             let reason = document.getElementById('form-reason').value;
 
             if (type === 'ทำงานนอกสถานที่') {
                 const det = document.getElementById('form-other-type-detail')?.value.trim();
                 if (det) type = `ทำงานนอกสถานที่ (${det})`;
+            }
+
+            if (durType === 'HALF') {
+                const halfPeriod = document.querySelector('input[name="half_day_period"]:checked')?.value || 'ครึ่งวัน';
+                reason = `[${halfPeriod}] ${reason}`;
+            } else if (durType === 'QUARTER') {
+                const startTime = document.getElementById('quarter-start-time')?.value || '10:00';
+                const endTime = document.getElementById('quarter-end-time')?.value || '12:00';
+                reason = `[ลาออกจากออฟฟิศ 2 ชม. (${startTime} - ${endTime} น.)] ${reason}`;
             }
 
             const d = getLiveDateData();
