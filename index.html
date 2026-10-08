@@ -250,6 +250,61 @@
         .today-out-bubble-2 { animation: gentleBubbleFloat2 4.8s ease-in-out infinite 0.7s; }
         .today-out-live-dot { animation: pulseDotLive 2s ease-in-out infinite; }
     </style>
+    <!-- ===== Time sheet + Workforce dashboard (added) ===== -->
+    <style id="ts-style">
+        .ts-paper { background:#fff; border:1px solid #cbd5e1; border-radius:14px; padding:22px 22px 26px; min-width:860px; color:#0f172a; }
+        .ts-title { font-family:'Plus Jakarta Sans','Prompt',sans-serif; font-weight:800; font-size:20px; text-align:center; letter-spacing:.01em; }
+        .ts-meta td { padding:2px 8px; font-size:12.5px; }
+        .ts-tbl { width:100%; border-collapse:collapse; font-size:12px; }
+        .ts-tbl th, .ts-tbl td { border:1px solid #cbd5e1; padding:3px 6px; text-align:center; white-space:nowrap; }
+        .ts-tbl thead th { background:#eef3ff; color:#1e3a8a; font-weight:700; }
+        .ts-tbl tbody tr:hover td { background:#f8faff; }
+        .ts-tbl td.ts-note { text-align:left; min-width:210px; white-space:normal; }
+        .ts-row-we td { background:#f1f5f9; color:#94a3b8; }
+        .ts-row-ho td { background:#fff1f2; color:#be123c; }
+        .ts-row-lv td { background:#fffbeb; }
+        .ts-row-off td { background:#eff6ff; }
+        .ts-row-miss td:first-child { box-shadow: inset 3px 0 0 #fb923c; }
+        .ts-row-flag td.ts-t { background:#fff7ed; }
+        .ts-inp { width:100%; border:1px solid transparent; background:transparent; font-size:12px; padding:2px 3px; border-radius:6px; text-align:center; color:inherit; }
+        .ts-inp:hover { border-color:#cbd5e1; background:#fff; }
+        .ts-inp:focus { outline:none; border-color:#2f66ee; background:#fff; box-shadow:0 0 0 3px rgba(47,102,238,.15); }
+        .ts-inp.ts-left { text-align:left; }
+        .ts-manual { position:relative; }
+        .ts-manual::after { content:''; position:absolute; top:3px; right:3px; width:5px; height:5px; border-radius:50%; background:#f59e0b; }
+        .ts-drop { border:2px dashed #bfd0f7; background:linear-gradient(180deg,#f7f9ff,#eef3ff); border-radius:22px; transition:all .2s; }
+        .ts-drop.ts-over { border-color:#2f66ee; background:#e4ecff; transform:scale(1.01); }
+        .tsd-hero { background:linear-gradient(135deg,#2f66ee 0%,#4f46e5 55%,#7c3aed 100%); border-radius:28px; color:#fff; position:relative; overflow:hidden; }
+        .tsd-hero::before { content:''; position:absolute; right:-80px; top:-80px; width:280px; height:280px; border-radius:50%; background:rgba(255,255,255,.08); }
+        .tsd-hero::after { content:''; position:absolute; right:120px; bottom:-120px; width:240px; height:240px; border-radius:50%; background:rgba(255,255,255,.06); }
+        .tsd-seg { display:inline-flex; background:rgba(255,255,255,.16); border-radius:14px; padding:3px; }
+        .tsd-seg button { padding:6px 16px; font-size:12px; font-weight:700; border-radius:11px; color:rgba(255,255,255,.85); transition:all .15s; }
+        .tsd-seg button.on { background:#fff; color:#2f66ee; box-shadow:0 2px 8px rgba(0,0,0,.12); }
+        .tsd-sel { background:rgba(255,255,255,.16); color:#fff; border-radius:12px; font-size:12px; font-weight:700; padding:7px 12px; border:1px solid rgba(255,255,255,.25); }
+        .tsd-sel option { color:#0f172a; }
+        .tsd-kpi { background:#fff; border:1px solid rgba(226,232,240,.9); border-radius:22px; padding:14px 16px; box-shadow:0 8px 24px -10px rgba(26,38,74,.12); }
+        .tsd-th { cursor:pointer; user-select:none; }
+        .tsd-th:hover { color:#2f66ee; }
+        .tsd-tbl { width:100%; border-collapse:separate; border-spacing:0 6px; font-size:12px; }
+        .tsd-tbl th { text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:#64748b; padding:0 10px 2px; white-space:nowrap; }
+        .tsd-tbl td { background:#f8fafc; padding:9px 10px; white-space:nowrap; }
+        .tsd-tbl td:first-child { border-radius:14px 0 0 14px; } .tsd-tbl td:last-child { border-radius:0 14px 14px 0; }
+        .tsd-tbl tr.tsd-click { cursor:pointer; } .tsd-tbl tr.tsd-click:hover td { background:#eef3ff; }
+        .tsd-tbl tr.tsd-active td { background:#e4ecff; }
+        .tsd-bar { height:7px; border-radius:99px; background:#e2e8f0; overflow:hidden; min-width:70px; }
+        .tsd-bar > i { display:block; height:100%; border-radius:99px; }
+        .tsd-heat { display:grid; gap:3px; align-items:center; }
+        .tsd-cell { width:100%; aspect-ratio:1/1; min-width:15px; border-radius:5px; }
+        .tsd-chip { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; padding:5px 10px; border-radius:99px; }
+        #ts-print-root { display:none; }
+        @media print {
+            body.ts-printing > *:not(#ts-print-root) { display:none !important; }
+            body.ts-printing { background:#fff !important; padding:0 !important; display:block !important; }
+            body.ts-printing #ts-print-root { display:block !important; }
+            body.ts-printing .ts-paper { border:none; min-width:0; padding:0; }
+            @page { size:A4 portrait; margin:10mm; }
+        }
+    </style>
 </head>
 <body class="text-slate-800 min-h-screen p-3 sm:p-5 flex items-center justify-center antialiased">
 
@@ -372,6 +427,17 @@
                             <i class="fa-solid fa-chart-pie text-slate-400 w-4"></i>
                             <span class="flex-1 text-left">สถิติ & Dashboard</span>
                         </button>
+                        <button type="button" onclick="switchTab('timesheet')" id="nav-timesheet" class="nav-item w-full py-2">
+                            <i class="fa-regular fa-clock text-slate-400 w-4"></i>
+                            <span class="flex-1 text-left">Time sheet</span>
+                        </button>
+
+                        <button type="button" onclick="switchTab('ts-dashboard')" id="nav-ts-dashboard" class="nav-item w-full py-2 hidden">
+                            <i class="fa-solid fa-gauge-high text-slate-400 w-4"></i>
+                            <span class="flex-1 text-left">Dashboard การทำงาน</span>
+                            <span class="text-[8.5px] font-extrabold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-md tracking-wide">EXEC</span>
+                        </button>
+
                     </nav>
                 </div>
 
@@ -885,6 +951,61 @@
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <!-- ===== TAB: Time sheet (added) ===== -->
+                <section id="tab-timesheet" class="tab-view hidden space-y-4">
+                    <div class="bento-card p-4 sm:p-5">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                            <div class="flex items-center space-x-3 text-left">
+                                <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-regular fa-clock"></i></div>
+                                <div>
+                                    <h2 class="font-extrabold text-slate-900 text-base leading-tight">Time sheet</h2>
+                                    <p class="text-[11px] text-slate-500">อัปโหลดไฟล์บันทึกเวลา → ระบบดึงเวลาสแกนแรก/สุดท้ายของแต่ละวัน · รอบ 22 เดือนก่อนหน้า – 21 เดือนปัจจุบัน</p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 text-xs">
+                                <div id="ts-emp-wrap" class="hidden items-center">
+                                    <select id="ts-emp-select" onchange="TS_UI.setEmp(this.value)" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 text-xs focus:outline-none cursor-pointer"></select>
+                                </div>
+                                <div class="flex items-center bg-slate-50 border border-slate-200 rounded-xl">
+                                    <button type="button" onclick="TS_UI.shift(-1)" class="px-3 py-2 text-slate-500 hover:text-blue-600 cursor-pointer"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                                    <select id="ts-cycle-select" onchange="TS_UI.setCycle(this.value)" class="bg-transparent font-bold text-slate-800 text-xs py-2 focus:outline-none cursor-pointer"></select>
+                                    <button type="button" onclick="TS_UI.shift(1)" class="px-3 py-2 text-slate-500 hover:text-blue-600 cursor-pointer"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                                </div>
+                                <button type="button" onclick="TS_UI.exportXlsx()" class="px-3 py-2 rounded-xl bg-emerald-50 text-emerald-700 font-bold hover:bg-emerald-100 transition cursor-pointer pressable"><i class="fa-solid fa-file-excel mr-1.5"></i>Excel</button>
+                                <button type="button" onclick="TS_UI.print()" class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 font-bold hover:bg-slate-200 transition cursor-pointer pressable"><i class="fa-solid fa-print mr-1.5"></i>พิมพ์ / PDF</button>
+                                <button type="button" id="ts-btn-holidays" onclick="TS_UI.holidays()" class="hidden px-3 py-2 rounded-xl bg-amber-50 text-amber-700 font-bold hover:bg-amber-100 transition cursor-pointer pressable"><i class="fa-solid fa-umbrella-beach mr-1.5"></i>วันหยุด</button>
+                                <button type="button" id="ts-btn-clear" onclick="TS_UI.clearCycle()" class="hidden px-3 py-2 rounded-xl bg-rose-50 text-rose-600 font-bold hover:bg-rose-100 transition cursor-pointer pressable"><i class="fa-regular fa-trash-can mr-1.5"></i>ล้างรอบนี้</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                        <div class="lg:col-span-5 bento-card p-5 space-y-3 text-left">
+                            <div id="ts-drop" class="ts-drop p-5 text-center cursor-pointer" onclick="document.getElementById('ts-file').click()"
+                                 ondragover="event.preventDefault();this.classList.add('ts-over')" ondragleave="this.classList.remove('ts-over')"
+                                 ondrop="event.preventDefault();this.classList.remove('ts-over');TS_UI.onFiles(event.dataTransfer.files)">
+                                <div class="w-12 h-12 mx-auto rounded-2xl bg-white shadow-sm flex items-center justify-center text-blue-600 text-lg mb-2"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                                <div class="font-extrabold text-slate-900 text-sm">อัปโหลดไฟล์บันทึกเวลา</div>
+                                <div class="text-[11px] text-slate-500 mt-1">ลากไฟล์มาวาง หรือคลิกเพื่อเลือก · รองรับ .CSV / .XLSX / .XLS<br>(รายงานการรูดบัตรจากเครื่องบันทึกเวลา)</div>
+                                <input type="file" id="ts-file" accept=".csv,.CSV,.txt,.xls,.xlsx" multiple class="hidden" onchange="TS_UI.onFiles(this.files);this.value=''">
+                            </div>
+                            <div id="ts-import-report" class="text-xs"></div>
+                            <div class="flex items-center justify-between text-[10.5px] text-slate-400 pt-1">
+                                <span id="ts-sync-badge"></span>
+                                <span>เวลา = สแกนแรก/สุดท้ายของวัน (ตัดวินาที) · พักเที่ยง 1 ชม.</span>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-3" id="ts-kpis"></div>
+                    </div>
+
+                    <div class="bento-card p-3 sm:p-5 overflow-x-auto" id="ts-sheet-wrap"></div>
+                </section>
+
+                <!-- ===== TAB: Workforce dashboard (added) ===== -->
+                <section id="tab-ts-dashboard" class="tab-view hidden space-y-4">
+                    <div id="tsd-root"></div>
                 </section>
 
                 <section id="tab-profile" class="tab-view hidden max-w-3xl mx-auto space-y-5">
@@ -3210,5 +3331,738 @@
             }, 2500);
         }
     </script>
+    <!-- ===== Time sheet cloud sync (added; separate docs, does not touch main_store) ===== -->
+    <script type="module">
+        import { getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        try {
+            const tsDb = getFirestore(getApp());
+            window.tsCloud = {
+                async save(empId, key, data) {
+                    const clean = JSON.parse(JSON.stringify(data));
+                    await setDoc(doc(tsDb, "pcbk_hr_database", `ts_${empId}_${key}`), { kind: "timesheet", empId: String(empId), key, data: clean, updatedAt: clean.updatedAt || Date.now() });
+                    return true;
+                },
+                async loadAll() {
+                    const snap = await getDocs(query(collection(tsDb, "pcbk_hr_database"), where("kind", "==", "timesheet")));
+                    return snap.docs.map(d => d.data());
+                }
+            };
+        } catch (e) { console.warn("Timesheet cloud unavailable, using local storage only:", e); }
+    </script>
+
+    <!-- ===== Time sheet + Workforce dashboard logic (added) ===== -->
+    <script>
+    (function () {
+        'use strict';
+        const LS_KEY = 'pcbk_timesheet_v1';
+        const EXEC_EXCLUDE = ['1101001', '1102003'];           // Dr. Chaisak, Dr. Lalana (not shown on dashboard)
+        const STD_IN = 8 * 60 + 30, BREAK = 60, DAY_MIN = 480; // 08:30 standard start, 1h lunch, 8h/day
+        const JOB_NO = 'GE0001';
+        const TH_M = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+        const EN_M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const EN_D = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const FIXED_HOL = {'01-01':'วันขึ้นปีใหม่','04-06':'วันจักรี','04-13':'วันสงกรานต์','04-14':'วันสงกรานต์','04-15':'วันสงกรานต์','05-01':'วันแรงงานแห่งชาติ','05-04':'วันฉัตรมงคล','06-03':'วันเฉลิมพระชนมพรรษาสมเด็จพระราชินี','07-28':'วันเฉลิมพระชนมพรรษา ร.10','08-12':'วันแม่แห่งชาติ','10-13':'วันนวมินทรมหาราช','10-23':'วันปิยมหาราช','12-05':'วันพ่อแห่งชาติ','12-10':'วันรัฐธรรมนูญ','12-31':'วันสิ้นปี'};
+        const MOVABLE_HOL = {'2026-03-03':'วันมาฆบูชา'};
+
+        // ---------- storage ----------
+        let store = { cycles: {}, holidays: {} };
+        try { const raw = localStorage.getItem(LS_KEY); if (raw) { const p = JSON.parse(raw); store.cycles = p.cycles || {}; store.holidays = p.holidays || {}; } } catch (e) {}
+        function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch (e) {} }
+        const ck = (emp, key) => `${emp}|${key}`;
+        function getCyc(emp, key) { return store.cycles[ck(emp, key)] || null; }
+        function ensureCyc(emp, key) {
+            const k = ck(emp, key);
+            if (!store.cycles[k]) store.cycles[k] = { days: {}, notes: {}, job: {}, updatedAt: Date.now() };
+            const c = store.cycles[k]; c.days = c.days || {}; c.notes = c.notes || {}; c.job = c.job || {};
+            return c;
+        }
+        let syncState = 'local';
+        const timers = {};
+        function touch(emp, key) {
+            const c = ensureCyc(emp, key); c.updatedAt = Date.now(); persist();
+            clearTimeout(timers[ck(emp, key)]);
+            timers[ck(emp, key)] = setTimeout(async () => {
+                if (!window.tsCloud) { syncState = 'local'; paintSync(); return; }
+                try { syncState = 'syncing'; paintSync(); await window.tsCloud.save(emp, key, c); syncState = 'ok'; }
+                catch (e) { console.warn('timesheet cloud save failed', e); syncState = 'local'; }
+                paintSync();
+            }, 700);
+        }
+        let lastPull = 0;
+        async function pullCloud(force) {
+            if (!window.tsCloud || (!force && Date.now() - lastPull < 45000)) return;
+            lastPull = Date.now();
+            try {
+                const docs = await window.tsCloud.loadAll(); let changed = false;
+                docs.forEach(d => {
+                    if (!d || !d.data) return; const k = ck(d.empId, d.key); const loc = store.cycles[k];
+                    if (!loc || (d.data.updatedAt || 0) > (loc.updatedAt || 0)) { store.cycles[k] = d.data; changed = true; }
+                });
+                syncState = 'ok'; if (changed) { persist(); renderActive(); }
+            } catch (e) { syncState = 'local'; }
+            paintSync();
+        }
+        function paintSync() {
+            const el = document.getElementById('ts-sync-badge'); if (!el) return;
+            const m = { ok: ['text-emerald-600', 'fa-cloud-check', 'ซิงก์คลาวด์แล้ว'], syncing: ['text-blue-600', 'fa-rotate', 'กำลังซิงก์...'], local: ['text-slate-400', 'fa-hard-drive', 'บันทึกในเครื่อง'] }[syncState];
+            el.innerHTML = `<span class="${m[0]} font-bold"><i class="fa-solid ${m[1] === 'fa-cloud-check' ? 'fa-cloud' : m[1]} mr-1"></i>${m[2]}</span>`;
+        }
+
+        // ---------- helpers ----------
+        const pad = n => String(n).padStart(2, '0');
+        const isoOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        const parseISO = s => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return new Date(y, m - 1, d); };
+        const toMin = s => { if (!s) return null; const m = /^(\d{1,2}):(\d{2})/.exec(s); return m ? (+m[1]) * 60 + (+m[2]) : null; };
+        const fmtT = m => m == null ? '' : `${Math.floor(m / 60)}:${pad(m % 60)}`;
+        const fmtHM = m => m == null ? '' : `${Math.floor(m / 60)}:${pad(Math.round(m % 60))}`;
+        const hrs = m => (m / 60);
+        const f1 = n => (Math.round(n * 10) / 10).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        const f0 = n => Math.round(n).toLocaleString('en-US');
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const parseHMtxt = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || '').trim()); return m ? (+m[1]) * 60 + (+m[2]) : 0; };
+        const beY = y => y + 543;
+        const cycleOf = d => { const x = d.getDate() >= 22 ? new Date(d.getFullYear(), d.getMonth() + 1, 1) : d; return `${x.getFullYear()}-${pad(x.getMonth() + 1)}`; };
+        function cycleRange(key) { const [y, m] = key.split('-').map(Number); return [new Date(y, m - 2, 22), new Date(y, m - 1, 21)]; }
+        function cycleLabel(key, short) {
+            const [s, e] = cycleRange(key);
+            return short ? `${TH_M[e.getMonth()]} ${beY(e.getFullYear())}` : `22 ${TH_M[s.getMonth()]} – 21 ${TH_M[e.getMonth()]} ${beY(e.getFullYear())}`;
+        }
+        function latestKeyWithData(empIds) {
+            let best = null;
+            Object.keys(store.cycles).forEach(k => { const [id, key] = k.split('|'); if (empIds && !empIds.includes(String(id))) return; if (Object.keys(store.cycles[k].days || {}).length && (!best || key > best)) best = key; });
+            return best;
+        }
+        const todayD = () => { const t = new Date(); t.setHours(0, 0, 0, 0); return t; };
+        const curCycle = () => cycleOf(todayD());
+        function holidayName(d) {
+            const iso = isoOf(d);
+            return store.holidays[iso] || MOVABLE_HOL[iso] || FIXED_HOL[iso.slice(5)] || null;
+        }
+        const isoCycleKeys = (from, to) => { const out = []; let [y, m] = from.split('-').map(Number); const [ty, tm] = to.split('-').map(Number); while (y < ty || (y === ty && m <= tm)) { out.push(`${y}-${pad(m)}`); m++; if (m > 12) { m = 1; y++; } } return out; };
+        const allEmp = () => (typeof employees !== 'undefined' ? employees : []);
+        const empById = id => allEmp().find(e => String(e.id) === String(id));
+        const canExec = () => { try { return typeof isExecutiveOrAdmin === 'function' && !!currentUser && isExecutiveOrAdmin(); } catch (e) { return false; } };
+        const amAdmin = () => { try { return !!isAdmin; } catch (e) { return false; } };
+        const nm = e => { try { return formatDisplayName(e); } catch (x) { return e ? e.name : ''; } };
+        const nick = id => { try { return getEmployeeNickname(id); } catch (e) { return ''; } };
+        const toast = m => { try { showToast(m); } catch (e) { alert(m); } };
+        const posEn = e => String(e && e.position || '').split('(')[0].trim();
+
+        // ---------- leave / off-site from the app's approved requests ----------
+        function leaveMap(empId, key) {
+            const [s, e] = cycleRange(key); const map = {};
+            let reqs = []; try { reqs = requests || []; } catch (x) {}
+            reqs.forEach(r => {
+                if (String(r.empId) !== String(empId)) return;
+                let ok = false; try { ok = isApprovedStatus(r.status); } catch (x) { ok = r.status === 'อนุมัติแล้ว'; }
+                if (!ok || !r.startDate) return;
+                const a = parseISO(r.startDate), b = parseISO(r.endDate || r.startDate);
+                const t = String(r.type || '');
+                const kind = t.includes('พักร้อน') ? 'vac' : t.includes('ป่วย') ? 'sick' : t.includes('ทำงานนอกสถานที่') ? 'off' : 'other';
+                const single = a.getTime() === b.getTime();
+                for (let d = new Date(a); d <= b; d.setDate(d.getDate() + 1)) {
+                    if (d < s || d > e) continue;
+                    const w = d.getDay(); if (w === 0 || w === 6 || holidayName(d)) continue;
+                    const days = single ? Math.min(1, Number(r.days) || 1) : 1;
+                    map[isoOf(d)] = { kind, days, label: (kind !== 'off' && days < 1) ? `${t} ${parseFloat(days.toFixed(2))} วัน` : t };
+                }
+            });
+            return map;
+        }
+
+        // ---------- stats ----------
+        function cycleStats(empId, key) {
+            const cyc = getCyc(empId, key); const [s, e] = cycleRange(key); const today = todayD();
+            const lm = leaveMap(empId, key);
+            const st = { has: !!(cyc && Object.keys(cyc.days).length), worked: 0, exp: 0, expFull: 0, leave: 0, vac: 0, sick: 0, offDays: 0, missing: 0, totalMin: 0, targetMin: 0, pct: 0, inSum: 0, inN: 0, outSum: 0, outN: 0, late: 0, otMin: 0, long: 0, incomplete: 0, days: [] };
+            for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+                const iso = isoOf(d), w = d.getDay(), hol = holidayName(d), off = (w === 0 || w === 6);
+                const rec = cyc && cyc.days[iso]; const lv = lm[iso];
+                const inM = rec ? toMin(rec.in) : null, outM = rec ? toMin(rec.out) : null;
+                const daily = (inM != null && outM != null) ? Math.max(0, outM - inM - ((lv && lv.kind !== 'off' && lv.days === 0.5) ? 0 : BREAK)) : null;
+                const future = d > today;
+                let state = 'we';
+                if (off) state = 'we'; else if (hol) state = 'ho';
+                else {
+                    st.expFull++;
+                    if (!future) st.exp++;
+                    if (rec && (inM != null || outM != null)) state = 'ok'; else if (lv) state = lv.kind === 'off' ? 'off' : 'lv'; else state = future ? 'fu' : 'miss';
+                }
+                if (rec && (inM != null || outM != null)) {
+                    if (daily != null) { st.worked++; st.totalMin += daily; st.otMin += Math.max(0, daily - DAY_MIN); if (daily >= 600) st.long++; }
+                    else st.incomplete++;
+                    if (inM != null) { st.inSum += inM; st.inN++; if (inM > STD_IN) { st.late++; if (state === 'ok') state = 'late'; } }
+                    if (outM != null) { st.outSum += outM; st.outN++; }
+                }
+                if (lv && !off && !hol && !future) { if (lv.kind === 'off') { if (!(rec && daily != null)) st.offDays++; } else { st.leave += lv.days; if (lv.kind === 'vac') st.vac += lv.days; if (lv.kind === 'sick') st.sick += lv.days; } }
+                if (state === 'miss') st.missing++;
+                st.days.push({ iso, d: d.getDate(), w, state, inM, outM, daily, hol, lv });
+            }
+            st.targetMin = Math.max(0, st.exp - st.leave - st.offDays) * DAY_MIN;
+            st.pct = st.targetMin ? st.totalMin / st.targetMin * 100 : 0;
+            st.avgIn = st.inN ? st.inSum / st.inN : null; st.avgOut = st.outN ? st.outSum / st.outN : null;
+            st.onTime = st.inN ? (st.inN - st.late) / st.inN * 100 : null;
+            return st;
+        }
+
+        // ---------- parsing the time-clock report ----------
+        function decodeBuf(buf) {
+            try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+            catch (e) { try { return new TextDecoder('windows-874').decode(buf); } catch (e2) { return new TextDecoder('utf-8').decode(buf); } }
+        }
+        function parseCSV(text) {
+            const rows = []; let row = [], cur = '', q = false;
+            for (let i = 0; i < text.length; i++) {
+                const c = text[i];
+                if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+                else if (c === '"') q = true;
+                else if (c === ',') { row.push(cur); cur = ''; }
+                else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+                else if (c !== '\r') cur += c;
+            }
+            if (cur.length || row.length) { row.push(cur); rows.push(row); }
+            return rows;
+        }
+        function parseDMY(s) {
+            const m = /(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(String(s || '')); if (!m) return null;
+            let y = +m[3]; if (y > 2400) y -= 543; return new Date(y, +m[2] - 1, +m[1]);
+        }
+        function timeCells(r) {
+            const out = [];
+            for (let i = 3; i < r.length; i++) {
+                const v = r[i]; if (v == null || v === '') continue;
+                if (typeof v === 'number' && v > 0 && v < 1) { const tot = Math.round(v * 86400); out.push({ m: Math.floor(tot / 60), s: tot % 60 }); continue; }
+                const m = /(\d{1,2}):(\d{2})(?::(\d{2}))?/.exec(String(v)); if (m) out.push({ m: (+m[1]) * 60 + (+m[2]), s: +(m[3] || 0) });
+            }
+            return out;
+        }
+        const hhmmss = t => `${pad(Math.floor(t.m / 60))}:${pad(t.m % 60)}:${pad(t.s)}`;
+        function analyse(rows) {
+            let period = null;
+            for (let i = 0; i < Math.min(6, rows.length); i++) {
+                const m = /(\d{1,2}\/\d{1,2}\/\d{4})\s*\S+\s*(\d{1,2}\/\d{1,2}\/\d{4})/.exec((rows[i] || []).join(' '));
+                if (m) { period = [parseDMY(m[1]), parseDMY(m[2])]; break; }
+            }
+            const byEmp = {};
+            rows.forEach(r => {
+                const code = String(r[0] == null ? '' : r[0]).trim();
+                if (!/^\d{5,}$/.test(code)) return;
+                const dt = parseDMY(r[2]); if (!dt) return;
+                const e = byEmp[code] = byEmp[code] || { name: String(r[1] || '').trim(), days: {} };
+                const iso = isoOf(dt); (e.days[iso] = e.days[iso] || []).push(...timeCells(r));
+            });
+            return { period, byEmp };
+        }
+        function cleanEnName(raw) {
+            const s = String(raw || '').replace(/\s+/g, ' ').trim().replace(/^(คุณ|นาย|นางสาว|นาง|Mr\.?|Mrs\.?|Ms\.?|Miss)\s*/i, '');
+            return /[A-Za-z]/.test(s) ? s : '';
+        }
+
+        // ---------- import ----------
+        let lastReport = null;
+        let sel = { emp: null, key: curCycle() };
+        function canImportFor(code) { return canExec() || (typeof currentUser !== 'undefined' && currentUser && String(currentUser.id) === String(code)); }
+        function importAnalysed(an, fileName) {
+            const rep = { file: fileName, period: an.period, items: [], skipped: [], unknown: [] };
+            const codes = Object.keys(an.byEmp);
+            if (!codes.length) { rep.error = 'ไม่พบข้อมูลการรูดบัตรในไฟล์นี้ (ตรวจสอบว่าเป็นรายงานจากเครื่องบันทึกเวลา)'; return rep; }
+            codes.forEach(code => {
+                const src = an.byEmp[code]; const emp = empById(code);
+                if (!emp) { rep.unknown.push({ code, name: src.name }); return; }
+                if (!canImportFor(code)) { rep.skipped.push({ code, name: nm(emp) }); return; }
+                const touched = {};
+                Object.keys(src.days).sort().forEach(iso => {
+                    const pts = src.days[iso].slice().sort((a, b) => a.m * 60 + a.s - (b.m * 60 + b.s));
+                    const first = pts[0], last = pts[pts.length - 1];
+                    const key = cycleOf(parseISO(iso)); const cyc = ensureCyc(code, key); touched[key] = true;
+                    let rec;
+                    if (pts.length === 1) rec = first.m < 12 * 60 ? { in: fmtT(first.m).padStart(5, '0'), out: null } : { in: null, out: fmtT(first.m).padStart(5, '0') };
+                    else rec = { in: fmtT(first.m).padStart(5, '0'), out: fmtT(last.m).padStart(5, '0') };
+                    rec.inS = hhmmss(first); rec.outS = hhmmss(last); rec.n = pts.length; rec.src = 'upload';
+                    cyc.days[iso] = rec;
+                    const en = cleanEnName(src.name); if (en) cyc.nameEn = en;
+                });
+                Object.keys(touched).forEach(key => {
+                    const c = ensureCyc(code, key); c.uploadedAt = Date.now(); c.fileName = fileName; touch(code, key);
+                    const st = cycleStats(code, key);
+                    rep.items.push({ code, name: nm(emp), key, days: Object.keys(c.days).filter(i => cycleOf(parseISO(i)) === key).length, incomplete: st.incomplete });
+                });
+            });
+            return rep;
+        }
+        async function readFile(file) {
+            const buf = await file.arrayBuffer(); const lower = file.name.toLowerCase();
+            if (lower.endsWith('.xlsx') || lower.endsWith('.xls')) {
+                const wb = XLSX.read(buf, { type: 'array' });
+                return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+            }
+            return parseCSV(decodeBuf(buf));
+        }
+        async function onFiles(files) {
+            if (!files || !files.length) return;
+            if (typeof currentUser === 'undefined' || !currentUser) { toast('กรุณาเข้าสู่ระบบก่อนอัปโหลด'); return; }
+            const reports = [];
+            for (const f of Array.from(files)) {
+                try { reports.push(importAnalysed(analyse(await readFile(f)), f.name)); }
+                catch (e) { console.error(e); reports.push({ file: f.name, error: 'อ่านไฟล์ไม่สำเร็จ: ' + (e.message || e), items: [], skipped: [], unknown: [] }); }
+            }
+            lastReport = reports;
+            const firstItem = reports.flatMap(r => r.items)[0];
+            if (firstItem) { picked = true; sel.emp = firstItem.code; sel.key = firstItem.key; toast(`นำเข้าไทม์ชีตเรียบร้อย · ${firstItem.name}`); }
+            renderTimesheet();
+        }
+        function reportHTML() {
+            if (!lastReport) return '';
+            return lastReport.map(r => {
+                if (r.error) return `<div class="p-3 rounded-2xl bg-rose-50 border border-rose-100 text-rose-700 font-semibold"><i class="fa-solid fa-circle-exclamation mr-1.5"></i>${esc(r.file)}: ${esc(r.error)}</div>`;
+                const items = r.items.map(i => `<div class="flex items-center justify-between py-1.5 border-b border-emerald-100 last:border-0"><span class="font-bold text-slate-800">${esc(i.name)}</span><span class="text-slate-500">${cycleLabel(i.key, true)} · <b class="text-emerald-700">${i.days} วัน</b>${i.incomplete ? ` · <span class="text-amber-600 font-bold">${i.incomplete} วันสแกนไม่ครบ</span>` : ''}</span></div>`).join('');
+                const sk = r.skipped.length ? `<div class="mt-2 text-amber-700 bg-amber-50 rounded-xl p-2.5"><i class="fa-solid fa-lock mr-1"></i>ข้ามข้อมูลของ ${r.skipped.map(s => esc(s.name)).join(', ')} (อัปโหลดได้เฉพาะของตนเอง)</div>` : '';
+                const un = r.unknown.length ? `<div class="mt-2 text-slate-600 bg-slate-100 rounded-xl p-2.5"><i class="fa-solid fa-circle-question mr-1"></i>ไม่พบรหัสพนักงานในระบบ: ${r.unknown.map(u => esc(u.code)).join(', ')}</div>` : '';
+                return `<div class="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-100"><div class="font-extrabold text-emerald-800 mb-1"><i class="fa-solid fa-circle-check mr-1.5"></i>นำเข้าสำเร็จ · ${esc(r.file)}</div>${items || `<div class="text-slate-500">${r.skipped.length ? 'ไม่พบรหัสพนักงานของคุณในไฟล์นี้' : 'ไม่มีข้อมูลที่นำเข้า'}</div>`}${sk}${un}</div>`;
+            }).join('<div class="h-2"></div>');
+        }
+
+        // ---------- timesheet rows ----------
+        function buildSheet(empId, key) {
+            const cyc = getCyc(empId, key); const [s, e] = cycleRange(key); const lm = leaveMap(empId, key); const today = todayD();
+            const rows = []; let cum = 0, sumDaily = 0, workDays = 0, expDays = 0; const jobs = [0, 0, 0]; let vac = 0, sick = 0;
+            for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+                const iso = isoOf(d), w = d.getDay(), hol = holidayName(d), lv = lm[iso];
+                const rec = cyc && cyc.days[iso];
+                const inM = rec ? toMin(rec.in) : null, outM = rec ? toMin(rec.out) : null;
+                const daily = (inM != null && outM != null) ? Math.max(0, outM - inM - ((lv && lv.kind !== 'off' && lv.days === 0.5) ? 0 : BREAK)) : null;
+                if (daily != null) { cum += daily; sumDaily += daily; workDays++; }
+                if (w !== 0 && w !== 6 && !hol) expDays++;
+                if (lv && lv.kind === 'vac') vac += lv.days; if (lv && lv.kind === 'sick') sick += lv.days;
+                const jb = (cyc && cyc.job && cyc.job[iso]) || {};
+                const h = jb.h !== undefined ? jb.h : (daily != null ? '8:00' : '');
+                const j2 = jb.j2 !== undefined ? jb.j2 : (daily != null ? '-' : '');
+                const j3 = jb.j3 !== undefined ? jb.j3 : (daily != null ? '-' : '');
+                jobs[0] += parseHMtxt(h); jobs[1] += parseHMtxt(j2); jobs[2] += parseHMtxt(j3);
+                const auto = [hol, lv && lv.label].filter(Boolean).join(' / ');
+                const note = (cyc && cyc.notes && Object.prototype.hasOwnProperty.call(cyc.notes, iso)) ? cyc.notes[iso] : auto;
+                let cls = '';
+                if (w === 0 || w === 6) cls = 'ts-row-we'; else if (hol) cls = 'ts-row-ho'; else if (lv && !rec) cls = lv.kind === 'off' ? 'ts-row-off' : 'ts-row-lv';
+                else if (!rec && d <= today) cls = 'ts-row-miss';
+                if (rec && (inM == null || outM == null)) cls += ' ts-row-flag';
+                rows.push({ iso, d: new Date(d), w, cls, inM, outM, rec, daily, cum: (daily != null || rows.length) ? cum : null, h, j2, j3, note, hol });
+            }
+            return { rows, cyc, sumDaily, workDays, expDays, jobs, vac, sick, s, e };
+        }
+        function enHeader(empId, key) {
+            const emp = empById(empId); const cyc = getCyc(empId, key);
+            return { name: (cyc && cyc.nameEn) || (emp ? nm(emp) : ''), position: posEn(emp) };
+        }
+        function sheetHTML(empId, key, editable) {
+            const sh = buildSheet(empId, key); const hd = enHeader(empId, key); const [s, e] = [sh.s, sh.e];
+            const dmy = d => `${d.getDate()}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+            const stamp = `${e.getMonth() + 1}.${EN_M[e.getMonth()]} ${e.getFullYear()}`;
+            const inp = (iso, f, v, type, extra) => editable
+                ? `<input class="ts-inp ${extra || ''}" ${type === 'time' ? 'type="time"' : 'type="text"'} value="${esc(v || '')}" onchange="TS_UI.edit('${iso}','${f}',this.value)">`
+                : esc(v || '');
+            const body = sh.rows.map(r => {
+                const manual = r.rec && r.rec.src !== 'upload' ? 'ts-manual' : '';
+                const tip = r.rec && r.rec.inS ? `title="สแกน ${r.rec.n} ครั้ง: ${r.rec.inS} → ${r.rec.outS}"` : '';
+                const inV = r.inM != null ? String(r.rec.in).padStart(5, '0') : '', outV = r.outM != null ? String(r.rec.out).padStart(5, '0') : '';
+                return `<tr class="${r.cls}">
+                    <td>${pad(r.d.getDate())}/${pad(r.d.getMonth() + 1)}/${String(r.d.getFullYear()).slice(2)}</td><td>${EN_D[r.w]}</td>
+                    <td class="ts-t ${manual}" ${tip}>${inp(r.iso, 'in', inV, 'time')}</td><td class="ts-t ${manual}" ${tip}>${inp(r.iso, 'out', outV, 'time')}</td>
+                    <td class="font-bold">${r.daily != null ? fmtHM(r.daily) : ''}</td><td class="text-slate-500">${r.cum != null && (r.daily != null || r.cum > 0) ? fmtHM(r.cum) : ''}</td>
+                    <td>${inp(r.iso, 'h', r.h, 'text')}</td><td>${inp(r.iso, 'j2', r.j2, 'text')}</td><td>${inp(r.iso, 'j3', r.j3, 'text')}</td>
+                    <td class="ts-note">${editable ? `<input class="ts-inp ts-left" type="text" value="${esc(r.note)}" onchange="TS_UI.edit('${r.iso}','note',this.value)">` : esc(r.note)}</td></tr>`;
+            }).join('');
+            const jobTot = sh.jobs.reduce((a, b) => a + b, 0);
+            const lalana = empById('1102003');
+            return `<div class="ts-paper">
+                <div class="ts-title">PCBK Office Time Sheet</div>
+                <div class="text-right text-[12px] font-bold text-slate-600 -mt-5 mb-2">${stamp}</div>
+                <table class="ts-meta"><tbody>
+                    <tr><td class="font-bold">Year</td><td>: ${e.getFullYear()}</td></tr>
+                    <tr><td class="font-bold">Month</td><td>: ${dmy(s)} &nbsp;→&nbsp; ${dmy(e)}</td></tr>
+                    <tr><td class="font-bold">Job No.</td><td>: ${JOB_NO}</td></tr>
+                    <tr><td class="font-bold">Name</td><td>: ${esc(hd.name)}</td></tr>
+                    <tr><td class="font-bold">Position</td><td>: ${esc(hd.position)}</td></tr>
+                    <tr><td class="font-bold">Working Hours</td><td>: 08:30 &nbsp;-&nbsp; 17:30</td></tr>
+                </tbody></table>
+                <table class="ts-tbl mt-3">
+                    <thead>
+                        <tr><th rowspan="2">Date</th><th rowspan="2">Day</th><th colspan="4">Working Hours</th><th colspan="3">Job No.</th><th rowspan="2">Work Description</th></tr>
+                        <tr><th>Starting</th><th>Ending</th><th>Daily</th><th>Cumulative</th><th>GE0001<br>Office</th><th>0320<br>ZEH/ZEB</th><th>Other</th></tr>
+                    </thead>
+                    <tbody>${body}</tbody>
+                    <tfoot><tr class="font-extrabold" style="background:#eef3ff"><td colspan="4" class="text-left">Total Working Hours</td><td>${fmtHM(sh.sumDaily)}</td><td></td><td>${fmtHM(sh.jobs[0])}</td><td>${fmtHM(sh.jobs[1])}</td><td>${fmtHM(sh.jobs[2])}</td><td class="text-right">Total &nbsp; ${fmtHM(jobTot)}</td></tr></tfoot>
+                </table>
+                <div class="grid grid-cols-2 gap-x-10 mt-4 text-[12.5px]" style="max-width:520px">
+                    <div class="flex justify-between"><span class="font-bold">Monthly Working Days</span><span>${sh.expDays} Days</span></div><div class="flex justify-between"><span class="font-bold">Annual Leave</span><span>${parseFloat(sh.vac.toFixed(2))} Days</span></div>
+                    <div class="flex justify-between"><span class="font-bold">Monthly Working Hours</span><span>${(sh.expDays * 8).toFixed(2)} Hours</span></div><div class="flex justify-between"><span class="font-bold">Sick Leave</span><span>${parseFloat(sh.sick.toFixed(2))} Days</span></div>
+                    <div class="flex justify-between"><span class="font-bold">Total Working Days</span><span>${sh.workDays} Days</span></div><div></div>
+                    <div class="flex justify-between"><span class="font-bold">Total Working Hours</span><span>${(sh.sumDaily / 60).toFixed(2)} Hours</span></div><div></div>
+                </div>
+                <div class="grid grid-cols-2 gap-8 mt-8 text-[12.5px]">
+                    <div><div class="font-bold">Checked by (1) :</div><div class="mt-8 border-t border-slate-400 pt-1 w-64">( ${lalana ? 'Dr. Lalana Kongsukprasert' : '&nbsp;'} )</div><div class="font-bold mt-6">Checked by (2) :</div><div class="mt-8 border-t border-slate-400 pt-1 w-64">( &nbsp; )</div></div>
+                    <div><div class="font-bold">Signature :</div><div class="mt-8 border-t border-slate-400 pt-1 w-64">( ${esc(hd.name)} )</div></div>
+                </div>
+            </div>`;
+        }
+
+        // ---------- timesheet view ----------
+        function cycleOptions() {
+            const keys = [curCycle(), sel.key];
+            Object.keys(store.cycles).forEach(k => keys.push(k.split('|')[1]));
+            const [cy, cm] = curCycle().split('-').map(Number); const back = new Date(cy, cm - 12, 1);
+            keys.push(`${back.getFullYear()}-${pad(back.getMonth() + 1)}`);
+            const sorted = keys.slice().sort();
+            return isoCycleKeys(sorted[0], sorted[sorted.length - 1]).reverse();
+        }
+        function visibleEmployees() { return canExec() ? allEmp() : allEmp().filter(e => currentUser && String(e.id) === String(currentUser.id)); }
+        let picked = false;
+        function ensureSel() {
+            const vis = visibleEmployees();
+            if (!sel.emp || !vis.some(e => String(e.id) === String(sel.emp))) {
+                const pref = (typeof displayEmp !== 'undefined' && displayEmp && vis.find(e => String(e.id) === String(displayEmp.id))) || vis[0];
+                sel.emp = pref ? String(pref.id) : null;
+            }
+            if (!picked && sel.emp && !getCyc(sel.emp, sel.key)) { const k = latestKeyWithData([String(sel.emp)]); if (k) sel.key = k; }
+        }
+        function canEditSheet() { return amAdmin() || (currentUser && String(currentUser.id) === String(sel.emp)); }
+        function renderTimesheet() {
+            if (typeof currentUser === 'undefined' || !currentUser) return;
+            ensureSel(); if (!sel.emp) return;
+            const wrap = document.getElementById('ts-emp-wrap'), esel = document.getElementById('ts-emp-select');
+            if (canExec()) { wrap.classList.remove('hidden'); wrap.classList.add('flex'); esel.innerHTML = allEmp().map(e => `<option value="${e.id}" ${String(e.id) === String(sel.emp) ? 'selected' : ''}>${esc(nm(e))}${nick(e.id) ? ' (' + esc(nick(e.id)) + ')' : ''}</option>`).join(''); }
+            else { wrap.classList.add('hidden'); wrap.classList.remove('flex'); }
+            document.getElementById('ts-cycle-select').innerHTML = cycleOptions().map(k => `<option value="${k}" ${k === sel.key ? 'selected' : ''}>${cycleLabel(k)}</option>`).join('');
+            document.getElementById('ts-btn-holidays').classList.toggle('hidden', !amAdmin());
+            document.getElementById('ts-btn-clear').classList.toggle('hidden', !amAdmin());
+            document.getElementById('ts-import-report').innerHTML = reportHTML();
+            const st = cycleStats(sel.emp, sel.key);
+            const kp = (ic, c, v, l) => `<div class="bento-card p-3.5 text-left"><div class="w-8 h-8 rounded-xl ${c} flex items-center justify-center text-xs mb-2"><i class="${ic}"></i></div><div class="text-lg font-black text-slate-900 leading-none">${v}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">${l}</div></div>`;
+            document.getElementById('ts-kpis').innerHTML =
+                kp('fa-solid fa-calendar-check', 'bg-blue-50 text-blue-600', `${st.worked}<span class="text-xs text-slate-400 font-bold"> / ${st.expFull}</span>`, 'วันทำงาน / วันทำการในรอบ') +
+                kp('fa-solid fa-hourglass-half', 'bg-indigo-50 text-indigo-600', `${st.has ? f1(hrs(st.totalMin)) : '–'}<span class="text-xs text-slate-400 font-bold"> ชม.</span>`, 'ชั่วโมงทำงานรวม') +
+                kp('fa-solid fa-right-to-bracket', 'bg-emerald-50 text-emerald-600', st.avgIn != null ? fmtT(Math.round(st.avgIn)) : '–', 'เวลาเข้างานเฉลี่ย') +
+                kp('fa-solid fa-right-from-bracket', 'bg-amber-50 text-amber-600', st.avgOut != null ? fmtT(Math.round(st.avgOut)) : '–', 'เวลาออกงานเฉลี่ย');
+            const editable = canEditSheet();
+            const banner = st.has ? '' : `<div class="mb-3 p-3 rounded-2xl bg-blue-50 border border-blue-100 text-blue-800 text-xs font-semibold"><i class="fa-solid fa-circle-info mr-1.5"></i>ยังไม่มีข้อมูลของรอบ ${cycleLabel(sel.key)} — อัปโหลดไฟล์บันทึกเวลาเพื่อสร้างไทม์ชีตอัตโนมัติ</div>`;
+            const note = (st.incomplete ? `<div class="mb-3 p-3 rounded-2xl bg-amber-50 border border-amber-100 text-amber-800 text-xs font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>มี ${st.incomplete} วันที่สแกนเพียงครั้งเดียว — กรุณากรอกเวลาที่ขาดในช่องสีส้ม</div>` : '') +
+                (editable ? `<div class="mb-3 text-[11px] text-slate-400"><i class="fa-regular fa-pen-to-square mr-1"></i>คลิกที่เวลา / หมายเหตุ เพื่อแก้ไขได้ · จุดสีส้มคือค่าที่แก้ไขด้วยมือ · วางเมาส์บนเวลาเพื่อดูเวลาสแกนจริง (ถึงวินาที)</div>` : '');
+            document.getElementById('ts-sheet-wrap').innerHTML = banner + note + sheetHTML(sel.emp, sel.key, editable);
+            paintSync(); pullCloud(false);
+        }
+        function edit(iso, f, v) {
+            if (!canEditSheet()) return;
+            const c = ensureCyc(sel.emp, sel.key);
+            if (f === 'in' || f === 'out') {
+                const r = c.days[iso] || (c.days[iso] = { in: null, out: null, n: 0, src: 'manual' });
+                r[f] = v || null; r.src = 'manual';
+                if (!r.in && !r.out) delete c.days[iso];
+            } else if (f === 'note') c.notes[iso] = v;
+            else { c.job[iso] = c.job[iso] || {}; c.job[iso][f] = v; }
+            touch(sel.emp, sel.key); renderTimesheet();
+        }
+        function clearCycle() {
+            if (!amAdmin()) return;
+            if (!confirm(`ล้างข้อมูลไทม์ชีตรอบ ${cycleLabel(sel.key)} ของพนักงานคนนี้?`)) return;
+            delete store.cycles[ck(sel.emp, sel.key)]; persist();
+            if (window.tsCloud) { /* keep an empty marker so other devices pick up the clear */ store.cycles[ck(sel.emp, sel.key)] = { days: {}, notes: {}, job: {}, updatedAt: Date.now() }; touch(sel.emp, sel.key); }
+            renderTimesheet();
+        }
+        function setCycle(k) { picked = true; sel.key = k; renderTimesheet(); }
+        function shift(n) { picked = true; const list = cycleOptions().slice().reverse(); const i = list.indexOf(sel.key) + n; if (i >= 0 && i < list.length) { sel.key = list[i]; renderTimesheet(); } }
+        function setEmp(id) { sel.emp = id; renderTimesheet(); }
+
+        // ---------- export / print ----------
+        function exportXlsx() {
+            const sh = buildSheet(sel.emp, sel.key); const hd = enHeader(sel.emp, sel.key); const e = sh.e, s = sh.s;
+            const dmy = d => `${d.getDate()}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+            const aoa = [['PCBK Office Time Sheet'], [`${e.getMonth() + 1}.${EN_M[e.getMonth()]} ${e.getFullYear()}`], ['Year', ': ' + e.getFullYear()], ['Month', `: ${dmy(s)}  →  ${dmy(e)}`], ['Job No.', ': ' + JOB_NO], ['Name', ': ' + hd.name], ['Position', ': ' + hd.position], ['Working Hours', ': 08:30 - 17:30'], [],
+                ['Date', 'Day', 'Starting', 'Ending', 'Daily', 'Cumulative', 'GE0001 Office', '0320 ZEH/ZEB', 'Other', 'Work Description']];
+            sh.rows.forEach(r => aoa.push([`${pad(r.d.getDate())}/${pad(r.d.getMonth() + 1)}/${String(r.d.getFullYear()).slice(2)}`, EN_D[r.w], r.inM != null ? fmtT(r.inM) : '', r.outM != null ? fmtT(r.outM) : '', r.daily != null ? fmtHM(r.daily) : '', r.daily != null ? fmtHM(r.cum) : '', r.h, r.j2, r.j3, r.note]));
+            aoa.push(['Total Working Hours', '', '', '', fmtHM(sh.sumDaily), '', fmtHM(sh.jobs[0]), fmtHM(sh.jobs[1]), fmtHM(sh.jobs[2]), `Total ${fmtHM(sh.jobs[0] + sh.jobs[1] + sh.jobs[2])}`], [],
+                ['Monthly Working Days', sh.expDays, 'Days', '', '', 'Annual Leave', parseFloat(sh.vac.toFixed(2)), 'Days'],
+                ['Monthly Working Hours', sh.expDays * 8, 'Hours', '', '', 'Sick Leave', parseFloat(sh.sick.toFixed(2)), 'Days'],
+                ['Total Working Days', sh.workDays, 'Days'], ['Total Working Hours', +(sh.sumDaily / 60).toFixed(2), 'Hours'], [], ['Checked by (1) :', '( Dr. Lalana Kongsukprasert )'], ['Checked by (2) :', '(    )'], ['Signature :', `( ${hd.name} )`]);
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            ws['!cols'] = [{ wch: 14 }, { wch: 7 }, { wch: 10 }, { wch: 10 }, { wch: 9 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 9 }, { wch: 38 }];
+            ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } }];
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, `${EN_M[e.getMonth()].slice(0, 3)}${e.getFullYear()}`);
+            XLSX.writeFile(wb, `Timesheet_${(hd.name || sel.emp).replace(/\s+/g, '_')}_${sel.key}.xlsx`);
+        }
+        function printSheet() {
+            let root = document.getElementById('ts-print-root');
+            if (!root) { root = document.createElement('div'); root.id = 'ts-print-root'; document.body.appendChild(root); }
+            root.innerHTML = sheetHTML(sel.emp, sel.key, false);
+            document.body.classList.add('ts-printing');
+            const done = () => { document.body.classList.remove('ts-printing'); root.innerHTML = ''; window.removeEventListener('afterprint', done); };
+            window.addEventListener('afterprint', done); setTimeout(() => window.print(), 80);
+        }
+
+        // ---------- holiday manager (admin) ----------
+        function holidays() {
+            const old = document.getElementById('ts-hol-modal'); if (old) old.remove();
+            const m = document.createElement('div'); m.id = 'ts-hol-modal'; m.className = 'fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+            const list = () => Object.keys(store.holidays).sort().map(d => `<div class="flex items-center justify-between py-2 border-b border-slate-100 text-xs"><span><b>${d}</b> · ${esc(store.holidays[d])}</span><button class="text-rose-500 font-bold cursor-pointer" onclick="TS_UI.delHoliday('${d}')">ลบ</button></div>`).join('') || '<div class="text-xs text-slate-400 py-3">ยังไม่มีวันหยุดเพิ่มเติม</div>';
+            m.innerHTML = `<div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl space-y-4 text-left"><div class="flex items-center justify-between"><h3 class="font-extrabold text-slate-900">วันหยุดเพิ่มเติม / วันหยุดชดเชย</h3><button class="text-slate-400 cursor-pointer" onclick="document.getElementById('ts-hol-modal').remove()"><i class="fa-solid fa-xmark"></i></button></div>
+                <p class="text-[11px] text-slate-500">ระบบมีวันหยุดราชการประจำปีที่มีวันที่แน่นอนอยู่แล้ว (เช่น 12 ส.ค., 13 ต.ค., 23 ต.ค., 5 ธ.ค.) — เพิ่มวันหยุดตามประกาศบริษัท วันหยุดชดเชย หรือวันพระใหญ่ได้ที่นี่ เพื่อให้จำนวนวันทำการของแต่ละรอบถูกต้อง</p>
+                <div class="flex gap-2"><input id="ts-hol-date" type="date" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"><input id="ts-hol-name" placeholder="ชื่อวันหยุด" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs"><button class="bg-blue-600 text-white font-bold text-xs px-4 rounded-xl cursor-pointer" onclick="TS_UI.addHoliday()">เพิ่ม</button></div>
+                <div id="ts-hol-list" class="max-h-56 overflow-y-auto">${list()}</div></div>`;
+            document.body.appendChild(m);
+        }
+        function refreshHol() { const el = document.getElementById('ts-hol-list'); if (!el) return; holidays(); }
+        function addHoliday() { const d = document.getElementById('ts-hol-date').value, n = document.getElementById('ts-hol-name').value.trim(); if (!d || !n) return; store.holidays[d] = n; persist(); refreshHol(); renderActive(); }
+        function delHoliday(d) { delete store.holidays[d]; persist(); refreshHol(); renderActive(); }
+
+        // =====================================================================
+        //                       WORKFORCE DASHBOARD
+        // =====================================================================
+        const D = { picked: false, mode: 'month', key: curCycle(), year: new Date().getFullYear(), emp: null, sortKey: 'name', sortDir: 1, charts: {} };
+        const C = { blue: '#2f66ee', indigo: '#6366f1', violet: '#8b5cf6', emerald: '#10b981', amber: '#f59e0b', rose: '#f43f5e', sky: '#0ea5e9', slate: '#94a3b8' };
+        const PAL = ['#2f66ee', '#10b981', '#f59e0b', '#8b5cf6', '#f43f5e', '#0ea5e9', '#14b8a6', '#ec4899'];
+        const dashEmps = () => allEmp().filter(e => !EXEC_EXCLUDE.includes(String(e.id)));
+        function killCharts() { Object.values(D.charts).forEach(c => { try { c.destroy(); } catch (e) {} }); D.charts = {}; }
+        function mkChart(id, cfg) {
+            const el = document.getElementById(id); if (!el || typeof Chart === 'undefined') return;
+            Chart.defaults.font.family = "'Plus Jakarta Sans','Prompt',sans-serif"; Chart.defaults.color = '#64748b';
+            D.charts[id] = new Chart(el, cfg);
+        }
+        function yearAgg(empId, year) {
+            const months = []; const a = { worked: 0, exp: 0, totalMin: 0, targetMin: 0, late: 0, inN: 0, inSum: 0, outN: 0, outSum: 0, otMin: 0, leave: 0, vac: 0, sick: 0, missing: 0, has: false, covered: 0 };
+            for (let m = 1; m <= 12; m++) {
+                const key = `${year}-${pad(m)}`; const [s] = cycleRange(key);
+                if (s > todayD()) { months.push(null); continue; }
+                const st = cycleStats(empId, key); months.push(st);
+                if (!st.has) continue;
+                a.has = true; a.covered++;
+                ['worked', 'exp', 'totalMin', 'targetMin', 'late', 'inN', 'inSum', 'outN', 'outSum', 'otMin', 'leave', 'vac', 'sick', 'missing'].forEach(k => a[k] += st[k]);
+            }
+            a.pct = a.targetMin ? a.totalMin / a.targetMin * 100 : 0;
+            a.avgIn = a.inN ? a.inSum / a.inN : null; a.avgOut = a.outN ? a.outSum / a.outN : null; a.onTime = a.inN ? (a.inN - a.late) / a.inN * 100 : null;
+            return { a, months };
+        }
+        const pctColor = p => p >= 100 ? C.emerald : p >= 90 ? C.blue : p >= 75 ? C.amber : C.rose;
+        const avatar = id => `<img src="${(() => { try { return getEmployeeAvatar(id); } catch (e) { return id + '.jpg'; } })()}" class="w-8 h-8 rounded-xl object-cover bg-white border border-slate-200 shrink-0" onerror="handleImageError(this,'${id}')">`;
+
+        function dashData() {
+            const emps = dashEmps();
+            if (D.mode === 'month') {
+                return emps.map(e => { const st = cycleStats(e.id, D.key); return { emp: e, s: st, a: st, has: st.has }; });
+            }
+            return emps.map(e => { const y = yearAgg(e.id, D.year); return { emp: e, s: null, a: y.a, months: y.months, has: y.has !== false && y.a.has }; });
+        }
+        function sortRows(rows) {
+            const k = D.sortKey, dir = D.sortDir;
+            const val = r => ({ name: nm(r.emp), worked: r.a.worked, hours: r.a.totalMin, pct: r.a.pct, avgIn: r.a.avgIn == null ? 1e9 : r.a.avgIn, late: r.a.late, ot: r.a.otMin, leave: r.a.leave, missing: r.a.missing || 0 })[k];
+            return rows.slice().sort((x, y) => { const a = val(x), b = val(y); return (typeof a === 'string' ? a.localeCompare(b, 'th') : a - b) * dir; });
+        }
+        function heroHTML(rows) {
+            const have = rows.filter(r => r.has);
+            const tot = k => have.reduce((s, r) => s + (r.a[k] || 0), 0);
+            const hours = tot('totalMin'), target = tot('targetMin'), worked = tot('worked');
+            const inN = tot('inN'), inSum = tot('inSum'), late = tot('late');
+            const avgIn = inN ? inSum / inN : null; const onTime = inN ? (inN - late) / inN * 100 : null;
+            const pct = target ? hours / target * 100 : 0;
+            const label = D.mode === 'month' ? `รอบ ${cycleLabel(D.key)}` : `ปี พ.ศ. ${beY(D.year)}`;
+            const kpi = (ic, col, v, l, sub) => `<div class="tsd-kpi text-left"><div class="flex items-center justify-between"><div class="w-9 h-9 rounded-2xl flex items-center justify-center text-sm" style="background:${col}1a;color:${col}"><i class="${ic}"></i></div></div><div class="text-2xl font-black text-slate-900 leading-none mt-3">${v}</div><div class="text-[11px] font-bold text-slate-700 mt-1.5">${l}</div><div class="text-[10px] text-slate-400 mt-0.5">${sub}</div></div>`;
+            const yearOpts = (() => { const out = []; for (let y = new Date().getFullYear(); y >= 2023; y--) out.push(`<option value="${y}" ${y === D.year ? 'selected' : ''}>พ.ศ. ${beY(y)}</option>`); return out.join(''); })();
+            const cycOpts = cycleOptions().map(k => `<option value="${k}" ${k === D.key ? 'selected' : ''}>${cycleLabel(k)}</option>`).join('');
+            return `<div class="tsd-hero p-5 sm:p-7"><div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4 text-left">
+                    <div><div class="text-[10.5px] font-extrabold tracking-[.18em] uppercase text-white/70">Workforce Performance</div>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight mt-1">แดชบอร์ดผลการทำงานของพนักงาน</h2>
+                    <p class="text-xs text-white/75 mt-1.5">${label} · พนักงาน ${rows.length} คน (ไม่รวมผู้บริหาร) · ข้อมูลครบ ${have.length}/${rows.length} คน</p></div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="tsd-seg"><button class="${D.mode === 'month' ? 'on' : ''}" onclick="TS_UI.dMode('month')">รายเดือน</button><button class="${D.mode === 'year' ? 'on' : ''}" onclick="TS_UI.dMode('year')">รายปี</button></div>
+                        ${D.mode === 'month' ? `<select class="tsd-sel cursor-pointer" onchange="TS_UI.dKey(this.value)">${cycOpts}</select>` : `<select class="tsd-sel cursor-pointer" onchange="TS_UI.dYear(this.value)">${yearOpts}</select>`}
+                        <button class="tsd-sel cursor-pointer" onclick="TS_UI.dExport()"><i class="fa-solid fa-file-arrow-down mr-1.5"></i>ส่งออก Excel</button>
+                    </div></div></div>
+                <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 -mt-6 px-3 sm:px-6 relative z-10">
+                    ${kpi('fa-solid fa-bullseye', C.blue, `${have.length ? f0(pct) : '–'}<span class="text-sm">%</span>`, 'ชั่วโมงทำงานเทียบเป้า', `${f0(hrs(hours))} / ${f0(hrs(target))} ชม.`)}
+                    ${kpi('fa-solid fa-calendar-check', C.emerald, f0(worked), 'วันทำงานรวม', 'ทุกคน (วันที่มีสแกนครบ)')}
+                    ${kpi('fa-solid fa-right-to-bracket', C.indigo, avgIn != null ? fmtT(Math.round(avgIn)) : '–', 'เข้างานเฉลี่ย', 'เกณฑ์ 08:30 น.')}
+                    ${kpi('fa-solid fa-user-clock', C.amber, onTime != null ? `${f0(onTime)}<span class="text-sm">%</span>` : '–', 'เข้างานไม่เกิน 08:30', `${f0(late)} ครั้งหลัง 08:30`)}
+                    ${kpi('fa-solid fa-business-time', C.violet, f1(hrs(tot('otMin'))), 'ชม. ส่วนเกิน 8 ชม./วัน', 'รวมทุกคน')}
+                    ${kpi('fa-solid fa-plane-departure', C.sky, parseFloat(tot('leave').toFixed(2)), 'วันลา (อนุมัติแล้ว)', `พักร้อน ${parseFloat(tot('vac').toFixed(2))} · ป่วย ${parseFloat(tot('sick').toFixed(2))}`)}
+                </div>`;
+        }
+        function highlightsHTML(rows) {
+            const have = rows.filter(r => r.has && r.a.worked > 0); if (!have.length) return '';
+            const best = (f, dir) => have.slice().sort((a, b) => dir * (f(a) - f(b)))[0];
+            const items = [
+                [C.blue, 'fa-solid fa-trophy', 'ชั่วโมงทำงานเทียบเป้าสูงสุด', nm(best(r => r.a.pct, -1).emp), `${f0(best(r => r.a.pct, -1).a.pct)}%`],
+                [C.emerald, 'fa-solid fa-stopwatch', 'เข้างานเช้าที่สุดโดยเฉลี่ย', nm(best(r => r.a.avgIn == null ? 1e9 : r.a.avgIn, 1).emp), fmtT(Math.round(best(r => r.a.avgIn == null ? 1e9 : r.a.avgIn, 1).a.avgIn))],
+                [C.violet, 'fa-solid fa-moon', 'ชั่วโมงส่วนเกินมากที่สุด', nm(best(r => r.a.otMin, -1).emp), `${f1(hrs(best(r => r.a.otMin, -1).a.otMin))} ชม.`],
+                [C.amber, 'fa-solid fa-circle-question', 'วันที่ไม่มีบันทึกสแกนมากที่สุด', nm(best(r => r.a.missing || 0, -1).emp), `${best(r => r.a.missing || 0, -1).a.missing || 0} วัน`]
+            ];
+            return `<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">${items.map(i => `<div class="bento-card p-4 flex items-center gap-3 text-left"><div class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style="background:${i[0]}1a;color:${i[0]}"><i class="${i[1]}"></i></div><div class="min-w-0"><div class="text-[10.5px] text-slate-500 font-semibold">${i[2]}</div><div class="text-sm font-extrabold text-slate-900 truncate">${esc(i[3])}</div><div class="text-xs font-bold" style="color:${i[0]}">${i[4]}</div></div></div>`).join('')}</div>`;
+        }
+        function tableHTML(rows) {
+            const th = (k, l) => `<th class="tsd-th" onclick="TS_UI.dSort('${k}')">${l}${D.sortKey === k ? (D.sortDir > 0 ? ' ▲' : ' ▼') : ''}</th>`;
+            const body = sortRows(rows).map(r => {
+                const a = r.a; const act = String(D.emp) === String(r.emp.id) ? 'tsd-active' : '';
+                if (!r.has) return `<tr class="tsd-click ${act}" onclick="TS_UI.dEmp('${r.emp.id}')"><td><div class="flex items-center gap-2.5">${avatar(r.emp.id)}<div><div class="font-bold text-slate-900">${esc(nm(r.emp))}</div><div class="text-[10px] text-slate-400">${esc(posEn(r.emp))}</div></div></div></td><td colspan="8" class="text-slate-400 font-semibold"><i class="fa-regular fa-file-circle-xmark mr-1.5"></i>ยังไม่มีข้อมูลบันทึกเวลา${D.mode === 'month' ? 'ของรอบนี้' : 'ของปีนี้'}</td></tr>`;
+                const col = pctColor(a.pct);
+                return `<tr class="tsd-click ${act}" onclick="TS_UI.dEmp('${r.emp.id}')">
+                    <td><div class="flex items-center gap-2.5">${avatar(r.emp.id)}<div><div class="font-bold text-slate-900">${esc(nm(r.emp))}</div><div class="text-[10px] text-slate-400">${esc(posEn(r.emp))}</div></div></div></td>
+                    <td class="font-bold">${a.worked}<span class="text-slate-400 font-semibold"> / ${a.exp}</span></td>
+                    <td class="font-bold">${f1(hrs(a.totalMin))}<span class="text-slate-400 font-semibold"> / ${f0(hrs(a.targetMin))}</span></td>
+                    <td style="min-width:130px"><div class="flex items-center gap-2"><div class="tsd-bar flex-1"><i style="width:${Math.min(100, a.pct)}%;background:${col}"></i></div><b style="color:${col}">${f0(a.pct)}%</b></div></td>
+                    <td class="font-semibold">${a.avgIn != null ? fmtT(Math.round(a.avgIn)) : '–'} <span class="text-slate-300">→</span> ${a.avgOut != null ? fmtT(Math.round(a.avgOut)) : '–'}</td>
+                    <td>${a.late ? `<span class="tsd-chip bg-amber-50 text-amber-700">${a.late}</span>` : `<span class="tsd-chip bg-emerald-50 text-emerald-700">0</span>`}</td>
+                    <td class="font-semibold">${f1(hrs(a.otMin))}</td>
+                    <td class="font-semibold">${parseFloat(a.leave.toFixed(2))}</td>
+                    <td>${(a.missing || 0) ? `<span class="tsd-chip bg-orange-50 text-orange-700">${a.missing}</span>` : '<span class="text-slate-300">–</span>'}</td></tr>`;
+            }).join('');
+            return `<div class="bento-card p-5 text-left"><div class="flex items-center justify-between mb-2"><h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-table-list text-blue-600 mr-2"></i>สรุปรายบุคคล ${D.mode === 'month' ? '· ' + cycleLabel(D.key) : '· ปี พ.ศ. ' + beY(D.year)}</h3><span class="text-[10.5px] text-slate-400">คลิกชื่อเพื่อดูรายละเอียด · คลิกหัวคอลัมน์เพื่อเรียง</span></div>
+                <div class="overflow-x-auto"><table class="tsd-tbl"><thead><tr>${th('name', 'พนักงาน')}${th('worked', 'วันทำงาน')}${th('hours', 'ชั่วโมง (เป้า)')}${th('pct', '% เทียบเป้า')}<th>เข้า → ออกเฉลี่ย</th>${th('late', 'หลัง 08:30')}${th('ot', 'ชม.ส่วนเกิน')}${th('leave', 'วันลา')}${th('missing', 'ไม่มีบันทึก')}</tr></thead><tbody>${body}</tbody></table></div>
+                <div class="text-[10.5px] text-slate-400 mt-1">เป้าชั่วโมง = (วันทำการ − วันลา − วันทำงานนอกสถานที่ที่ไม่มีสแกน) × 8 ชม. · วันที่ไม่มีบันทึก = วันทำการที่ไม่มีสแกนและไม่มีใบลา</div></div>`;
+        }
+        function heatHTML(rows) {
+            const [s, e] = cycleRange(D.key); const n = Math.round((e - s) / 864e5) + 1;
+            const colors = { ok: C.emerald, late: C.amber, miss: '#fdba74', lv: C.sky, off: C.violet, we: '#eef2f7', ho: '#fecdd3', fu: '#fff' };
+            const lab = { ok: 'เข้างานตามเกณฑ์', late: 'เข้างานหลัง 08:30', miss: 'ไม่มีบันทึก', lv: 'ลา', off: 'ทำงานนอกสถานที่', we: 'วันหยุดสุดสัปดาห์', ho: 'วันหยุดนักขัตฤกษ์', fu: 'ยังไม่ถึง' };
+            const head = Array.from({ length: n }, (_, i) => { const d = new Date(s); d.setDate(d.getDate() + i); return `<div class="text-[9px] text-center ${d.getDay() === 0 || d.getDay() === 6 ? 'text-rose-400' : 'text-slate-400'} font-bold">${d.getDate()}</div>`; }).join('');
+            const body = sortRows(rows).map(r => {
+                const st = cycleStats(r.emp.id, D.key);
+                const cells = st.days.map(x => `<div class="tsd-cell" style="background:${colors[x.state]};${x.state === 'fu' ? 'border:1px dashed #e2e8f0' : ''}" title="${x.d}/${pad(new Date(x.iso).getMonth() + 1)} · ${lab[x.state]}${x.inM != null ? ' · เข้า ' + fmtT(x.inM) : ''}${x.outM != null ? ' ออก ' + fmtT(x.outM) : ''}${x.daily != null ? ' (' + fmtHM(x.daily) + ' ชม.)' : ''}${x.hol ? ' · ' + x.hol : ''}"></div>`).join('');
+                return `<div class="text-[11px] font-bold text-slate-700 truncate pr-2 flex items-center">${esc(nick(r.emp.id) || nm(r.emp).split(' ')[0])}</div><div class="tsd-heat" style="grid-template-columns:repeat(${n},minmax(15px,1fr))">${cells}</div>`;
+            }).join('');
+            const legend = ['ok', 'late', 'lv', 'off', 'miss', 'ho', 'we'].map(k => `<span class="flex items-center gap-1.5 text-[10.5px] text-slate-500 font-semibold"><i class="inline-block w-3 h-3 rounded" style="background:${colors[k]}"></i>${lab[k]}</span>`).join('');
+            return `<div class="bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-border-all text-emerald-600 mr-2"></i>แผนที่การเข้างานรายวัน</h3>
+                <div class="overflow-x-auto"><div style="min-width:640px;display:grid;grid-template-columns:70px 1fr;row-gap:5px;align-items:center"><div></div><div class="tsd-heat" style="grid-template-columns:repeat(${n},minmax(15px,1fr))">${head}</div>${body}</div></div>
+                <div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">${legend}</div></div>`;
+        }
+        function yearMatrixHTML(rows) {
+            const head = Array.from({ length: 12 }, (_, i) => `<th class="text-center">${TH_M[i]}</th>`).join('');
+            const body = sortRows(rows).map(r => {
+                const cells = (r.months || []).map(st => {
+                    if (!st) return '<td class="text-center text-slate-300">·</td>';
+                    if (!st.has) return '<td class="text-center text-slate-300">–</td>';
+                    const c = pctColor(st.pct); return `<td class="text-center" style="background:${c}1f"><div class="font-extrabold" style="color:${c}">${f0(hrs(st.totalMin))}</div><div class="text-[9px] text-slate-400">${f0(st.pct)}%</div></td>`;
+                }).join('');
+                return `<tr class="tsd-click" onclick="TS_UI.dEmp('${r.emp.id}')"><td class="font-bold text-slate-900">${esc(nick(r.emp.id) || nm(r.emp))}</td>${cells}<td class="text-center font-black text-slate-900">${r.has ? f0(hrs(r.a.totalMin)) : '–'}</td></tr>`;
+            }).join('');
+            return `<div class="bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-1"><i class="fa-solid fa-grip text-indigo-600 mr-2"></i>ชั่วโมงทำงานรายเดือน ตลอดปี พ.ศ. ${beY(D.year)} <span class="text-slate-400 font-semibold text-[11px]">(รอบ 22–21 · เดือนตามวันสิ้นสุดรอบ)</span></h3>
+                <div class="overflow-x-auto"><table class="tsd-tbl"><thead><tr><th>พนักงาน</th>${head}<th class="text-center">รวม (ชม.)</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
+        }
+        function detailHTML(rows) {
+            const r = rows.find(x => String(x.emp.id) === String(D.emp)); if (!r) return '';
+            const a = r.a;
+            return `<div class="bento-card p-5 text-left"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"><div class="flex items-center gap-3">${avatar(r.emp.id).replace('w-8 h-8', 'w-12 h-12')}<div><div class="font-extrabold text-slate-900">${esc(nm(r.emp))}${nick(r.emp.id) ? ` <span class="text-slate-400 font-semibold">(${esc(nick(r.emp.id))})</span>` : ''}</div><div class="text-[11px] text-slate-500">${esc(r.emp.position)}</div></div></div>
+                ${r.has ? `<div class="flex flex-wrap gap-2"><span class="tsd-chip bg-blue-50 text-blue-700">${f1(hrs(a.totalMin))} ชม. · ${f0(a.pct)}% ของเป้า</span><span class="tsd-chip bg-emerald-50 text-emerald-700">${a.worked} วันทำงาน</span><span class="tsd-chip bg-amber-50 text-amber-700">หลัง 08:30: ${a.late} ครั้ง</span><span class="tsd-chip bg-violet-50 text-violet-700">ส่วนเกิน ${f1(hrs(a.otMin))} ชม.</span></div>` : '<span class="text-xs text-slate-400">ยังไม่มีข้อมูล</span>'}</div>
+                <div class="h-56 relative"><canvas id="tsd-chart-detail"></canvas></div>
+                <div class="mt-3 text-right"><button class="text-xs font-bold text-blue-600 hover:underline cursor-pointer" onclick="TS_UI.openSheet('${r.emp.id}')">เปิดไทม์ชีตของ ${esc(nick(r.emp.id) || nm(r.emp).split(' ')[0])} <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div>`;
+        }
+        function renderDashboard() {
+            const root = document.getElementById('tsd-root'); if (!root) return;
+            killCharts();
+            if (!canExec()) { root.innerHTML = `<div class="bento-card p-10 text-center"><div class="w-14 h-14 mx-auto rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-xl mb-3"><i class="fa-solid fa-lock"></i></div><div class="font-extrabold text-slate-900">เฉพาะผู้บริหาร / ผู้ดูแลระบบ</div><div class="text-xs text-slate-500 mt-1">หน้านี้สรุปผลการทำงานของพนักงานทุกคน</div></div>`; return; }
+            if (!D.picked) { const ids = dashEmps().map(e => String(e.id)); const hasNow = ids.some(id => getCyc(id, D.key) && Object.keys(getCyc(id, D.key).days).length); if (!hasNow) { const k = latestKeyWithData(ids); if (k) D.key = k; } }
+            const rows = dashData();
+            if (!D.emp || !rows.some(r => String(r.emp.id) === String(D.emp))) D.emp = (rows.find(r => r.has) || rows[0] || {}).emp ? (rows.find(r => r.has) || rows[0]).emp.id : null;
+            const anyData = rows.some(r => r.has);
+            const empty = anyData ? '' : `<div class="bento-card p-5 text-left flex items-center gap-3"><i class="fa-solid fa-circle-info text-blue-500"></i><div class="text-xs text-slate-600">ยังไม่มีข้อมูลบันทึกเวลาในช่วงที่เลือก — ให้พนักงานอัปโหลดไฟล์ที่แท็บ <b>Time sheet</b> หรือเลือกรอบ/ปีอื่น</div></div>`;
+            const charts = D.mode === 'month' ? `
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    <div class="lg:col-span-7 bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-chart-column text-blue-600 mr-2"></i>ชั่วโมงทำงานจริง เทียบเป้าหมาย</h3><div class="h-64 relative"><canvas id="tsd-chart-hours"></canvas></div></div>
+                    <div class="lg:col-span-5 bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-chart-pie text-amber-500 mr-2"></i>ช่วงเวลาเข้างาน (ทุกคน)</h3><div class="h-64 relative flex items-center justify-center"><canvas id="tsd-chart-arrival"></canvas></div></div>
+                </div>
+                <div class="bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i>จำนวนพนักงานที่มาทำงานในแต่ละวัน</h3><div class="h-48 relative"><canvas id="tsd-chart-trend"></canvas></div></div>
+                ${heatHTML(rows)}` : `
+                <div class="bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i>ชั่วโมงทำงานรายเดือนของทีม ปี พ.ศ. ${beY(D.year)}</h3><div class="h-64 relative"><canvas id="tsd-chart-year"></canvas></div></div>
+                ${yearMatrixHTML(rows)}`;
+            root.innerHTML = `<div class="space-y-4">${heroHTML(rows)}${empty}${highlightsHTML(rows)}${tableHTML(rows)}${charts}<div id="tsd-detail">${detailHTML(rows)}</div></div>`;
+            setTimeout(() => drawCharts(rows), 30);
+        }
+        function drawCharts(rows) {
+            const have = rows.filter(r => r.has); const label = r => nick(r.emp.id) || nm(r.emp).split(' ')[0];
+            const grid = { color: 'rgba(148,163,184,.18)' };
+            if (D.mode === 'month') {
+                mkChart('tsd-chart-hours', { type: 'bar', data: { labels: have.map(label), datasets: [
+                    { label: 'ชั่วโมงจริง', data: have.map(r => +hrs(r.a.totalMin).toFixed(1)), backgroundColor: have.map(r => pctColor(r.a.pct)), borderRadius: 8, maxBarThickness: 34 },
+                    { label: 'เป้าหมาย', data: have.map(r => +hrs(r.a.targetMin).toFixed(1)), type: 'line', borderColor: '#334155', borderDash: [5, 4], pointRadius: 3, pointBackgroundColor: '#334155', borderWidth: 1.5, fill: false }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, scales: { y: { beginAtZero: true, grid, title: { display: true, text: 'ชั่วโมง' } }, x: { grid: { display: false } } } } });
+                const bk = [0, 0, 0, 0]; have.forEach(r => r.s.days.forEach(d => { if (d.inM == null) return; if (d.inM < 450) bk[0]++; else if (d.inM <= STD_IN) bk[1]++; else if (d.inM <= 540) bk[2]++; else bk[3]++; }));
+                mkChart('tsd-chart-arrival', { type: 'doughnut', data: { labels: ['ก่อน 07:30', '07:30–08:30', '08:31–09:00', 'หลัง 09:00'], datasets: [{ data: bk, backgroundColor: [C.sky, C.emerald, C.amber, C.rose], borderWidth: 3, borderColor: '#fff' }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '64%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } } } });
+                const [s, e] = cycleRange(D.key); const labels = [], vals = [];
+                const first = have[0] ? have[0].s.days : [];
+                first.forEach((d, i) => { if (d.state === 'we' || d.state === 'ho') return; labels.push(`${d.d}`); vals.push(have.filter(r => { const x = r.s.days[i]; return x && (x.inM != null || x.outM != null); }).length); });
+                mkChart('tsd-chart-trend', { type: 'line', data: { labels, datasets: [{ label: 'คนที่มีสแกน', data: vals, borderColor: C.emerald, backgroundColor: 'rgba(16,185,129,.12)', fill: true, tension: .35, pointRadius: 3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, suggestedMax: Math.max(have.length, 1), grid }, x: { grid: { display: false }, title: { display: true, text: 'วันที่ในรอบ' } } } } });
+            } else {
+                mkChart('tsd-chart-year', { type: 'bar', data: { labels: TH_M, datasets: [
+                    { label: 'ชั่วโมงรวมทีม', data: TH_M.map((_, m) => { let t = 0, any = false; have.forEach(r => { const st = r.months[m]; if (st && st.has) { t += st.totalMin; any = true; } }); return any ? +hrs(t).toFixed(1) : null; }), backgroundColor: 'rgba(47,102,238,.85)', borderRadius: 8, maxBarThickness: 36, yAxisID: 'y' },
+                    { label: '% เทียบเป้า', type: 'line', data: TH_M.map((_, m) => { let t = 0, g = 0; have.forEach(r => { const st = r.months[m]; if (st && st.has) { t += st.totalMin; g += st.targetMin; } }); return g ? +(t / g * 100).toFixed(1) : null; }), borderColor: C.amber, backgroundColor: C.amber, tension: .3, pointRadius: 4, yAxisID: 'y1' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, scales: { y: { beginAtZero: true, grid, title: { display: true, text: 'ชั่วโมง' } }, y1: { position: 'right', grid: { display: false }, suggestedMin: 0, suggestedMax: 120, title: { display: true, text: '%' } }, x: { grid: { display: false } } } } });
+            }
+            drawDetail(rows);
+        }
+        function drawDetail(rows) {
+            const r = rows.find(x => String(x.emp.id) === String(D.emp)); if (!r || !document.getElementById('tsd-chart-detail')) return;
+            if (D.charts['tsd-chart-detail']) { D.charts['tsd-chart-detail'].destroy(); delete D.charts['tsd-chart-detail']; }
+            const grid = { color: 'rgba(148,163,184,.18)' };
+            if (D.mode === 'month') {
+                const st = cycleStats(r.emp.id, D.key); const days = st.days.filter(d => d.state !== 'we' && d.state !== 'ho');
+                mkChart('tsd-chart-detail', { type: 'bar', data: { labels: days.map(d => d.d), datasets: [
+                    { label: 'ชั่วโมงทำงาน', data: days.map(d => d.daily != null ? +hrs(d.daily).toFixed(2) : null), backgroundColor: days.map(d => d.state === 'late' ? C.amber : C.blue), borderRadius: 5, maxBarThickness: 18 },
+                    { label: '8 ชม.', type: 'line', data: days.map(() => 8), borderColor: '#334155', borderDash: [5, 4], pointRadius: 0, borderWidth: 1.2 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { footer: i => { const d = days[i[0].dataIndex]; return d.inM != null ? `เข้า ${fmtT(d.inM)} · ออก ${d.outM != null ? fmtT(d.outM) : '–'}` : ''; } } } }, scales: { y: { beginAtZero: true, grid, title: { display: true, text: 'ชม./วัน' } }, x: { grid: { display: false } } } } });
+            } else {
+                mkChart('tsd-chart-detail', { type: 'bar', data: { labels: TH_M, datasets: [
+                    { label: 'ชั่วโมงจริง', data: (r.months || []).map(m => m && m.has ? +hrs(m.totalMin).toFixed(1) : null), backgroundColor: (r.months || []).map(m => m && m.has ? pctColor(m.pct) : C.slate), borderRadius: 8, maxBarThickness: 30 },
+                    { label: 'เป้าหมาย', type: 'line', data: (r.months || []).map(m => m && m.has ? +hrs(m.targetMin).toFixed(1) : null), borderColor: '#334155', borderDash: [5, 4], pointRadius: 3, borderWidth: 1.5 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8 } } }, scales: { y: { beginAtZero: true, grid }, x: { grid: { display: false } } } } });
+            }
+        }
+        function dExport() {
+            const rows = dashData(); const head = ['พนักงาน', 'ตำแหน่ง', 'วันทำงาน', 'วันทำการ', 'ชั่วโมงรวม', 'ชั่วโมงเป้าหมาย', '% เทียบเป้า', 'เข้างานเฉลี่ย', 'ออกงานเฉลี่ย', 'จำนวนครั้งหลัง 08:30', 'ชม.ส่วนเกิน', 'วันลา', 'วันที่ไม่มีบันทึก'];
+            const aoa = [head].concat(sortRows(rows).map(r => r.has ? [nm(r.emp), posEn(r.emp), r.a.worked, r.a.exp, +hrs(r.a.totalMin).toFixed(2), +hrs(r.a.targetMin).toFixed(2), +r.a.pct.toFixed(1), r.a.avgIn != null ? fmtT(Math.round(r.a.avgIn)) : '', r.a.avgOut != null ? fmtT(Math.round(r.a.avgOut)) : '', r.a.late, +hrs(r.a.otMin).toFixed(2), parseFloat(r.a.leave.toFixed(2)), r.a.missing || 0] : [nm(r.emp), posEn(r.emp), 'ยังไม่มีข้อมูล']));
+            const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = head.map((h, i) => ({ wch: i < 2 ? 28 : 14 }));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, D.mode === 'month' ? `สรุป_${D.key}` : `สรุปปี_${beY(D.year)}`);
+            XLSX.writeFile(wb, D.mode === 'month' ? `Dashboard_Timesheet_${D.key}.xlsx` : `Dashboard_Timesheet_${D.year}.xlsx`);
+        }
+
+        // ---------- tab plumbing ----------
+        function renderActive() {
+            const a = document.getElementById('tab-timesheet'), b = document.getElementById('tab-ts-dashboard');
+            if (a && !a.classList.contains('hidden')) renderTimesheet();
+            if (b && !b.classList.contains('hidden')) renderDashboard();
+        }
+        const MINE = ['timesheet', 'ts-dashboard'];
+        function syncNav() {
+            const n = document.getElementById('nav-ts-dashboard'); if (!n) return;
+            n.classList.toggle('hidden', !canExec());
+            if (!canExec()) { const v = document.getElementById('tab-ts-dashboard'); if (v && !v.classList.contains('hidden')) window.switchTab('dashboard'); }
+        }
+        const origSwitch = window.switchTab;
+        window.switchTab = function (tabId) {
+            if (tabId === 'ts-dashboard' && !canExec()) { toast('แดชบอร์ดนี้สำหรับผู้บริหาร / ผู้ดูแลระบบ'); tabId = 'dashboard'; }
+            origSwitch(tabId);
+            MINE.forEach(t => {
+                const btn = document.getElementById('nav-' + t), view = document.getElementById('tab-' + t);
+                if (btn) btn.classList.toggle('active', t === tabId);
+                if (view) view.classList.toggle('hidden', t !== tabId);
+            });
+            syncNav();
+            if (tabId === 'timesheet') { renderTimesheet(); pullCloud(true); }
+            if (tabId === 'ts-dashboard') { renderDashboard(); pullCloud(true); }
+        };
+        setInterval(() => { if (typeof currentUser !== 'undefined' && currentUser) syncNav(); }, 1200);
+
+        window.TS_UI = {
+            onFiles, setEmp, setCycle, shift, edit, exportXlsx, print: printSheet, clearCycle, holidays, addHoliday, delHoliday,
+            dMode: m => { D.mode = m; renderDashboard(); },
+            dKey: k => { D.picked = true; D.key = k; renderDashboard(); },
+            dYear: y => { D.year = +y; renderDashboard(); },
+            dSort: k => { if (D.sortKey === k) D.sortDir *= -1; else { D.sortKey = k; D.sortDir = k === 'name' ? 1 : -1; } renderDashboard(); },
+            dEmp: id => {
+                D.emp = id; const rows = dashData(); const el = document.getElementById('tsd-detail'); if (!el) return renderDashboard();
+                document.querySelectorAll('#tsd-root tr.tsd-click').forEach(tr => tr.classList.toggle('tsd-active', (tr.getAttribute('onclick') || '').includes(`'${id}'`)));
+                el.innerHTML = detailHTML(rows); drawDetail(rows); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            },
+            dExport,
+            openSheet: id => { sel.emp = String(id); sel.key = D.mode === 'month' ? D.key : sel.key; window.switchTab('timesheet'); }
+        };
+    })();
+    </script>
+
 </body>
 </html>
