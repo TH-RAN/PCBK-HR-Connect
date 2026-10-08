@@ -251,6 +251,55 @@
         .today-out-live-dot { animation: pulseDotLive 2s ease-in-out infinite; }
     </style>
     <!-- ===== Time sheet + Workforce dashboard (added) ===== -->
+    <style id="dir-style">
+        .dir-chip { font-size:11px; font-weight:700; padding:6px 12px; border-radius:99px; border:1px solid #e2e8f0; color:#64748b; background:#fff; cursor:pointer; transition:all .15s; white-space:nowrap; }
+        .dir-chip.on { background:#eef2ff; border-color:#c7d2fe; color:#4f46e5; }
+        .dir-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+        .dir-card { background:#fff; border:1px solid #e2e8f0; border-radius:22px; padding:16px; position:relative; transition:box-shadow .2s, transform .2s; overflow:hidden; }
+        .dir-card:hover { box-shadow:0 14px 32px -12px rgba(26,38,74,.2); transform:translateY(-2px); }
+        .dir-card::before { content:''; position:absolute; left:0; top:0; right:0; height:4px; background:var(--g, #c7d2fe); }
+        .dir-ava { width:58px; height:58px; border-radius:20px; padding:2px; background:linear-gradient(135deg,var(--g,#c7d2fe),#fff); position:relative; flex-shrink:0; }
+        .dir-ava img { width:100%; height:100%; border-radius:18px; object-fit:cover; background:#fff; }
+        .dir-dot { position:absolute; right:-3px; bottom:-3px; width:15px; height:15px; border-radius:50%; border:3px solid #fff; }
+        .dir-fact { background:#f8fafc; border-radius:12px; padding:7px 10px; }
+        .dir-fact span { display:block; font-size:9.5px; font-weight:700; color:#94a3b8; }
+        .dir-fact b { display:block; font-size:11.5px; font-weight:800; color:#0f172a; margin-top:1px; }
+        .dir-exec { border-radius:24px; color:#fff; padding:18px; position:relative; overflow:hidden; background:linear-gradient(135deg,#2f66ee,#4f46e5 55%,#7c3aed); }
+        .dir-exec::after { content:''; position:absolute; right:-40px; top:-50px; width:150px; height:150px; border-radius:50%; background:rgba(255,255,255,.1); }
+        .dir-insight { border-radius:22px; padding:14px 16px; border:1px solid rgba(226,232,240,.9); background:linear-gradient(180deg,#fff,#f8faff); }
+    </style>
+    <style id="sum-style">
+        .sum-seg { display:inline-flex; background:#f1f5f9; border-radius:14px; padding:3px; }
+        .sum-seg button { padding:6px 14px; font-size:12px; font-weight:700; color:#64748b; border-radius:11px; transition:all .15s; cursor:pointer; white-space:nowrap; }
+        .sum-seg button.on { background:#fff; color:#2f66ee; box-shadow:0 2px 8px rgba(26,38,74,.1); }
+        .sum-chip { font-size:11px; font-weight:700; padding:6px 12px; border-radius:99px; border:1px solid #e2e8f0; color:#64748b; background:#fff; cursor:pointer; transition:all .15s; }
+        .sum-chip.on { background:#eef3ff; border-color:#bfd0f7; color:#2f66ee; }
+        .sum-kpi { border-radius:20px; padding:12px 14px; border:1px solid rgba(226,232,240,.9); background:linear-gradient(180deg,#fff,#f8faff); }
+        .sum-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px; align-items:start; }
+        .sum-card { background:#fff; border:1px solid #e2e8f0; border-radius:22px; padding:16px; transition:box-shadow .2s, transform .2s; position:relative; overflow:hidden; }
+        .sum-card:hover { box-shadow:0 12px 30px -10px rgba(26,38,74,.18); transform:translateY(-1px); }
+        .sum-card.my-row-highlight { border-left-width:4px; }
+        .sum-ring { width:62px; height:62px; border-radius:50%; background:conic-gradient(var(--c) var(--p), #e8edf5 0); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .sum-ring > div { width:48px; height:48px; border-radius:50%; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:1; }
+        .sum-ring b { font-size:15px; font-weight:900; color:#0f172a; } .sum-ring span { font-size:8.5px; color:#94a3b8; font-weight:700; margin-top:2px; }
+        .sum-stat { background:#f8fafc; border-radius:12px; padding:7px 4px; text-align:center; }
+        .sum-stat b { display:block; font-size:14px; font-weight:800; color:#0f172a; } .sum-stat span { font-size:9.5px; color:#94a3b8; font-weight:700; }
+        .sum-bars { display:flex; align-items:flex-end; gap:3px; height:38px; }
+        .sum-bars > div { flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%; border-radius:4px; background:#f1f5f9; overflow:hidden; }
+        .sum-bars > div.cur { box-shadow:0 0 0 1.5px #2f66ee; }
+        .sum-in { width:100%; text-align:center; font-size:12px; font-weight:700; padding:6px 2px; border-radius:10px; border:1px solid #e2e8f0; background:#fff; color:#0f172a; }
+        .sum-in:focus { outline:none; border-color:#2f66ee; box-shadow:0 0 0 3px rgba(47,102,238,.15); }
+        .sum-in:disabled { background:#f8fafc; border-color:transparent; color:#475569; }
+        .sum-mgrid { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; }
+        .sum-mgrid label { font-size:9.5px; font-weight:700; color:#94a3b8; text-align:center; display:block; margin-bottom:2px; }
+        .sum-mx { width:100%; border-collapse:separate; border-spacing:0; font-size:12px; }
+        .sum-mx th { font-size:10.5px; color:#64748b; font-weight:800; padding:8px 4px; text-align:center; background:#f8fafc; position:sticky; top:0; z-index:2; white-space:nowrap; }
+        .sum-mx td { padding:5px 3px; border-top:1px solid #f1f5f9; text-align:center; background:#fff; }
+        .sum-mx td.sticky-c, .sum-mx th.sticky-c { position:sticky; left:0; z-index:3; text-align:left; min-width:190px; box-shadow:6px 0 8px -8px rgba(15,23,42,.18); }
+        .sum-mx tr:hover td { background:#f8faff; }
+        .sum-mx tr.my-row-highlight td { background:#fff1f2 !important; }
+        .sum-mx tfoot td { font-weight:800; background:#eef3ff; border-top:2px solid #cbd5f5; }
+    </style>
     <style id="ts-style">
         .ts-paper { background:#fff; border:1px solid #cbd5e1; border-radius:14px; padding:22px 22px 26px; min-width:860px; color:#0f172a; }
         .ts-title { font-family:'Plus Jakarta Sans','Prompt',sans-serif; font-weight:800; font-size:20px; text-align:center; letter-spacing:.01em; }
@@ -517,7 +566,7 @@
                         
                         <!-- COLUMN LEFT (SPAN 7) -->
                         <div class="lg:col-span-7 space-y-5">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start">
                                 <!-- Card 1: Profile Card with Clean Non-Duplicated Quotas -->
                                 <div class="bento-card p-5 space-y-4 bg-gradient-to-br from-white via-white to-blue-50/40 relative overflow-hidden flex flex-col justify-between">
                                     <div class="flex flex-col items-center justify-center text-center space-y-2">
@@ -561,6 +610,7 @@
                                     </div>
                                 </div>
 
+                                <div class="space-y-5">
                                 <!-- Card 2: Mini Calendar -->
                                 <div class="bento-card p-5 space-y-2">
                                     <div class="flex items-center justify-between text-slate-800">
@@ -573,17 +623,18 @@
                                     </div>
                                     <div id="mini-cal-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
                                 </div>
-                            </div>
 
-                            <!-- Card 3: Today Out List -->
-                            <div class="bento-card p-5 space-y-2.5 text-left">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
-                                    <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center">
-                                        <i class="fa-solid fa-user-slash text-rose-500 mr-2"></i> พนักงานที่ไม่อยู่ออฟฟิศวันนี้
-                                    </h3>
-                                    <span id="today-out-count-pill" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full">0 คน</span>
+                                <!-- Card 3: Today Out List -->
+                                <div class="bento-card p-5 space-y-2.5 text-left">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                                        <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center">
+                                            <i class="fa-solid fa-user-slash text-rose-500 mr-2"></i> พนักงานที่ไม่อยู่ออฟฟิศวันนี้
+                                        </h3>
+                                        <span id="today-out-count-pill" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full">0 คน</span>
+                                    </div>
+                                    <div id="bento-today-out-list" class="space-y-2 max-h-32 overflow-y-auto pr-1"></div>
                                 </div>
-                                <div id="bento-today-out-list" class="space-y-2 max-h-32 overflow-y-auto pr-1"></div>
+                                </div>
                             </div>
 
                             <!-- Card 4: Weekly Schedule Feed -->
@@ -848,82 +899,60 @@
                 </section>
 
                 <section id="tab-summary-table" class="tab-view hidden space-y-4">
-                    <div class="bento-card p-6 space-y-4 text-left">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                            <div>
-                                <div class="flex items-center space-x-2">
-                                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight" id="summary-table-header-title">สรุปตารางวันลาของพนักงาน</h2>
-                                    <span id="badge-lock-status" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">โหมดแก้ไข (Admin)</span>
+                    <div class="bento-card p-5 sm:p-6 space-y-4 text-left">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-blue-500/20"><i class="fa-solid fa-umbrella-beach"></i></div>
+                                <div>
+                                    <div class="flex items-center flex-wrap gap-2">
+                                        <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight" id="summary-table-header-title">ตารางสรุปวันลาของพนักงาน</h2>
+                                        <span id="badge-lock-status" class="bg-slate-100 text-slate-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">โหมดแก้ไข (Admin)</span>
+                                    </div>
+                                    <p class="text-[11px] text-slate-500 mt-0.5">สิทธิ์และวันลาสะสมประจำปี · คลิกการ์ดเพื่อดู/แก้ไขรายเดือน</p>
                                 </div>
                             </div>
-
-                            <div class="flex items-center space-x-2">
-                                <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ, ตำแหน่ง..." class="pl-3.5 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 w-48">
-                                <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-xl transition flex items-center space-x-1.5 cursor-pointer">
+                            <div class="flex items-center gap-2">
+                                <div class="relative">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                    <input type="text" id="search-emp" onkeyup="renderSummaryTable()" placeholder="ค้นหาชื่อ, ตำแหน่ง..." class="pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 w-44 sm:w-56">
+                                </div>
+                                <button type="button" onclick="exportSummaryToExcel()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center space-x-1.5 cursor-pointer">
                                     <i class="fa-solid fa-file-excel"></i>
                                     <span>Excel</span>
                                 </button>
                             </div>
                         </div>
-
-                        <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner relative max-h-[480px]">
-                            <table class="w-full text-left text-xs border-collapse whitespace-nowrap min-w-[1600px]">
-                                <thead>
-                                    <tr class="bg-slate-900 text-white text-center font-bold divide-x divide-slate-800 border-b border-slate-800 sticky top-0 z-20">
-                                        <th rowspan="3" class="p-2.5 w-12 sticky left-0 z-30 bg-slate-950">ลำดับ</th>
-                                        <th rowspan="3" class="p-2.5 w-20">รหัส</th>
-                                        <th rowspan="3" class="p-2.5 min-w-[180px] sticky left-12 z-30 bg-slate-950">ชื่อ - นามสกุล</th>
-                                        <th rowspan="3" class="p-2.5 min-w-[160px]">ตำแหน่ง</th>
-                                        <th rowspan="3" class="p-2.5">วันเกิด</th>
-                                        <th rowspan="3" class="p-2.5">วันเริ่มงาน</th>
-                                        <th rowspan="3" class="p-2.5 bg-purple-900/90 text-purple-100 min-w-[80px]">ทบวันพักร้อน</th>
-                                        <th colspan="27" class="p-2 bg-amber-900/90 text-amber-100">ลาพักร้อน</th>
-                                        <th colspan="13" class="p-2 bg-emerald-900/90 text-emerald-100">ลาป่วย</th>
-                                        <th rowspan="3" class="p-2.5 bg-pink-900/90 text-pink-100 min-w-[80px]">นอกสถานที่</th>
-                                        <th rowspan="3" class="p-2.5 min-w-[120px]">หมายเหตุ</th>
-                                    </tr>
-                                    <tr class="bg-slate-100 text-slate-700 text-center font-semibold border-b border-slate-300 divide-x divide-slate-200 sticky top-[33px] z-10">
-                                        <th colspan="24" class="p-1.5 bg-amber-50 text-amber-900">เพิ่ม (+1/ด.) & ใช้ลาประจำเดือน</th>
-                                        <th rowspan="2" class="p-2 bg-amber-200 text-amber-950 font-bold">รวมเพิ่ม</th>
-                                        <th rowspan="2" class="p-2 bg-rose-200 text-rose-950 font-bold">รวมใช้</th>
-                                        <th rowspan="2" class="p-2 bg-yellow-300 text-yellow-950 font-bold">คงเหลือ</th>
-                                        <th colspan="12" class="p-1.5 bg-emerald-50 text-emerald-900">รายเดือน</th>
-                                        <th rowspan="2" class="p-2 bg-emerald-200 text-emerald-950 font-bold">รวมป่วย</th>
-                                    </tr>
-                                    <tr class="bg-slate-50 text-slate-600 text-[10px] text-center divide-x divide-slate-200 border-b border-slate-300 sticky top-[65px] z-10">
-                                        <th class="p-1">+</th><th class="p-1">ม.ค.</th><th class="p-1">+</th><th class="p-1">ก.พ.</th><th class="p-1">+</th><th class="p-1">มี.ค.</th><th class="p-1">+</th><th class="p-1">เม.ย.</th><th class="p-1">+</th><th class="p-1">พ.ค.</th><th class="p-1">+</th><th class="p-1">มิ.ย.</th><th class="p-1">+</th><th class="p-1">ก.ค.</th><th class="p-1">+</th><th class="p-1">ส.ค.</th><th class="p-1">+</th><th class="p-1">ก.ย.</th><th class="p-1">+</th><th class="p-1">ต.ค.</th><th class="p-1">+</th><th class="p-1">พ.ย.</th><th class="p-1">+</th><th class="p-1">ธ.ค.</th>
-                                        <th class="p-1">ม.ค.</th><th class="p-1">ก.พ.</th><th class="p-1">มี.ค.</th><th class="p-1">เม.ย.</th><th class="p-1">พ.ค.</th><th class="p-1">มิ.ย.</th><th class="p-1">ก.ค.</th><th class="p-1">ส.ค.</th><th class="p-1">ก.ย.</th><th class="p-1">ต.ค.</th><th class="p-1">พ.ย.</th><th class="p-1">ธ.ค.</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="summary-table-body" class="divide-y divide-slate-200 bg-white"></tbody>
-                            </table>
-                        </div>
+                        <div id="summary-kpis" class="grid grid-cols-2 lg:grid-cols-5 gap-3"></div>
+                        <div id="summary-toolbar" class="flex flex-wrap items-center justify-between gap-2"></div>
+                        <div id="summary-table-body"></div>
                     </div>
                 </section>
 
                 <section id="tab-directory" class="tab-view hidden space-y-4">
-                    <div class="bento-card p-6 space-y-4 text-left">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                            <div>
-                                <h2 class="text-sm sm:text-base font-extrabold text-slate-900 tracking-tight flex items-center">
-                                    <i class="fa-solid fa-users-rectangle text-blue-600 mr-2.5"></i> ทำเนียบบุคลากรองค์กร
-                                </h2>
+                    <div class="bento-card p-5 sm:p-6 space-y-5 text-left">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20"><i class="fa-solid fa-users-rectangle"></i></div>
+                                <div>
+                                    <h2 class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">ทำเนียบบุคลากรองค์กร</h2>
+                                    <p class="text-[11px] text-slate-500 mt-0.5" id="directory-subtitle">ทำความรู้จักทีมงาน · สถานะวันนี้ · วันเกิดที่กำลังจะถึง</p>
+                                </div>
                             </div>
-                            <div class="relative w-full md:w-64">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
-                                <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, รหัส..." class="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
+                            <div class="relative w-full lg:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="search-directory" onkeyup="renderStaffDirectory()" placeholder="ค้นหาชื่อ, ฉายา, ตำแหน่ง..." class="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300">
                             </div>
                         </div>
 
-                        <div class="space-y-2">
+                        <div id="directory-insights" class="grid grid-cols-1 lg:grid-cols-12 gap-3"></div>
+                        <div id="directory-toolbar" class="flex flex-wrap items-center gap-2"></div>
+
+                        <div class="space-y-2" id="directory-exec-wrap">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Executive Board</span>
                             <div id="directory-executives-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                         </div>
 
-                        <div class="space-y-2 pt-3 border-t border-slate-100">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Employee & Operations</span>
-                            <div id="directory-staff-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                        </div>
+                        <div class="space-y-5 pt-1" id="directory-staff-grid"></div>
                     </div>
                 </section>
 
@@ -1759,9 +1788,9 @@
                     searchInp.value = "";
                     renderSummaryTable();
                     
-                    const rows = document.querySelectorAll('#summary-table-body tr');
+                    const rows = document.querySelectorAll('#summary-table-body tr, #summary-table-body .sum-card');
                     rows.forEach(r => {
-                        if (r.innerText.includes(targetEmp.name)) {
+                        if ((r.innerText.includes(targetEmp.name) || r.getAttribute('data-emp') === String(targetEmp.id))) {
                             r.classList.add('my-row-highlight');
                             r.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         } else {
@@ -2729,118 +2758,146 @@
             showToast("ลบกิจกรรมเรียบร้อยแล้ว");
         }
 
+        // ===== ตารางสรุปวันลาของพนักงาน (redesigned) — ใช้ handler บันทึก/ซิงค์คลาวด์ชุดเดิมทั้งหมด =====
+        const SUMV = { view: 'cards', metric: 'used', filter: 'all', open: {} };
+        const SUM_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        const sumEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const sumN = v => parseFloat(v) || 0;
+        const sumFmt = v => parseFloat((Math.round(v * 100) / 100).toFixed(2)).toString();
+        function sumSetView(v) { SUMV.view = v; renderSummaryTable(); }
+        function sumSetMetric(m) { SUMV.metric = m; renderSummaryTable(); }
+        function sumSetFilter(f) { SUMV.filter = f; renderSummaryTable(); }
+        function sumToggle(id) { SUMV.open[id] = !SUMV.open[id]; renderSummaryTable(); }
+
+        function sumCalc(e) {
+            if (!e.vacationAccrued || e.vacationAccrued.length !== 12) e.vacationAccrued = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0];
+            if (!e.vacationUsedMonths || e.vacationUsedMonths.length !== 12) e.vacationUsedMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            if (!e.sickMonths || e.sickMonths.length !== 12) e.sickMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            let acc = 0, used = 0, sick = 0;
+            for (let m = 0; m < 12; m++) { acc += sumN(e.vacationAccrued[m]); used += sumN(e.vacationUsedMonths[m]); sick += sumN(e.sickMonths[m]); }
+            const carry = sumN(e.carryVacation);
+            const remaining = Math.min(20, Math.max(0, carry + acc - used));
+            return { acc, used, sick, carry, remaining, off: sumN(e.otherLeaveDays), avail: carry + acc };
+        }
+
+        function sumMonthBlock(title, color, arr, idx, fn, canEdit) {
+            const cells = arr.map((v, m) => `<div><label>${SUM_M[m]}</label><input type="number" step="0.25" min="0" class="sum-in" value="${sumN(v) > 0 ? sumN(v) : ''}" placeholder="–" ${canEdit ? '' : 'disabled'} onchange="${fn}(${idx}, ${m}, this.value)"></div>`).join('');
+            return `<div><div class="flex items-center gap-2 mb-1.5"><i class="inline-block w-2.5 h-2.5 rounded" style="background:${color}"></i><span class="text-[11px] font-extrabold text-slate-700">${title}</span></div><div class="sum-mgrid">${cells}</div></div>`;
+        }
+
+        function sumCard(e, idx, c, mine) {
+            const nick = getEmployeeNickname(e.id);
+            const frac = Math.max(0, Math.min(1, c.remaining / 20)); // เพดานสะสมสูงสุด 20 วัน: เต็มวง = ถึงเพดาน
+            const col = frac > 0.5 ? '#10b981' : frac > 0.25 ? '#f59e0b' : '#f43f5e';
+            const maxM = Math.max(1, ...e.vacationUsedMonths.map((v, m) => sumN(v) + sumN(e.sickMonths[m])));
+            const curM = new Date().getMonth();
+            const bars = SUM_M.map((_, m) => {
+                const v = sumN(e.vacationUsedMonths[m]), s = sumN(e.sickMonths[m]);
+                return `<div class="${m === curM ? 'cur' : ''}" title="${SUM_M[m]} · พักร้อน ${sumFmt(v)} · ป่วย ${sumFmt(s)}"><i style="display:block;height:${s / maxM * 100}%;background:#64748b"></i><i style="display:block;height:${v / maxM * 100}%;background:#0ea5e9"></i></div>`;
+            }).join('');
+            const open = !!SUMV.open[e.id];
+            const canEdit = !!isAdmin;
+            const editor = open ? `
+                <div class="mt-4 pt-4 border-t border-dashed border-slate-200 space-y-4">
+                    ${sumMonthBlock('เพิ่มสิทธิ์พักร้อน (+)', '#f59e0b', e.vacationAccrued, idx, 'updateVacAccruedMonth', canEdit)}
+                    ${sumMonthBlock('ใช้ลาพักร้อน (วัน)', '#0ea5e9', e.vacationUsedMonths, idx, 'updateVacUsedMonth', canEdit)}
+                    ${sumMonthBlock('ลาป่วย (วัน)', '#64748b', e.sickMonths, idx, 'updateSickMonth', canEdit)}
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><label class="text-[10.5px] font-bold text-slate-500 block mb-1">ทบวันพักร้อน</label><input type="number" step="0.25" min="0" class="sum-in" value="${e.carryVacation || 0}" ${canEdit ? '' : 'disabled'} onchange="updateEmpField(${idx}, 'carryVacation', this.value)"></div>
+                        <div><label class="text-[10.5px] font-bold text-slate-500 block mb-1">นอกสถานที่ (วัน)</label><input type="number" step="0.25" min="0" class="sum-in" value="${c.off > 0 ? c.off : ''}" placeholder="0" ${canEdit ? '' : 'disabled'} onchange="updateEmpField(${idx}, 'otherLeaveDays', this.value)"></div>
+                    </div>
+                    <div><label class="text-[10.5px] font-bold text-slate-500 block mb-1">หมายเหตุ</label><input type="text" class="sum-in" style="text-align:left;padding:7px 10px;font-weight:600" value="${sumEsc(e.note || '')}" placeholder="${canEdit ? 'พิมพ์หมายเหตุ' : '-'}" ${canEdit ? '' : 'disabled'} onchange="updateEmpField(${idx}, 'note', this.value)"></div>
+                </div>` : (e.note ? `<div class="mt-3 text-[11px] text-slate-500 bg-slate-50 rounded-xl px-3 py-2"><i class="fa-regular fa-note-sticky mr-1.5"></i>${sumEsc(e.note)}</div>` : '');
+            return `
+            <div class="sum-card ${mine ? 'my-row-highlight' : ''}" data-emp="${e.id}">
+                <div class="flex items-center gap-3">
+                    <img src="${getEmployeeAvatar(e.id)}" class="w-12 h-12 rounded-2xl object-cover bg-slate-100 border border-slate-200 shrink-0" onerror="handleImageError(this,'${e.id}')">
+                    <div class="min-w-0 flex-1">
+                        <div class="font-extrabold text-slate-900 text-[13px] leading-tight truncate" title="${sumEsc(e.name)}">${sumEsc(e.name)}</div>
+                        <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                            ${nick ? `<span class="text-[10px] font-extrabold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${sumEsc(nick)}</span>` : ''}
+                            ${mine ? '<span class="text-[10px] font-extrabold bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full">คุณ</span>' : ''}
+                            <span class="text-[10.5px] text-slate-500 truncate">${sumEsc(e.position)}</span>
+                        </div>
+                    </div>
+                    <div class="sum-ring" style="--p:${frac * 360}deg;--c:${col}" title="พักร้อนคงเหลือ ${sumFmt(c.remaining)} วัน (สะสมได้สูงสุด 20 วัน)${c.remaining >= 20 ? ' · ถึงเพดานแล้ว' : ''}"><div><b>${sumFmt(c.remaining)}</b><span>เหลือ</span></div></div>
+                </div>
+                <div class="grid grid-cols-4 gap-2 mt-3.5">
+                    <div class="sum-stat"><b>${sumFmt(c.carry)}</b><span>ทบมา</span></div>
+                    <div class="sum-stat"><b>${sumFmt(c.acc)}</b><span>เพิ่ม</span></div>
+                    <div class="sum-stat"><b style="color:#0284c7">${sumFmt(c.used)}</b><span>ใช้</span></div>
+                    <div class="sum-stat"><b style="color:#475569">${sumFmt(c.sick)}</b><span>ลาป่วย</span></div>
+                </div>
+                <div class="flex items-center justify-between mt-3.5 gap-3">
+                    <div class="sum-bars flex-1">${bars}</div>
+                    <div class="text-right shrink-0"><div class="text-[10px] text-slate-400 font-bold">นอกสถานที่</div><div class="text-sm font-extrabold ${c.off > 0 ? 'text-emerald-600' : 'text-slate-300'}">${sumFmt(c.off)} <span class="text-[10px] font-bold">วัน</span></div></div>
+                </div>
+                ${editor}
+                <button type="button" onclick="sumToggle('${e.id}')" class="mt-3.5 w-full text-[11.5px] font-bold py-2 rounded-xl ${open ? 'bg-slate-100 text-slate-600' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'} transition cursor-pointer">
+                    <i class="fa-solid ${open ? 'fa-chevron-up' : (canEdit ? 'fa-pen-to-square' : 'fa-calendar-days')} mr-1.5"></i>${open ? 'ซ่อนรายเดือน' : (canEdit ? 'แก้ไขรายเดือน' : 'ดูรายเดือน')}
+                </button>
+            </div>`;
+        }
+
+        function sumMatrix(list) {
+            const key = { used: 'vacationUsedMonths', add: 'vacationAccrued', sick: 'sickMonths' }[SUMV.metric];
+            const fn = { used: 'updateVacUsedMonth', add: 'updateVacAccruedMonth', sick: 'updateSickMonth' }[SUMV.metric];
+            const tint = { used: ['#e0f2fe', '#0369a1'], add: ['#fef3c7', '#b45309'], sick: ['#e2e8f0', '#334155'] }[SUMV.metric];
+            const foot = Array(12).fill(0); let footTot = 0;
+            const rows = list.map(({ e, idx, c, mine }) => {
+                let tot = 0;
+                const cells = e[key].map((v, m) => {
+                    const n = sumN(v); tot += n; foot[m] += n;
+                    return `<td><input type="number" step="0.25" min="0" value="${n > 0 ? n : ''}" placeholder="–" ${isAdmin ? '' : 'disabled'} onchange="${fn}(${idx}, ${m}, this.value)" class="sum-in" style="width:46px;${n > 0 ? `background:${tint[0]};color:${tint[1]};border-color:transparent` : ''}"></td>`;
+                }).join('');
+                footTot += tot;
+                const nick = getEmployeeNickname(e.id);
+                return `<tr class="${mine ? 'my-row-highlight' : ''}"><td class="sticky-c"><div class="flex items-center gap-2.5"><img src="${getEmployeeAvatar(e.id)}" class="w-8 h-8 rounded-xl object-cover bg-slate-100 border border-slate-200" onerror="handleImageError(this,'${e.id}')"><div><div class="font-bold text-slate-900 text-xs">${sumEsc(e.name)}${nick ? ` <span class="text-blue-600">(${sumEsc(nick)})</span>` : ''}</div><div class="text-[10px] text-slate-400">${sumEsc(e.position)}</div></div></div></td>${cells}<td class="font-extrabold text-slate-900">${sumFmt(tot)}</td>${SUMV.metric === 'used' ? `<td class="font-extrabold ${c.remaining <= 3 ? 'text-rose-600' : 'text-emerald-600'}">${sumFmt(c.remaining)}</td>` : ''}</tr>`;
+            }).join('');
+            const head = SUM_M.map(m => `<th>${m}</th>`).join('');
+            return `<div class="overflow-x-auto rounded-2xl border border-slate-200 max-h-[540px]"><table class="sum-mx"><thead><tr><th class="sticky-c">พนักงาน</th>${head}<th>รวม</th>${SUMV.metric === 'used' ? '<th>คงเหลือ</th>' : ''}</tr></thead><tbody>${rows}</tbody><tfoot><tr><td class="sticky-c" style="background:#eef3ff">รวมทั้งบริษัท</td>${foot.map(v => `<td>${v > 0 ? sumFmt(v) : '–'}</td>`).join('')}<td>${sumFmt(footTot)}</td>${SUMV.metric === 'used' ? '<td></td>' : ''}</tr></tfoot></table></div>`;
+        }
+
+        let sumRendering = false;
         function renderSummaryTable() {
-            const tbody = document.getElementById('summary-table-body');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const search = document.getElementById('search-emp')?.value.toLowerCase() || '';
-            const filtered = employees.filter(e => {
-                return (e.name && e.name.toLowerCase().includes(search)) || 
-                       (e.id && e.id.toLowerCase().includes(search)) || 
-                       (e.position && e.position.toLowerCase().includes(search));
-            });
-
+            // กันการเรียกซ้อนตอนช่องกรอกเสียโฟกัส (blur → change → render) ระหว่างที่กำลังวาดใหม่
+            if (sumRendering) { setTimeout(renderSummaryTable, 0); return; }
+            sumRendering = true;
+            try { renderSummaryTableInner(); } finally { sumRendering = false; }
+        }
+        function renderSummaryTableInner() {
+            const host = document.getElementById('summary-table-body');
+            if (!host) return;
+            const search = (document.getElementById('search-emp')?.value || '').toLowerCase();
+            const filtered = employees.filter(e => (e.name && e.name.toLowerCase().includes(search)) || (e.id && String(e.id).toLowerCase().includes(search)) || (e.position && e.position.toLowerCase().includes(search)) || (getEmployeeNickname(e.id) || '').toLowerCase().includes(search));
             const execList = filtered.filter(e => e.id === '1101001' || e.id === '1102003');
             const staffList = filtered.filter(e => e.id !== '1101001' && e.id !== '1102003');
             staffList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
-            const sortedList = [...execList, ...staffList];
-
-            const inputAttr = isAdmin ? '' : 'disabled style="pointer-events: none; opacity: 0.9;"';
-
-            sortedList.forEach((e, displayIndex) => {
-                const empIndex = employees.findIndex(emp => emp.id === e.id);
-                if (!e.vacationAccrued || e.vacationAccrued.length !== 12) e.vacationAccrued = [1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0];
-                if (!e.vacationUsedMonths || e.vacationUsedMonths.length !== 12) e.vacationUsedMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-                if (!e.sickMonths || e.sickMonths.length !== 12) e.sickMonths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-                let totalAccrued = 0;
-                let totalVacationUsed = 0;
-                let totalSickUsed = 0;
-                for (let m = 0; m < 12; m++) {
-                    totalAccrued += parseFloat(e.vacationAccrued[m]) || 0;
-                    totalVacationUsed += parseFloat(e.vacationUsedMonths[m]) || 0;
-                    totalSickUsed += parseFloat(e.sickMonths[m]) || 0;
-                }
-
-                const carryVal = parseFloat(e.carryVacation) || 0;
-                const remainingVacation = Math.min(20, Math.max(0, carryVal + totalAccrued - totalVacationUsed));
-                const finalOtherUsed = parseFloat(e.otherLeaveDays) || 0;
-
-                const isCurrentLoggedIn = currentUser && String(currentUser.id) === String(e.id);
-                const rowClass = isCurrentLoggedIn ? 'my-row-highlight font-semibold' : 'hover:bg-slate-50';
-
-                const nick = getEmployeeNickname(e.id);
-                const displayNameWithNick = nick ? `${e.name} (${nick})` : e.name;
-
-                let rowHtml = `
-                    <tr class="${rowClass} transition text-slate-800 divide-x divide-slate-200">
-                        <td class="p-2 text-center font-bold text-slate-500 sticky left-0 z-10 bg-white">${displayIndex + 1}</td>
-                        <td class="p-2 text-center font-mono text-slate-600">${e.id}</td>
-                        <td class="p-2 font-bold text-slate-900 sticky left-12 z-10 bg-white shadow-r">
-                            ${displayNameWithNick}
-                            ${isCurrentLoggedIn ? '<span class="ml-1.5 bg-rose-200 text-rose-900 text-[10px] px-1.5 rounded font-bold">คุณ</span>' : ''}
-                        </td>
-                        <td class="p-2 text-slate-600 text-xs">${e.position}</td>
-                        <td class="p-2 text-center text-slate-500">${e.dob || '-'}</td>
-                        <td class="p-2 text-center text-slate-500">${e.startDate || '-'}</td>
-                        <td class="p-1.5 text-center font-bold bg-purple-50 text-purple-900">
-                            <input type="number" step="0.25" min="0" value="${e.carryVacation || 0}" ${inputAttr}
-                                onchange="updateEmpField(${empIndex}, 'carryVacation', this.value)"
-                                class="w-12 text-center bg-transparent rounded p-0.5 font-bold">
-                        </td>
-                `;
-
-                for (let m = 0; m < 12; m++) {
-                    const addVal = e.vacationAccrued[m] !== undefined ? e.vacationAccrued[m] : 1;
-                    const usedVal = e.vacationUsedMonths[m] !== undefined ? e.vacationUsedMonths[m] : 0;
-                    rowHtml += `
-                        <td class="p-0 text-center bg-amber-50/40">
-                            <input type="number" step="0.25" min="0" value="${addVal > 0 ? addVal : ''}" placeholder="0" ${inputAttr}
-                                onchange="updateVacAccruedMonth(${empIndex}, ${m}, this.value)"
-                                class="w-8 text-center text-xs bg-transparent">
-                        </td>
-                        <td class="p-0 text-center ${usedVal > 0 ? 'bg-amber-100/60' : ''}">
-                            <input type="number" step="0.25" min="0" value="${usedVal > 0 ? usedVal : ''}" placeholder="-" ${inputAttr}
-                                onchange="updateVacUsedMonth(${empIndex}, ${m}, this.value)"
-                                class="w-9 text-center text-xs font-semibold bg-transparent">
-                        </td>
-                    `;
-                }
-
-                rowHtml += `
-                    <td class="p-2 text-center font-bold bg-amber-100 text-amber-950">${totalAccrued}</td>
-                    <td class="p-2 text-center font-bold bg-rose-100 text-rose-800">${totalVacationUsed}</td>
-                    <td class="p-2 text-center font-extrabold text-sm bg-yellow-300 text-slate-900">${remainingVacation}</td>
-                `;
-
-                for (let m = 0; m < 12; m++) {
-                    const sickVal = e.sickMonths[m] !== undefined ? e.sickMonths[m] : 0;
-                    rowHtml += `
-                        <td class="p-0 text-center ${sickVal > 0 ? 'bg-emerald-100/60' : 'bg-emerald-50/20'}">
-                            <input type="number" step="0.25" min="0" value="${sickVal > 0 ? sickVal : ''}" placeholder="-" ${inputAttr}
-                                onchange="updateSickMonth(${empIndex}, ${m}, this.value)"
-                                class="w-9 text-center text-xs bg-transparent">
-                        </td>
-                    `;
-                }
-
-                rowHtml += `
-                    <td class="p-2 text-center font-bold bg-emerald-100 text-emerald-900">${totalSickUsed}</td>
-                    <td class="p-1.5 text-center font-bold bg-pink-100 text-pink-950">
-                        <input type="number" step="0.25" min="0" value="${finalOtherUsed > 0 ? finalOtherUsed : ''}" placeholder="0" ${inputAttr}
-                            onchange="updateEmpField(${empIndex}, 'otherLeaveDays', this.value)"
-                            class="w-12 text-center text-xs font-bold bg-transparent">
-                    </td>
-                    <td class="p-1.5 text-xs">
-                        <input type="text" value="${e.note || ''}" placeholder="${isAdmin ? 'หมายเหตุ' : '-'}" ${inputAttr}
-                            onchange="updateEmpField(${empIndex}, 'note', this.value)"
-                            class="w-full text-xs text-slate-600 bg-transparent p-1">
-                    </td>
-                </tr>`;
-
-                tbody.innerHTML += rowHtml;
+            let list = [...execList, ...staffList].map(e => {
+                const idx = employees.findIndex(emp => emp.id === e.id);
+                return { e, idx, c: sumCalc(e), mine: !!(currentUser && String(currentUser.id) === String(e.id)) };
             });
+            if (SUMV.filter === 'low') list = list.filter(x => x.c.remaining <= 3);
+            if (SUMV.filter === 'sick') list = list.filter(x => x.c.sick > 0);
+
+            // KPI strip (ทุกคนที่ตรงกับการค้นหา)
+            const all = [...execList, ...staffList].map(e => sumCalc(e));
+            const tot = k => all.reduce((s, c) => s + c[k], 0);
+            const kpi = (ic, col, v, l) => `<div class="sum-kpi flex items-center gap-3"><div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm" style="background:${col}1f;color:${col}"><i class="${ic}"></i></div><div><div class="text-lg font-black text-slate-900 leading-none">${v}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">${l}</div></div></div>`;
+            document.getElementById('summary-kpis').innerHTML =
+                kpi('fa-solid fa-users', '#2f66ee', all.length, 'พนักงานทั้งหมด') + kpi('fa-solid fa-plane-departure', '#0ea5e9', sumFmt(tot('used')), 'ใช้พักร้อนรวม (วัน)') +
+                kpi('fa-solid fa-suitcase-rolling', '#10b981', sumFmt(tot('remaining')), 'พักร้อนคงเหลือรวม (วัน)') + kpi('fa-solid fa-briefcase-medical', '#64748b', sumFmt(tot('sick')), 'ลาป่วยรวม (วัน)') +
+                kpi('fa-solid fa-location-dot', '#8b5cf6', sumFmt(tot('off')), 'ทำงานนอกสถานที่รวม (วัน)');
+
+            const seg = (cur, items, fn) => `<div class="sum-seg">${items.map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" onclick="${fn}('${v}')">${l}</button>`).join('')}</div>`;
+            const chip = (v, l) => `<button type="button" class="sum-chip ${SUMV.filter === v ? 'on' : ''}" onclick="sumSetFilter('${v}')">${l}</button>`;
+            document.getElementById('summary-toolbar').innerHTML =
+                `<div class="flex flex-wrap items-center gap-2">${seg(SUMV.view, [['cards', '<i class="fa-solid fa-table-cells-large mr-1.5"></i>การ์ด'], ['matrix', '<i class="fa-solid fa-table-list mr-1.5"></i>ตารางรายเดือน']], 'sumSetView')}` +
+                (SUMV.view === 'matrix' ? seg(SUMV.metric, [['used', 'ใช้พักร้อน'], ['add', 'เพิ่มสิทธิ์'], ['sick', 'ลาป่วย']], 'sumSetMetric') : '') + `</div>` +
+                `<div class="flex flex-wrap items-center gap-2">${chip('all', 'ทั้งหมด')}${chip('low', 'พักร้อนเหลือ ≤ 3 วัน')}${chip('sick', 'มีลาป่วย')}</div>`;
+
+            if (!list.length) { host.innerHTML = '<div class="text-center text-slate-400 text-sm py-12"><i class="fa-regular fa-face-meh text-2xl mb-2 block"></i>ไม่พบข้อมูลที่ตรงกับเงื่อนไข</div>'; return; }
+            host.innerHTML = SUMV.view === 'matrix' ? sumMatrix(list) : `<div class="sum-grid">${list.map(x => sumCard(x.e, x.idx, x.c, x.mine)).join('')}</div>`;
         }
 
         async function updateEmpField(empIndex, field, val) {
@@ -3135,67 +3192,115 @@
             showToast("ลบรายการประวัติคำขอเรียบร้อยแล้ว");
         }
 
+        // ===== ทำเนียบบุคลากร (redesigned): โฟกัสที่ "ใครคือใคร" · สถานะวันนี้ · วันเกิด/ครบรอบ — ไม่ซ้ำกับตารางสรุปวันลา =====
+        const DIRV = { group: 'all' };
+        const DIR_GROUPS = [
+            { key: 'eng', label: 'Engineering & GIS', icon: 'fa-gears', color: '#2f66ee', test: p => /engineer|gis|วิศวกร|ภูมิสารสนเทศ/i.test(p) },
+            { key: 'admin', label: 'Finance & Secretary', icon: 'fa-folder-open', color: '#10b981', test: p => /accountant|secretary|บัญชี|เลขานุการ/i.test(p) },
+            { key: 'ops', label: 'Driver & Operation', icon: 'fa-truck-fast', color: '#8b5cf6', test: p => /driver|messenger|พนักงานขับรถ|ส่งเอกสาร/i.test(p) },
+            { key: 'other', label: 'Others', icon: 'fa-user-group', color: '#64748b', test: () => true }
+        ];
+        const dirGroupOf = e => DIR_GROUPS.find(g => g.test(String(e.position || ''))) || DIR_GROUPS[3];
+        const dirEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const DIR_TH = { 'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5, 'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11 };
+        function dirParseDate(str) {
+            const p = String(str || '').trim().split(/\s+/); if (p.length < 3) return null;
+            const d = parseInt(p[0], 10), m = DIR_TH[p[1]]; let y = parseInt(p[2], 10);
+            if (isNaN(d) || m === undefined || isNaN(y)) return null; if (y > 2400) y -= 543;
+            return { d, m, y };
+        }
+        function dirNextAnnual(str) {
+            const x = dirParseDate(str); if (!x) return null;
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            let when = new Date(today.getFullYear(), x.m, x.d); if (when < today) when = new Date(today.getFullYear() + 1, x.m, x.d);
+            return { when, days: Math.round((when - today) / 864e5), years: when.getFullYear() - x.y, d: x.d, m: x.m };
+        }
+        function dirTodayStatus(emp) {
+            const d = getLiveDateData(); const dow = d.liveNow.getDay();
+            const r = requests.find(q => String(q.empId) === String(emp.id) && q.startDate <= d.iso && q.endDate >= d.iso && !isRejectedStatus(q.status));
+            if (r) {
+                const t = String(r.type || ''); const pend = !isApprovedStatus(r.status) ? ' (รออนุมัติ)' : '';
+                if (t.includes('นอกสถานที่')) { const m = t.match(/\(([^)]+)\)/); return { k: 'off', color: '#8b5cf6', icon: 'fa-location-dot', text: 'ทำงานนอกสถานที่' + (m ? ` · ${m[1].trim()}` : '') + pend }; }
+                if (t.includes('ป่วย')) return { k: 'leave', color: '#64748b', icon: 'fa-briefcase-medical', text: 'ลาป่วย' + pend };
+                return { k: 'leave', color: '#0ea5e9', icon: 'fa-umbrella-beach', text: t.replace(/\s*\(.*\)/, '') + pend };
+            }
+            if (dow === 0 || dow === 6) return { k: 'rest', color: '#94a3b8', icon: 'fa-mug-hot', text: 'วันหยุดสุดสัปดาห์' };
+            return { k: 'in', color: '#10b981', icon: 'fa-circle-check', text: 'อยู่ออฟฟิศวันนี้' };
+        }
+        function dirPosSplit(pos) { const m = String(pos || '').match(/^([^(]+?)\s*(?:\((.*)\))?$/); return { en: (m && m[1] ? m[1] : pos || '').trim(), th: (m && m[2]) || '' }; }
+        function dirSetGroup(g) { DIRV.group = g; renderStaffDirectory(); }
+        function dirBdayBadge(emp) {
+            const b = dirNextAnnual(emp.dob); if (!b || b.days > 30) return '';
+            return `<span class="text-[10px] font-extrabold bg-pink-50 text-pink-600 px-2 py-0.5 rounded-full">🎂 ${b.days === 0 ? 'วันนี้!' : 'อีก ' + b.days + ' วัน'}</span>`;
+        }
+        function dirFacts(emp, light) {
+            const x = dirParseDate(emp.startDate); const bd = dirParseDate(emp.dob);
+            const ts = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            const tenure = x ? calculateWorkTenure(emp.startDate) : '-';
+            const bTxt = bd ? `${bd.d} ${ts[bd.m]}` : '-';
+            const f = (l, v) => light ? `<div class="rounded-xl bg-white/15 px-3 py-1.5"><span class="block text-[9.5px] text-white/70 font-bold">${l}</span><b class="text-[11.5px]">${v}</b></div>` : `<div class="dir-fact"><span>${l}</span><b>${v}</b></div>`;
+            return f('อายุงาน', dirEsc(tenure)) + f('วันเกิด', dirEsc(bTxt));
+        }
         function renderStaffDirectory() {
             const execGrid = document.getElementById('directory-executives-grid');
-            const staffGrid = document.getElementById('directory-staff-grid');
-            if (!execGrid || !staffGrid) return;
+            const staffHost = document.getElementById('directory-staff-grid');
+            if (!execGrid || !staffHost) return;
+            const search = (document.getElementById('search-directory')?.value || '').toLowerCase();
+            const filtered = employees.filter(e => (e.name && e.name.toLowerCase().includes(search)) || (e.id && String(e.id).toLowerCase().includes(search)) || (e.position && e.position.toLowerCase().includes(search)) || (getEmployeeNickname(e.id) || '').toLowerCase().includes(search));
+            const isExec = e => e.id === '1101001' || e.id === '1102003';
+            const execList = filtered.filter(isExec);
+            const staffAll = employees.filter(e => !isExec(e));
+            const staffList = filtered.filter(e => !isExec(e)).sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
 
-            execGrid.innerHTML = '';
-            staffGrid.innerHTML = '';
+            // --- insights ---
+            const st = employees.map(e => dirTodayStatus(e));
+            const nIn = st.filter(s => s.k === 'in').length, nLeave = st.filter(s => s.k === 'leave').length, nOff = st.filter(s => s.k === 'off').length;
+            const bdays = employees.map(e => ({ e, b: dirNextAnnual(e.dob) })).filter(x => x.b).sort((a, b) => a.b.days - b.b.days).slice(0, 3);
+                        const TH = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            const person = (e, sub) => `<div class="flex items-center gap-2.5 min-w-0"><img src="${getEmployeeAvatar(e.id)}" class="w-9 h-9 rounded-xl object-cover bg-white border border-slate-200 shrink-0" onerror="handleImageError(this,'${e.id}')"><div class="min-w-0"><div class="text-xs font-extrabold text-slate-900 truncate">${dirEsc(getEmployeeNickname(e.id) || formatDisplayName(e))}</div><div class="text-[10.5px] text-slate-500">${sub}</div></div></div>`;
+            document.getElementById('directory-insights').innerHTML = `
+                <div class="dir-insight lg:col-span-5"><div class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">สถานะวันนี้</div>
+                    <div class="flex items-end gap-5"><div><div class="text-2xl font-black text-emerald-600 leading-none">${nIn}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">อยู่ออฟฟิศ</div></div>
+                    <div><div class="text-2xl font-black text-sky-600 leading-none">${nLeave}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">ลา</div></div>
+                    <div><div class="text-2xl font-black text-violet-600 leading-none">${nOff}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">นอกสถานที่</div></div>
+                    <div class="ml-auto text-right"><div class="text-2xl font-black text-slate-800 leading-none">${employees.length}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">บุคลากรทั้งหมด</div></div></div></div>
+                <div class="dir-insight lg:col-span-7"><div class="text-[10.5px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">🎂 วันเกิดที่กำลังจะถึง</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">${bdays.map(x => person(x.e, x.b.days === 0 ? 'วันนี้!' : `${x.b.d} ${TH[x.b.m]} · อีก ${x.b.days} วัน`)).join('') || '<span class="text-xs text-slate-400">ยังไม่มีข้อมูลวันเกิด</span>'}</div></div>`;
 
-            const search = document.getElementById('search-directory')?.value.toLowerCase() || '';
-            const filtered = employees.filter(e => {
-                return (e.name && e.name.toLowerCase().includes(search)) || 
-                       (e.id && e.id.toLowerCase().includes(search)) || 
-                       (e.position && e.position.toLowerCase().includes(search));
-            });
+            // --- group chips ---
+            const cnt = g => staffAll.filter(e => dirGroupOf(e).key === g.key).length;
+            document.getElementById('directory-toolbar').innerHTML = `<button type="button" class="dir-chip ${DIRV.group === 'all' ? 'on' : ''}" onclick="dirSetGroup('all')">ทั้งหมด · ${employees.length}</button>` +
+                `<button type="button" class="dir-chip ${DIRV.group === 'exec' ? 'on' : ''}" onclick="dirSetGroup('exec')">Executive Board · ${employees.length - staffAll.length}</button>` +
+                DIR_GROUPS.filter(g => cnt(g) > 0).map(g => `<button type="button" class="dir-chip ${DIRV.group === g.key ? 'on' : ''}" onclick="dirSetGroup('${g.key}')"><i class="fa-solid ${g.icon} mr-1.5" style="color:${g.color}"></i>${g.label} · ${cnt(g)}</button>`).join('');
 
-            const execList = filtered.filter(e => e.id === '1101001' || e.id === '1102003');
-            const staffList = filtered.filter(e => e.id !== '1101001' && e.id !== '1102003');
-            staffList.sort((a, b) => getStartDateTimestamp(a.startDate) - getStartDateTimestamp(b.startDate));
+            // --- executives ---
+            document.getElementById('directory-exec-wrap').style.display = (DIRV.group === 'all' || DIRV.group === 'exec') && execList.length ? '' : 'none';
+            execGrid.innerHTML = execList.map(emp => {
+                const nick = getEmployeeNickname(emp.id); const ps = dirPosSplit(emp.position); const s = dirTodayStatus(emp);
+                return `<div class="dir-exec"><div class="relative z-10 flex items-center gap-3.5">
+                    <div class="w-16 h-16 rounded-2xl p-0.5 bg-white/25 shrink-0"><img src="${getEmployeeAvatar(emp.id)}" alt="" class="w-full h-full rounded-[14px] object-cover bg-white" onerror="handleImageError(this,'${emp.id}')"></div>
+                    <div class="min-w-0 flex-1"><div class="font-extrabold text-sm leading-tight">${dirEsc(formatDisplayName(emp))} ${nick ? `<span class="text-white/70 font-bold">(${dirEsc(nick)})</span>` : ''}</div>
+                    <div class="text-xs text-white/90 font-bold mt-1">${dirEsc(ps.en)}</div><div class="text-[10.5px] text-white/65">${dirEsc(ps.th)}</div></div></div>
+                    <div class="relative z-10 grid grid-cols-2 gap-2 mt-3.5">${dirFacts(emp, true)}</div>
+                    <div class="relative z-10 mt-2.5 flex items-center justify-between"><span class="text-[11px] font-bold bg-white/15 rounded-full px-3 py-1"><i class="fa-solid ${s.icon} mr-1.5"></i>${dirEsc(s.text)}</span>${dirBdayBadge(emp)}</div></div>`;
+            }).join('');
 
-            execList.forEach(emp => {
-                const nick = getEmployeeNickname(emp.id);
-                const tenure = calculateWorkTenure(emp.startDate);
-                const quotas = getEmpRemainingQuotas(emp.id);
-
-                execGrid.innerHTML += `
-                    <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-sky-600 text-white rounded-2xl p-4 shadow-sm flex items-center space-x-3.5 text-xs sm:text-sm">
-                        <div class="w-12 h-12 rounded-xl p-0.5 bg-white/20 shrink-0">
-                            <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full rounded-lg object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
-                        </div>
-                        <div class="min-w-0 flex-1 leading-tight text-left">
-                            <h3 class="font-extrabold text-sm truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h3>
-                            <p class="text-xs text-white/90 truncate">${emp.position}</p>
-                            <span class="text-[11px] text-amber-300 font-bold mt-1 block">พักร้อนเหลือ: ${formatLeaveNumber(quotas.vacRem)} วัน</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            staffList.forEach(emp => {
-                const nick = getEmployeeNickname(emp.id);
-                const tenure = calculateWorkTenure(emp.startDate);
-                const quotas = getEmpRemainingQuotas(emp.id);
-
-                staffGrid.innerHTML += `
-                    <div class="bento-card p-4 space-y-2 text-left flex flex-col justify-between text-xs sm:text-sm">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-xl bg-slate-100 border shrink-0 overflow-hidden">
-                                <img src="${getEmployeeAvatar(emp.id)}" alt="${emp.name}" class="w-full h-full object-cover bg-white" onerror="handleImageError(this, '${emp.id}')">
-                            </div>
-                            <div class="min-w-0 flex-1 leading-tight">
-                                <h4 class="font-extrabold text-slate-900 text-xs truncate">${formatDisplayName(emp)} ${nick ? `(${nick})` : ''}</h4>
-                                <p class="text-[10px] text-slate-500 truncate mt-0.5">${emp.position}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
-                            <span class="text-slate-400">อายุงาน: ${tenure}</span>
-                            <strong class="text-emerald-600 font-bold">${formatLeaveNumber(quotas.vacRem)} วัน</strong>
-                        </div>
-                    </div>
-                `;
-            });
+            // --- staff by group ---
+            if (DIRV.group === 'exec') { staffHost.innerHTML = ''; return; }
+            const groups = DIR_GROUPS.filter(g => (DIRV.group === 'all' || DIRV.group === g.key)).map(g => ({ g, list: staffList.filter(e => dirGroupOf(e).key === g.key) })).filter(x => x.list.length);
+            if (!groups.length && !execList.length) { staffHost.innerHTML = '<div class="text-center text-slate-400 text-sm py-12"><i class="fa-regular fa-face-meh text-2xl mb-2 block"></i>ไม่พบบุคลากรที่ตรงกับการค้นหา</div>'; return; }
+            staffHost.innerHTML = groups.map(({ g, list }) => `
+                <div class="space-y-2.5"><div class="flex items-center gap-2"><span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs" style="background:${g.color}1f;color:${g.color}"><i class="fa-solid ${g.icon}"></i></span><span class="text-xs font-extrabold text-slate-800">${g.label}</span><span class="text-[10.5px] font-bold text-slate-400">${list.length} คน</span><div class="flex-1 h-px bg-slate-100"></div></div>
+                <div class="dir-grid">${list.map(emp => {
+                    const nick = getEmployeeNickname(emp.id); const ps = dirPosSplit(emp.position); const s = dirTodayStatus(emp);
+                    return `<div class="dir-card" style="--g:${g.color}33"><div class="flex items-center gap-3">
+                        <div class="dir-ava" style="--g:${g.color}66"><img src="${getEmployeeAvatar(emp.id)}" alt="" onerror="handleImageError(this,'${emp.id}')"><span class="dir-dot" style="background:${s.color}" title="${dirEsc(s.text)}"></span></div>
+                        <div class="min-w-0 flex-1"><div class="font-extrabold text-slate-900 text-[13px] leading-tight truncate">${dirEsc(formatDisplayName(emp))}</div>
+                        <div class="flex items-center gap-1.5 mt-1 flex-wrap">${nick ? `<span class="text-[10px] font-extrabold px-2 py-0.5 rounded-full" style="background:${g.color}1a;color:${g.color}">${dirEsc(nick)}</span>` : ''}${dirBdayBadge(emp)}</div></div></div>
+                        <div class="mt-2.5"><div class="text-xs font-bold text-slate-700">${dirEsc(ps.en)}</div><div class="text-[10.5px] text-slate-400 truncate">${dirEsc(ps.th)}</div></div>
+                        <div class="grid grid-cols-2 gap-2 mt-3">${dirFacts(emp, false)}</div>
+                        <div class="mt-3 text-[11px] font-bold rounded-xl px-3 py-2 flex items-center" style="background:${s.color}14;color:${s.color}"><i class="fa-solid ${s.icon} mr-2"></i><span class="truncate">${dirEsc(s.text)}</span></div></div>`;
+                }).join('')}</div></div>`).join('');
         }
 
         function renderDashboardCharts() {
