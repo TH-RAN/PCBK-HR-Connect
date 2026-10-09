@@ -3582,38 +3582,80 @@
             return map;
         }
 
+        // ---------- day classification: ใช้ข้อความในช่องหมายเหตุของไทม์ชีต (ที่พนักงานแก้เอง) ก่อน แล้วค่อยใช้วันหยุด/ใบลาในระบบ ----------
+        function inferNote(note) {
+            const t = String(note || '').toLowerCase().trim(); if (!t) return null;
+            let kind = null;
+            if (/ลาพักร้อน|พักร้อน|annual leave|vacation/.test(t)) kind = 'vac';
+            else if (/ลาป่วย|sick/.test(t)) kind = 'sick';
+            else if (/ลากิจ|ลาคลอด|ลาบวช|ลาอื่น|ลาไม่รับค่าจ้าง|ลาพิเศษ|personal leave/.test(t)) kind = 'other';
+            else if (/นอกสถานที่|wfh|work from home|remote/.test(t)) kind = 'off';
+            else if (/วันหยุด|หยุดชดเชย|บูชา|สงกรานต์|holiday|ปิดทำการ/.test(t)) kind = 'holiday';
+            if (!kind) return null;
+            let days = 1;
+            if (kind === 'vac' || kind === 'sick' || kind === 'other') {
+                const m1 = /(\d+(?:\.\d+)?)\s*วัน/.exec(t), m2 = /(?:^|[^\d])(0?\.(?:25|5|75))/.exec(t);
+                if (/ครึ่งวัน|ครึ่ง/.test(t)) days = 0.5;
+                else if (m1 && parseFloat(m1[1]) > 0 && parseFloat(m1[1]) < 1) days = parseFloat(m1[1]);
+                else if (m2) days = parseFloat(m2[1]);
+            }
+            return { kind, days, label: note };
+        }
+        function dayInfo(cyc, lm, d) {
+            const iso = isoOf(d);
+            const manual = (cyc && cyc.notes && Object.prototype.hasOwnProperty.call(cyc.notes, iso)) ? cyc.notes[iso] : null;
+            const inf = manual ? inferNote(manual) : null; if (inf) return inf;
+            const hol = holidayName(d); if (hol) return { kind: 'holiday', days: 1, label: hol };
+            const lv = lm[iso]; if (lv) return { kind: lv.kind, days: lv.days, label: lv.label };
+            return { kind: 'work', days: 0, label: '' };
+        }
+        const isLeaveKind = k => k === 'vac' || k === 'sick' || k === 'other';
+        const partNeed = days => days === 0.5 ? 210 : days === 0.25 ? 120 : Math.round(DAY_MIN * (1 - days)); // ลาครึ่งวัน 3:30 · ลา 0.25 วัน 2:00
+        function jobMins(cyc, iso, daily) {
+            const jb = (cyc && cyc.job && cyc.job[iso]) || {};
+            const h = jb.h !== undefined ? parseHMtxt(jb.h) : (daily != null ? DAY_MIN : 0);
+            return h + (jb.j2 !== undefined ? parseHMtxt(jb.j2) : 0) + (jb.j3 !== undefined ? parseHMtxt(jb.j3) : 0);
+        }
+
         // ---------- stats ----------
         function cycleStats(empId, key) {
             const cyc = getCyc(empId, key); const [s, e] = cycleRange(key); const today = todayD();
             const lm = leaveMap(empId, key);
             const st = { has: !!(cyc && Object.keys(cyc.days).length), worked: 0, exp: 0, expFull: 0, leave: 0, vac: 0, sick: 0, offDays: 0, missing: 0, totalMin: 0, targetMin: 0, pct: 0, inSum: 0, inN: 0, outSum: 0, outN: 0, late: 0, otMin: 0, long: 0, incomplete: 0, days: [] };
             for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
-                const iso = isoOf(d), w = d.getDay(), hol = holidayName(d), off = (w === 0 || w === 6);
-                const rec = cyc && cyc.days[iso]; const lv = lm[iso];
+                const iso = isoOf(d), w = d.getDay(), off = (w === 0 || w === 6);
+                const info = dayInfo(cyc, lm, d); const leaveK = isLeaveKind(info.kind); const hol = info.kind === 'holiday' && !off;
+                const rec = cyc && cyc.days[iso];
                 const inM = rec ? toMin(rec.in) : null, outM = rec ? toMin(rec.out) : null;
-                const daily = (inM != null && outM != null) ? Math.max(0, outM - inM - ((lv && lv.kind !== 'off' && lv.days === 0.5) ? 0 : BREAK)) : null;
+                const has = !!(rec && (inM != null || outM != null));
+                const daily = (inM != null && outM != null) ? Math.max(0, outM - inM - ((leaveK && info.days === 0.5) ? 0 : BREAK)) : null;
                 const future = d > today;
-                let state = 'we';
+                let state = 'we', req = 0;   // req = ชั่วโมงที่ "ต้องทำ" ของวันนั้น ตามไทม์ชีต
                 if (off) state = 'we'; else if (hol) state = 'ho';
                 else {
-                    st.expFull++;
-                    if (!future) st.exp++;
-                    if (rec && (inM != null || outM != null)) state = 'ok'; else if (lv) state = lv.kind === 'off' ? 'off' : 'lv'; else state = future ? 'fu' : 'miss';
+                    st.expFull++; if (!future) st.exp++;
+                    if (has) { const jt = jobMins(cyc, iso, daily); req = (leaveK && info.days < 1) ? partNeed(info.days) : (jt > 0 ? jt : DAY_MIN); state = 'ok'; }
+                    else if (leaveK) { req = info.days < 1 ? partNeed(info.days) : 0; state = 'lv'; }
+                    else if (info.kind === 'off') { req = 0; state = 'off'; }
+                    else { state = future ? 'fu' : 'miss'; req = future ? 0 : DAY_MIN; }
+                    if (future) req = 0;
                 }
-                if (rec && (inM != null || outM != null)) {
+                if (has) {
                     if (daily != null) { st.worked++; st.totalMin += daily; st.otMin += Math.max(0, daily - DAY_MIN); if (daily >= 600) st.long++; }
                     else st.incomplete++;
                     if (inM != null) { st.inSum += inM; st.inN++; if (inM > STD_IN) st.late++; }
                     if (outM != null) { st.outSum += outM; st.outN++; }
-                    // สีในแผนที่: เขียว = ชั่วโมง Daily ตามไทม์ชีตครบ 8:00 (ลาครึ่งวัน 3:30 · ลา 0.25 วัน 2:00) · ส้ม = ไม่ครบ · ม่วง = ทำงานนอกสถานที่
-                    if (state === 'ok') { const need = (lv && lv.kind !== 'off') ? (lv.days === 0.5 ? 210 : lv.days === 0.25 ? 120 : DAY_MIN) : DAY_MIN; state = (daily != null && daily >= need) ? 'ok' : 'short'; }
+                    if (state === 'ok') state = (daily != null && daily >= req) ? 'ok' : 'short';
                 }
-                if (lv && lv.kind === 'off' && !off && !hol) state = 'off';
-                if (lv && !off && !hol && !future) { if (lv.kind === 'off') { if (!(rec && daily != null)) st.offDays++; } else { st.leave += lv.days; if (lv.kind === 'vac') st.vac += lv.days; if (lv.kind === 'sick') st.sick += lv.days; } }
+                if (info.kind === 'off' && !off && !hol) state = 'off';
+                if (!off && !hol && !future) {
+                    if (leaveK) { st.leave += info.days; if (info.kind === 'vac') st.vac += info.days; if (info.kind === 'sick') st.sick += info.days; }
+                    else if (info.kind === 'off' && !(has && daily != null)) st.offDays++;
+                }
+                st.targetMin += req;
                 if (state === 'miss') st.missing++;
-                st.days.push({ iso, d: d.getDate(), w, state, inM, outM, daily, hol, lv });
+                st.days.push({ iso, d: d.getDate(), w, state, inM, outM, daily, req, hol: hol ? info.label : null, lv: leaveK ? info : null });
             }
-            st.targetMin = Math.max(0, st.exp - st.leave - st.offDays) * DAY_MIN;
             st.pct = st.targetMin ? st.totalMin / st.targetMin * 100 : 0;
             st.avgIn = st.inN ? st.inSum / st.inN : null; st.avgOut = st.outN ? st.outSum / st.outN : null;
             st.onTime = st.inN ? (st.inN - st.late) / st.inN * 100 : null;
@@ -3742,28 +3784,31 @@
             const cyc = getCyc(empId, key); const [s, e] = cycleRange(key); const lm = leaveMap(empId, key); const today = todayD();
             const rows = []; let cum = 0, sumDaily = 0, workDays = 0, expDays = 0; const jobs = [0, 0, 0]; let vac = 0, sick = 0;
             for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
-                const iso = isoOf(d), w = d.getDay(), hol = holidayName(d), lv = lm[iso];
+                const iso = isoOf(d), w = d.getDay(); const wk = !(w === 0 || w === 6);
+                const info = dayInfo(cyc, lm, d); const leaveK = isLeaveKind(info.kind); const hol = wk && info.kind === 'holiday';
                 const rec = cyc && cyc.days[iso];
                 const inM = rec ? toMin(rec.in) : null, outM = rec ? toMin(rec.out) : null;
-                const daily = (inM != null && outM != null) ? Math.max(0, outM - inM - ((lv && lv.kind !== 'off' && lv.days === 0.5) ? 0 : BREAK)) : null;
+                const daily = (inM != null && outM != null) ? Math.max(0, outM - inM - ((leaveK && info.days === 0.5) ? 0 : BREAK)) : null;
                 if (daily != null) { cum += daily; sumDaily += daily; workDays++; }
-                if (w !== 0 && w !== 6 && !hol) expDays++;
-                if (lv && lv.kind === 'vac') vac += lv.days; if (lv && lv.kind === 'sick') sick += lv.days;
+                if (wk && !hol) expDays++;
+                if (wk && !hol && leaveK) { if (info.kind === 'vac') vac += info.days; if (info.kind === 'sick') sick += info.days; }
                 const jb = (cyc && cyc.job && cyc.job[iso]) || {};
                 const h = jb.h !== undefined ? jb.h : (daily != null ? '8:00' : '');
                 const j2 = jb.j2 !== undefined ? jb.j2 : (daily != null ? '-' : '');
                 const j3 = jb.j3 !== undefined ? jb.j3 : (daily != null ? '-' : '');
                 jobs[0] += parseHMtxt(h); jobs[1] += parseHMtxt(j2); jobs[2] += parseHMtxt(j3);
-                const auto = [hol, lv && lv.label].filter(Boolean).join(' / ');
+                const sysHol = holidayName(d), sysLv = lm[iso];
+                const auto = [sysHol, sysLv && sysLv.label].filter(Boolean).join(' / ');
                 const note = (cyc && cyc.notes && Object.prototype.hasOwnProperty.call(cyc.notes, iso)) ? cyc.notes[iso] : auto;
                 let cls = '';
-                if (w === 0 || w === 6) cls = 'ts-row-we'; else if (hol) cls = 'ts-row-ho'; else if (lv && !rec) cls = lv.kind === 'off' ? 'ts-row-off' : 'ts-row-lv';
+                if (!wk) cls = 'ts-row-we'; else if (hol) cls = 'ts-row-ho'; else if (!rec && (leaveK || info.kind === 'off')) cls = info.kind === 'off' ? 'ts-row-off' : 'ts-row-lv';
                 else if (!rec && d <= today) cls = 'ts-row-miss';
                 if (rec && (inM == null || outM == null)) cls += ' ts-row-flag';
-                rows.push({ iso, d: new Date(d), w, cls, inM, outM, rec, daily, cum: (daily != null || rows.length) ? cum : null, h, j2, j3, note, hol });
+                rows.push({ iso, d: new Date(d), w, cls, inM, outM, rec, daily, cum: (daily != null || rows.length) ? cum : null, h, j2, j3, note, hol: hol ? info.label : null });
             }
             return { rows, cyc, sumDaily, workDays, expDays, jobs, vac, sick, s, e };
         }
+
         function enHeader(empId, key) {
             const emp = empById(empId); const cyc = getCyc(empId, key);
             return { name: (cyc && cyc.nameEn) || (emp ? nm(emp) : ''), position: posEn(emp) };
@@ -3861,7 +3906,7 @@
             const editable = canEditSheet();
             const banner = st.has ? '' : `<div class="mb-3 p-3 rounded-2xl bg-blue-50 border border-blue-100 text-blue-800 text-xs font-semibold"><i class="fa-solid fa-circle-info mr-1.5"></i>ยังไม่มีข้อมูลของรอบ ${cycleLabel(sel.key)} — อัปโหลดไฟล์บันทึกเวลาเพื่อสร้างไทม์ชีตอัตโนมัติ</div>`;
             const note = (st.incomplete ? `<div class="mb-3 p-3 rounded-2xl bg-amber-50 border border-amber-100 text-amber-800 text-xs font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>มี ${st.incomplete} วันที่สแกนเพียงครั้งเดียว — กรุณากรอกเวลาที่ขาดในช่องสีส้ม</div>` : '') +
-                (editable ? `<div class="mb-3 text-[11px] text-slate-400"><i class="fa-regular fa-pen-to-square mr-1"></i>คลิกที่เวลา / หมายเหตุ เพื่อแก้ไขได้ · จุดสีส้มคือค่าที่แก้ไขด้วยมือ · วางเมาส์บนเวลาเพื่อดูเวลาสแกนจริง (ถึงวินาที)</div>` : '');
+                (editable ? `<div class="mb-3 text-[11px] text-slate-400"><i class="fa-regular fa-pen-to-square mr-1"></i>คลิกที่เวลา / หมายเหตุ เพื่อแก้ไขได้ · จุดสีส้มคือค่าที่แก้ไขด้วยมือ · วางเมาส์บนเวลาเพื่อดูเวลาสแกนจริง (ถึงวินาที)<br><b class="text-slate-500">เคล็ดลับ:</b> พิมพ์ในช่องหมายเหตุว่า <b>ลาพักร้อน / ลาป่วย / ลากิจ / ลาครึ่งวัน / นอกสถานที่ / วันหยุด</b> (เช่น “ลาพักร้อน 0.5 วัน”) ระบบจะนำไปคิดเป้าชั่วโมงและวันลาใน Dashboard ให้อัตโนมัติ — เป้าชั่วโมงของแต่ละวันคิดจากผลรวมช่อง Job No. ของวันนั้น</div>` : '');
             document.getElementById('ts-sheet-wrap').innerHTML = banner + note + sheetHTML(sel.emp, sel.key, editable);
             paintSync(); pullCloud(false);
         }
@@ -4029,7 +4074,7 @@
             }).join('');
             return `<div class="bento-card p-5 text-left"><div class="flex items-center justify-between mb-2"><h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-table-list text-blue-600 mr-2"></i>สรุปรายบุคคล ${D.mode === 'month' ? '· ' + cycleLabel(D.key) : '· ปี พ.ศ. ' + beY(D.year)}</h3><span class="text-[10.5px] text-slate-400">คลิกชื่อเพื่อดูรายละเอียด · คลิกหัวคอลัมน์เพื่อเรียง</span></div>
                 <div class="overflow-x-auto"><table class="tsd-tbl"><thead><tr>${th('name', 'พนักงาน')}${th('worked', 'วันทำงาน')}${th('hours', 'ชั่วโมง (เป้า)')}${th('pct', '% เทียบเป้า')}<th>เข้า → ออกเฉลี่ย</th>${th('late', 'หลัง 08:30')}${th('ot', 'ชม.ส่วนเกิน')}${th('leave', 'วันลา')}${th('missing', 'ไม่มีบันทึก')}</tr></thead><tbody>${body}</tbody></table></div>
-                <div class="text-[10.5px] text-slate-400 mt-1">เป้าชั่วโมง = (วันทำการ − วันลา − วันทำงานนอกสถานที่ที่ไม่มีสแกน) × 8 ชม. · วันที่ไม่มีบันทึก = วันทำการที่ไม่มีสแกนและไม่มีใบลา</div></div>`;
+                <div class="text-[10.5px] text-slate-400 mt-1">เป้าชั่วโมง = ผลรวมชั่วโมงงานตาม Job No. ของแต่ละวันในไทม์ชีต (ค่าเริ่มต้น 8 ชม.) · ไม่นับวันหยุด/วันลาเต็มวัน/วันทำงานนอกสถานที่ที่ไม่มีสแกน · วันทำการที่ไม่มีสแกนและไม่ได้ระบุการลา นับเป็นวันละ 8 ชม.</div></div>`;
         }
         function heatHTML(rows) {
             const [s, e] = cycleRange(D.key); const n = Math.round((e - s) / 864e5) + 1;
