@@ -860,7 +860,7 @@
                                     <input type="date" id="form-start-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs sm:text-sm">
                                 </div>
                                 <div id="wrapper-end-date">
-                                    <label class="block font-bold text-slate-700 mb-1">ถึงวันที่ *</label>
+                                    <label class="block font-bold text-slate-700 mb-1">ถึงวันที่ <span id="end-date-req">*</span></label>
                                     <input type="date" id="form-end-date" required onchange="calculateDays()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs sm:text-sm">
                                 </div>
                             </div>
@@ -876,8 +876,8 @@
                             </div>
 
                             <div>
-                                <label class="block font-bold text-slate-700 mb-1">เหตุผลการลา / ช่องทางติดต่อ *</label>
-                                <textarea id="form-reason" rows="2" required placeholder="เช่น ติดต่อธุระส่วนตัว / โทร 081-xxx-xxxx" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs sm:text-sm"></textarea>
+                                <label class="block font-bold text-slate-700 mb-1">ช่องทางติดต่อ <span class="font-medium text-slate-400 text-[11px]">(ไม่บังคับ)</span></label>
+                                <textarea id="form-reason" rows="2" placeholder="เช่น โทร 081-xxx-xxxx / LINE ที่ติดต่อได้ระหว่างลา" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs sm:text-sm"></textarea>
                             </div>
 
                             <button type="submit" id="btn-submit-form" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-md transition pressable text-xs sm:text-sm">
@@ -1000,7 +1000,7 @@
                                 <span>เวลา = สแกนแรก/สุดท้ายของวัน (ตัดวินาที) · พักเที่ยง 1 ชม.</span>
                             </div>
                         </div>
-                        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-3" id="ts-kpis"></div>
+                        <div class="lg:col-span-7 grid grid-cols-2 auto-rows-fr gap-3" id="ts-kpis"></div>
                     </div>
 
                     <div class="bento-card p-3 sm:p-5 overflow-x-auto" id="ts-sheet-wrap"></div>
@@ -2690,7 +2690,7 @@
                 avatarImg.src = getEmployeeAvatar(req.empId);
                 nameEl.innerText = formatNameWithNickname(req.empName, req.empId);
                 timeEl.innerText = `📅 ${req.startDate} ถึง ${req.endDate} (${req.days} วัน)`;
-                titleEl.innerText = `${req.type}\nเหตุผล: ${req.reason || '-'}`;
+                titleEl.innerText = `${req.type}\nช่องทางติดต่อ: ${req.reason || '-'}`;
                 actionContainer.innerHTML = '';
             } else {
                 const ev = events.find(e => e.id === itemId);
@@ -2994,6 +2994,13 @@
 
         function calculateDays() {
             const durType = document.querySelector('input[name="leave_duration_type"]:checked')?.value || 'FULL';
+            // ลาครึ่งวัน/0.25 วัน = วันเดียว: "ถึงวันที่" ตามวันที่เริ่มอัตโนมัติและไม่บังคับกรอก
+            {
+                const sI = document.getElementById('form-start-date'), eI = document.getElementById('form-end-date'), rq = document.getElementById('end-date-req');
+                const single = (durType === 'HALF' || durType === 'QUARTER');
+                if (eI) { eI.required = !single; if (single && sI) eI.value = sI.value; }
+                if (rq) rq.style.display = single ? 'none' : '';
+            }
             const countEl = document.getElementById('form-day-count');
             let days = 1;
 
@@ -3099,6 +3106,7 @@
             await saveAllToCloud();
             renderAllViews();
             document.getElementById('leave-form').reset();
+            toggleDurationOptions();
             showToast("ยื่นใบลาเพื่อขออนุมัติเรียบร้อยแล้ว");
             switchTab('dashboard');
         }
@@ -3814,7 +3822,8 @@
 
         // ---------- timesheet view ----------
         function cycleOptions() {
-            const keys = [curCycle(), sel.key];
+            const tmr = todayD(); tmr.setDate(tmr.getDate() + 1);
+            const keys = [curCycle(), cycleOf(tmr), sel.key];   // วันที่ 21 ของเดือน → เพิ่มรอบถัดไป (22–21) ให้เลือกยื่นไทม์ชีต
             Object.keys(store.cycles).forEach(k => keys.push(k.split('|')[1]));
             const [cy, cm] = curCycle().split('-').map(Number); const back = new Date(cy, cm - 12, 1);
             keys.push(`${back.getFullYear()}-${pad(back.getMonth() + 1)}`);
@@ -3843,7 +3852,7 @@
             document.getElementById('ts-btn-clear').classList.toggle('hidden', !amAdmin());
             document.getElementById('ts-import-report').innerHTML = reportHTML();
             const st = cycleStats(sel.emp, sel.key);
-            const kp = (ic, c, v, l) => `<div class="bento-card p-3.5 text-left"><div class="w-8 h-8 rounded-xl ${c} flex items-center justify-center text-xs mb-2"><i class="${ic}"></i></div><div class="text-lg font-black text-slate-900 leading-none">${v}</div><div class="text-[10.5px] text-slate-500 font-semibold mt-1">${l}</div></div>`;
+            const kp = (ic, c, v, l) => `<div class="bento-card px-4 py-3 text-left flex items-center gap-3.5"><div class="w-11 h-11 rounded-2xl ${c} flex items-center justify-center text-base shrink-0"><i class="${ic}"></i></div><div class="min-w-0"><div class="text-2xl font-black text-slate-900 leading-none">${v}</div><div class="text-[11px] text-slate-500 font-semibold mt-1.5 leading-tight">${l}</div></div></div>`;
             document.getElementById('ts-kpis').innerHTML =
                 kp('fa-solid fa-calendar-check', 'bg-blue-50 text-blue-600', `${st.worked}<span class="text-xs text-slate-400 font-bold"> / ${st.expFull}</span>`, 'วันทำงาน / วันทำการในรอบ') +
                 kp('fa-solid fa-hourglass-half', 'bg-indigo-50 text-indigo-600', `${st.has ? f1(hrs(st.totalMin)) : '–'}<span class="text-xs text-slate-400 font-bold"> ชม.</span>`, 'ชั่วโมงทำงานรวม') +
@@ -4024,7 +4033,7 @@
         }
         function heatHTML(rows) {
             const [s, e] = cycleRange(D.key); const n = Math.round((e - s) / 864e5) + 1;
-            const colors = { ok: C.emerald, short: C.amber, miss: '#fdba74', lv: C.sky, off: C.violet, we: '#eef2f7', ho: '#fecdd3', fu: '#fff' };
+            const colors = { ok: C.emerald, short: C.amber, miss: '#64748b', lv: C.sky, off: C.violet, we: '#eef2f7', ho: '#fecdd3', fu: '#fff' };
             const lab = { ok: 'ทำงานครบเวลา', short: 'ทำงานไม่ครบเวลา', miss: 'ไม่มีบันทึก', lv: 'ลา', off: 'ทำงานนอกสถานที่', we: 'วันหยุดสุดสัปดาห์', ho: 'วันหยุดนักขัตฤกษ์', fu: 'ยังไม่ถึง' };
             const head = Array.from({ length: n }, (_, i) => { const d = new Date(s); d.setDate(d.getDate() + i); return `<div class="text-[9px] text-center ${d.getDay() === 0 || d.getDay() === 6 ? 'text-rose-400' : 'text-slate-400'} font-bold">${d.getDate()}</div>`; }).join('');
             const body = sortRows(rows).map(r => {
