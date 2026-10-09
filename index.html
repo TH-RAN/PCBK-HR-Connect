@@ -4065,6 +4065,7 @@
             return `<div class="bento-card p-5 text-left"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"><div class="flex items-center gap-3">${avatar(r.emp.id).replace('w-8 h-8', 'w-12 h-12')}<div><div class="font-extrabold text-slate-900">${esc(nm(r.emp))}${nick(r.emp.id) ? ` <span class="text-slate-400 font-semibold">(${esc(nick(r.emp.id))})</span>` : ''}</div><div class="text-[11px] text-slate-500">${esc(r.emp.position)}</div></div></div>
                 ${r.has ? `<div class="flex flex-wrap gap-2"><span class="tsd-chip bg-blue-50 text-blue-700">${f1(hrs(a.totalMin))} ชม. · ${f0(a.pct)}% ของเป้า</span><span class="tsd-chip bg-emerald-50 text-emerald-700">${a.worked} วันทำงาน</span><span class="tsd-chip bg-amber-50 text-amber-700">หลัง 08:30: ${a.late} ครั้ง</span><span class="tsd-chip bg-violet-50 text-violet-700">ส่วนเกิน ${f1(hrs(a.otMin))} ชม.</span></div>` : '<span class="text-xs text-slate-400">ยังไม่มีข้อมูล</span>'}</div>
                 <div class="h-56 relative"><canvas id="tsd-chart-detail"></canvas></div>
+                ${D.mode === 'month' ? `<div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">${[['#10b981', 'ทำงานครบเวลา'], ['#f59e0b', 'ทำงานไม่ครบเวลา'], ['#8b5cf6', 'ทำงานนอกสถานที่'], ['#0ea5e9', 'ลา'], ['#64748b', 'ไม่มีบันทึก']].map(x => `<span class="flex items-center gap-1.5 text-[10.5px] text-slate-500 font-semibold"><i class="inline-block w-3 h-3 rounded" style="background:${x[0]}"></i>${x[1]}</span>`).join('')}</div>` : ''}
                 <div class="mt-3 text-right"><button class="text-xs font-bold text-blue-600 hover:underline cursor-pointer" onclick="TS_UI.openSheet('${r.emp.id}')">เปิดไทม์ชีตของ ${esc(nick(r.emp.id) || nm(r.emp).split(' ')[0])} <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div>`;
         }
         function renderDashboard() {
@@ -4117,7 +4118,7 @@
             if (D.mode === 'month') {
                 const st = cycleStats(r.emp.id, D.key); const days = st.days.filter(d => d.state !== 'we' && d.state !== 'ho');
                 mkChart('tsd-chart-detail', { type: 'bar', data: { labels: days.map(d => d.d), datasets: [
-                    { label: 'ชั่วโมงทำงาน', data: days.map(d => d.daily != null ? +hrs(d.daily).toFixed(2) : null), backgroundColor: days.map(d => d.state === 'short' ? C.amber : d.state === 'off' ? C.violet : C.blue), borderRadius: 5, maxBarThickness: 18 },
+                    { label: 'ชั่วโมงทำงาน', data: days.map(d => d.daily != null ? +hrs(d.daily).toFixed(2) : null), backgroundColor: days.map(d => ({ ok: C.emerald, short: C.amber, lv: C.sky, off: C.violet, miss: '#64748b' }[d.state] || C.slate)), borderRadius: 5, maxBarThickness: 18 },
                     { label: '8 ชม.', type: 'line', data: days.map(() => 8), borderColor: '#334155', borderDash: [5, 4], pointRadius: 0, borderWidth: 1.2 }] },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { footer: i => { const d = days[i[0].dataIndex]; return d.inM != null ? `เข้า ${fmtT(d.inM)} · ออก ${d.outM != null ? fmtT(d.outM) : '–'}` : ''; } } } }, scales: { y: { beginAtZero: true, grid, title: { display: true, text: 'ชม./วัน' } }, x: { grid: { display: false } } } } });
             } else {
