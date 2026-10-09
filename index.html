@@ -3433,6 +3433,7 @@
             }, 2500);
         }
     </script>
+
     <!-- ===== Time sheet cloud sync (added; separate docs, does not touch main_store) ===== -->
     <script type="module">
         import { getApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -3596,8 +3597,8 @@
                     else st.incomplete++;
                     if (inM != null) { st.inSum += inM; st.inN++; if (inM > STD_IN) st.late++; }
                     if (outM != null) { st.outSum += outM; st.outN++; }
-                    // สีในแผนที่: เขียว = ทำงานครบเวลาที่ต้องทำ (8-1 = 7 ชม. หรือ 3.5 ชม. ถ้าลาครึ่งวัน) · ส้ม = ไม่ครบ · ม่วง = ทำงานนอกสถานที่
-                    if (state === 'ok') { const need = (lv && lv.kind !== 'off' && lv.days === 0.5) ? 210 : (DAY_MIN - BREAK); state = (daily != null && daily >= need) ? 'ok' : 'short'; }
+                    // สีในแผนที่: เขียว = ชั่วโมง Daily ตามไทม์ชีตครบ 8:00 (ลาครึ่งวัน 3:30 · ลา 0.25 วัน 2:00) · ส้ม = ไม่ครบ · ม่วง = ทำงานนอกสถานที่
+                    if (state === 'ok') { const need = (lv && lv.kind !== 'off') ? (lv.days === 0.5 ? 210 : lv.days === 0.25 ? 120 : DAY_MIN) : DAY_MIN; state = (daily != null && daily >= need) ? 'ok' : 'short'; }
                 }
                 if (lv && lv.kind === 'off' && !off && !hol) state = 'off';
                 if (lv && !off && !hol && !future) { if (lv.kind === 'off') { if (!(rec && daily != null)) st.offDays++; } else { st.leave += lv.days; if (lv.kind === 'vac') st.vac += lv.days; if (lv.kind === 'sick') st.sick += lv.days; } }
@@ -4164,10 +4165,75 @@
                 el.innerHTML = detailHTML(rows); drawDetail(rows); el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             },
             dExport,
+            getState: () => ({ ts: { emp: sel.emp, key: sel.key, picked }, dash: { picked: D.picked, mode: D.mode, key: D.key, year: D.year, emp: D.emp, sortKey: D.sortKey, sortDir: D.sortDir } }),
+            setState: st => { if (!st) return; if (st.ts) { if (st.ts.emp) sel.emp = st.ts.emp; if (st.ts.key) sel.key = st.ts.key; picked = !!st.ts.picked; } if (st.dash) Object.assign(D, st.dash); },
             openSheet: id => { sel.emp = String(id); sel.key = D.mode === 'month' ? D.key : sel.key; window.switchTab('timesheet'); }
         };
     })();
     </script>
+
+    <!-- ===== จำหน้า/ตัวเลือกล่าสุดเมื่อรีเฟรช (added) ===== -->
+    <script>
+    (function () {
+        'use strict';
+        const KEY = 'pcbk_ui_state_v1';
+        let restored = false, tab = 'dashboard', lastSaved = '';
+        const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } };
+        const val = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+        function snapshot() {
+            const st = {
+                user: String(currentUser.id), tab,
+                adminViewMode: isAdmin ? adminViewMode : undefined, displayEmpId: displayEmp ? String(displayEmp.id) : null,
+                calMode: calendarMode, calBase: calendarBaseDate.getTime(), miniCal: miniCalDate.getTime(),
+                searchEmp: val('search-emp'), searchDir: val('search-directory'),
+                sum: { view: SUMV.view, metric: SUMV.metric, filter: SUMV.filter, open: SUMV.open },
+                dir: { group: DIRV.group }
+            };
+            try { Object.assign(st, window.TS_UI.getState()); } catch (e) {}
+            return st;
+        }
+        function save() {
+            if (!restored || typeof currentUser === 'undefined' || !currentUser) return;
+            try { const j = JSON.stringify(snapshot()); if (j !== lastSaved) { localStorage.setItem(KEY, j); lastSaved = j; } } catch (e) {}
+        }
+        function apply(st) {
+            try {
+                if (isAdmin && st.adminViewMode) adminViewMode = st.adminViewMode;
+                if (st.displayEmpId) { const e = employees.find(x => String(x.id) === st.displayEmpId); if (e && (isAdmin || isExecutiveOrAdmin() || String(e.id) === String(currentUser.id))) displayEmp = e; }
+                if (st.calMode) calendarMode = st.calMode;
+                if (st.calBase) calendarBaseDate = new Date(st.calBase);
+                if (st.miniCal) miniCalDate = new Date(st.miniCal);
+                const se = document.getElementById('search-emp'); if (se && st.searchEmp) se.value = st.searchEmp;
+                const sd = document.getElementById('search-directory'); if (sd && st.searchDir) sd.value = st.searchDir;
+                if (st.sum) { SUMV.view = st.sum.view || SUMV.view; SUMV.metric = st.sum.metric || SUMV.metric; SUMV.filter = st.sum.filter || SUMV.filter; SUMV.open = st.sum.open || {}; }
+                if (st.dir && st.dir.group) DIRV.group = st.dir.group;
+                window.TS_UI.setState(st);
+                if (typeof setCalendarMode === 'function' && st.calMode) { const keep = new Date(calendarBaseDate); setCalendarMode(st.calMode); calendarBaseDate = keep; }
+                const sel = document.getElementById('exec-inspect-select'); if (sel && displayEmp) sel.value = displayEmp.id;
+                renderAllViews(); // วาดข้อมูลใหม่เฉพาะส่วนที่ผูกกับตัวเลือกที่กู้คืน
+            } catch (e) { console.warn('restore ui state failed', e); }
+        }
+        const orig = window.switchTab;
+        window.switchTab = function (tabId) {
+            // การเปลี่ยนแท็บอัตโนมัติครั้งแรกหลังล็อกอิน (ไปหน้าแรก) → กลับไปหน้าที่ค้างไว้แทน
+            if (!restored && tabId === 'dashboard' && typeof currentUser !== 'undefined' && currentUser) {
+                restored = true;
+                const st = load();
+                if (st && st.user === String(currentUser.id)) { apply(st); if (st.tab) tabId = st.tab; }
+            }
+            if (document.getElementById('tab-' + tabId)) tab = tabId;
+            orig(tabId);
+            save();
+        };
+        document.addEventListener('change', () => setTimeout(save, 50), true);
+        document.addEventListener('click', () => setTimeout(save, 120), true);
+        document.addEventListener('keyup', () => setTimeout(save, 120), true);
+        window.addEventListener('beforeunload', save);
+        document.addEventListener('visibilitychange', save);
+        setInterval(save, 1500);
+    })();
+    </script>
+
 
 </body>
 </html>
