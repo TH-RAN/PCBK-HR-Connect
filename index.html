@@ -3683,7 +3683,7 @@
         function cycleStats(empId, key) {
             const cyc = getCyc(empId, key); const [s, e] = cycleRange(key); const today = todayD();
             const lm = leaveMap(empId, key);
-            const st = { has: !!(cyc && Object.keys(cyc.days).length), worked: 0, exp: 0, expFull: 0, leave: 0, vac: 0, sick: 0, offDays: 0, missing: 0, totalMin: 0, targetMin: 0, pct: 0, inSum: 0, inN: 0, outSum: 0, outN: 0, late: 0, otMin: 0, long: 0, incomplete: 0, days: [] };
+            const st = { has: !!(cyc && Object.keys(cyc.days).length), worked: 0, exp: 0, expFull: 0, leave: 0, vac: 0, sick: 0, offDays: 0, missing: 0, totalMin: 0, targetMin: 0, pct: 0, inSum: 0, inN: 0, outSum: 0, outN: 0, late: 0, lateShort: 0, otMin: 0, long: 0, incomplete: 0, days: [] };
             for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
                 const iso = isoOf(d), w = d.getDay(), off = (w === 0 || w === 6);
                 const info = dayInfo(cyc, lm, d); const leaveK = isLeaveKind(info.kind); const hol = info.kind === 'holiday' && !off;
@@ -3709,6 +3709,7 @@
                     if (state === 'ok') state = (daily != null && daily >= req) ? 'ok' : 'short';
                 }
                 if (info.kind === 'off' && !off && !hol) state = 'off';
+                if (has && inM != null && inM > STD_IN && state === 'short') st.lateShort++;   // เข้าสาย (หลัง 08:30) และชั่วโมง Daily ไม่ถึงเป้าของวันนั้น
                 if (!off && !hol && !future) {
                     if (leaveK) { st.leave += info.days; if (info.kind === 'vac') st.vac += info.days; if (info.kind === 'sick') st.sick += info.days; }
                     else if (info.kind === 'off' && !(has && daily != null)) st.offDays++;
@@ -4067,7 +4068,7 @@
         // =====================================================================
         //                       WORKFORCE DASHBOARD
         // =====================================================================
-        const D = { picked: false, mode: 'month', key: curCycle(), year: new Date().getFullYear(), emp: null, sortKey: 'name', sortDir: 1, charts: {} };
+        const D = { picked: false, mode: 'month', key: curCycle(), year: new Date().getFullYear(), emp: null, sortKey: 'pct', sortDir: -1, charts: {} };
         const C = { blue: '#2f66ee', indigo: '#6366f1', violet: '#8b5cf6', emerald: '#10b981', amber: '#f59e0b', rose: '#f43f5e', sky: '#0ea5e9', slate: '#94a3b8' };
         const PAL = ['#2f66ee', '#10b981', '#f59e0b', '#8b5cf6', '#f43f5e', '#0ea5e9', '#14b8a6', '#ec4899'];
         const dashEmps = () => allEmp().filter(e => !EXEC_EXCLUDE.includes(String(e.id)));
@@ -4078,14 +4079,14 @@
             D.charts[id] = new Chart(el, cfg);
         }
         function yearAgg(empId, year) {
-            const months = []; const a = { worked: 0, exp: 0, totalMin: 0, targetMin: 0, late: 0, inN: 0, inSum: 0, outN: 0, outSum: 0, otMin: 0, leave: 0, vac: 0, sick: 0, missing: 0, has: false, covered: 0 };
+            const months = []; const a = { worked: 0, exp: 0, totalMin: 0, targetMin: 0, late: 0, lateShort: 0, inN: 0, inSum: 0, outN: 0, outSum: 0, otMin: 0, leave: 0, vac: 0, sick: 0, missing: 0, has: false, covered: 0 };
             for (let m = 1; m <= 12; m++) {
                 const key = `${year}-${pad(m)}`; const [s] = cycleRange(key);
                 if (s > todayD()) { months.push(null); continue; }
                 const st = cycleStats(empId, key); months.push(st);
                 if (!st.has) continue;
                 a.has = true; a.covered++;
-                ['worked', 'exp', 'totalMin', 'targetMin', 'late', 'inN', 'inSum', 'outN', 'outSum', 'otMin', 'leave', 'vac', 'sick', 'missing'].forEach(k => a[k] += st[k]);
+                ['worked', 'exp', 'totalMin', 'targetMin', 'late', 'lateShort', 'inN', 'inSum', 'outN', 'outSum', 'otMin', 'leave', 'vac', 'sick', 'missing'].forEach(k => a[k] += st[k]);
             }
             a.pct = a.targetMin ? a.totalMin / a.targetMin * 100 : 0;
             a.avgIn = a.inN ? a.inSum / a.inN : null; a.avgOut = a.outN ? a.outSum / a.outN : null; a.onTime = a.inN ? (a.inN - a.late) / a.inN * 100 : null;
@@ -4103,7 +4104,7 @@
         }
         function sortRows(rows) {
             const k = D.sortKey, dir = D.sortDir;
-            const val = r => ({ name: nm(r.emp), worked: r.a.worked, hours: r.a.totalMin, pct: r.a.pct, avgIn: r.a.avgIn == null ? 1e9 : r.a.avgIn, late: r.a.late, ot: r.a.otMin, leave: r.a.leave, missing: r.a.missing || 0 })[k];
+            const val = r => ({ name: nm(r.emp), worked: r.a.worked, hours: r.a.totalMin, pct: r.a.pct, avgIn: r.a.avgIn == null ? 1e9 : r.a.avgIn, late: r.a.late, lateShort: r.a.lateShort || 0, ot: r.a.otMin, leave: r.a.leave, missing: r.a.missing || 0 })[k];
             return rows.slice().sort((x, y) => { const a = val(x), b = val(y); return (typeof a === 'string' ? a.localeCompare(b, 'th') : a - b) * dir; });
         }
         function heroHTML(rows) {
@@ -4142,7 +4143,7 @@
                 [C.blue, 'fa-solid fa-trophy', 'ชั่วโมงทำงานเทียบเป้าสูงสุด', nm(best(r => r.a.pct, -1).emp), `${f0(best(r => r.a.pct, -1).a.pct)}%`],
                 [C.emerald, 'fa-solid fa-stopwatch', 'เข้างานเช้าที่สุดโดยเฉลี่ย', nm(best(r => r.a.avgIn == null ? 1e9 : r.a.avgIn, 1).emp), fmtT(Math.round(best(r => r.a.avgIn == null ? 1e9 : r.a.avgIn, 1).a.avgIn))],
                 [C.violet, 'fa-solid fa-moon', 'ชั่วโมงส่วนเกินมากที่สุด', nm(best(r => r.a.otMin, -1).emp), `${f1(hrs(best(r => r.a.otMin, -1).a.otMin))} ชม.`],
-                [C.amber, 'fa-solid fa-circle-question', 'วันที่ไม่มีบันทึกสแกนมากที่สุด', nm(best(r => r.a.missing || 0, -1).emp), `${best(r => r.a.missing || 0, -1).a.missing || 0} วัน`]
+                [C.amber, 'fa-solid fa-clock', 'เข้าสายและทำงานไม่ครบเวลามากที่สุด', (best(r => r.a.lateShort || 0, -1).a.lateShort ? nm(best(r => r.a.lateShort || 0, -1).emp) : 'ไม่มี'), `${best(r => r.a.lateShort || 0, -1).a.lateShort || 0} วัน`]
             ];
             return `<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">${items.map(i => `<div class="bento-card p-4 flex items-center gap-3 text-left"><div class="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style="background:${i[0]}1a;color:${i[0]}"><i class="${i[1]}"></i></div><div class="min-w-0"><div class="text-[10.5px] text-slate-500 font-semibold">${i[2]}</div><div class="text-sm font-extrabold text-slate-900 truncate">${esc(i[3])}</div><div class="text-xs font-bold" style="color:${i[0]}">${i[4]}</div></div></div>`).join('')}</div>`;
         }
@@ -4158,14 +4159,14 @@
                     <td class="font-bold">${f1(hrs(a.totalMin))}<span class="text-slate-400 font-semibold"> / ${f0(hrs(a.targetMin))}</span></td>
                     <td style="min-width:130px"><div class="flex items-center gap-2"><div class="tsd-bar flex-1"><i style="width:${Math.min(100, a.pct)}%;background:${col}"></i></div><b style="color:${col}">${f0(a.pct)}%</b></div></td>
                     <td class="font-semibold">${a.avgIn != null ? fmtT(Math.round(a.avgIn)) : '–'} <span class="text-slate-300">→</span> ${a.avgOut != null ? fmtT(Math.round(a.avgOut)) : '–'}</td>
-                    <td>${a.late ? `<span class="tsd-chip bg-amber-50 text-amber-700">${a.late}</span>` : `<span class="tsd-chip bg-emerald-50 text-emerald-700">0</span>`}</td>
+                    <td>${a.lateShort ? `<span class="tsd-chip bg-amber-50 text-amber-700">${a.lateShort}</span>` : `<span class="tsd-chip bg-emerald-50 text-emerald-700">0</span>`}</td>
                     <td class="font-semibold">${f1(hrs(a.otMin))}</td>
                     <td class="font-semibold">${parseFloat(a.leave.toFixed(2))}</td>
                     <td>${(a.missing || 0) ? `<span class="tsd-chip bg-orange-50 text-orange-700">${a.missing}</span>` : '<span class="text-slate-300">–</span>'}</td></tr>`;
             }).join('');
             return `<div class="bento-card p-5 text-left"><div class="flex items-center justify-between mb-2"><h3 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-table-list text-blue-600 mr-2"></i>สรุปรายบุคคล ${D.mode === 'month' ? '· ' + cycleLabel(D.key) : '· ปี พ.ศ. ' + beY(D.year)}</h3><span class="text-[10.5px] text-slate-400">คลิกชื่อเพื่อดูรายละเอียด · คลิกหัวคอลัมน์เพื่อเรียง</span></div>
-                <div class="overflow-x-auto"><table class="tsd-tbl"><thead><tr>${th('name', 'พนักงาน')}${th('worked', 'วันทำงาน')}${th('hours', 'ชั่วโมง (เป้า)')}${th('pct', '% เทียบเป้า')}<th>เข้า → ออกเฉลี่ย</th>${th('late', 'หลัง 08:30')}${th('ot', 'ชม.ส่วนเกิน')}${th('leave', 'วันลา')}${th('missing', 'ไม่มีบันทึก')}</tr></thead><tbody>${body}</tbody></table></div>
-                <div class="text-[10.5px] text-slate-400 mt-1">เป้าชั่วโมง = ผลรวมชั่วโมงในคอลัมน์ Job No. ที่กรอกไว้ในไทม์ชีต (ตรงกับตัวเลข Total มุมขวาล่างของไทม์ชีต · ถ้ายังไม่ได้กรอกชั่วโมง Job เลย ใช้ 8 ชม./วันที่มีเวลาเข้า-ออก) · วันที่ไม่มีบันทึกจะแสดงในคอลัมน์ "ไม่มีบันทึก"</div></div>`;
+                <div class="overflow-x-auto"><table class="tsd-tbl"><thead><tr>${th('name', 'พนักงาน')}${th('worked', 'วันทำงาน')}${th('hours', 'ชั่วโมง (เป้า)')}${th('pct', '% เทียบเป้า')}<th>เข้า → ออกเฉลี่ย</th>${th('lateShort', 'เข้าสาย + ไม่ครบเวลา (วัน)')}${th('ot', 'ชม.ส่วนเกิน')}${th('leave', 'วันลา')}${th('missing', 'ไม่มีบันทึก')}</tr></thead><tbody>${body}</tbody></table></div>
+                <div class="text-[10.5px] text-slate-400 mt-1">เป้าชั่วโมง = ผลรวมชั่วโมงในคอลัมน์ Job No. ที่กรอกไว้ในไทม์ชีต (ตรงกับตัวเลข Total มุมขวาล่างของไทม์ชีต · ถ้ายังไม่ได้กรอกชั่วโมง Job เลย ใช้ 8 ชม./วันที่มีเวลาเข้า-ออก) · วันที่ไม่มีบันทึกจะแสดงในคอลัมน์ "ไม่มีบันทึก" · เข้าสาย+ไม่ครบเวลา = จำนวนวันในไทม์ชีตที่เริ่มงานหลัง 08:30 และชั่วโมง Daily ไม่ถึงเป้าของวันนั้น (ไม่นับวันทำงานนอกสถานที่)</div></div>`;
         }
         function heatHTML(rows) {
             const [s, e] = cycleRange(D.key); const n = Math.round((e - s) / 864e5) + 1;
@@ -4199,7 +4200,7 @@
             const r = rows.find(x => String(x.emp.id) === String(D.emp)); if (!r) return '';
             const a = r.a;
             return `<div class="bento-card p-5 text-left"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3"><div class="flex items-center gap-3">${avatar(r.emp.id).replace('w-8 h-8', 'w-12 h-12')}<div><div class="font-extrabold text-slate-900">${esc(nm(r.emp))}${nick(r.emp.id) ? ` <span class="text-slate-400 font-semibold">(${esc(nick(r.emp.id))})</span>` : ''}</div><div class="text-[11px] text-slate-500">${esc(r.emp.position)}</div></div></div>
-                ${r.has ? `<div class="flex flex-wrap gap-2"><span class="tsd-chip bg-blue-50 text-blue-700">${f1(hrs(a.totalMin))} ชม. · ${f0(a.pct)}% ของเป้า</span><span class="tsd-chip bg-emerald-50 text-emerald-700">${a.worked} วันทำงาน</span><span class="tsd-chip bg-amber-50 text-amber-700">หลัง 08:30: ${a.late} ครั้ง</span><span class="tsd-chip bg-violet-50 text-violet-700">ส่วนเกิน ${f1(hrs(a.otMin))} ชม.</span></div>` : '<span class="text-xs text-slate-400">ยังไม่มีข้อมูล</span>'}</div>
+                ${r.has ? `<div class="flex flex-wrap gap-2"><span class="tsd-chip bg-blue-50 text-blue-700">${f1(hrs(a.totalMin))} ชม. · ${f0(a.pct)}% ของเป้า</span><span class="tsd-chip bg-emerald-50 text-emerald-700">${a.worked} วันทำงาน</span><span class="tsd-chip bg-amber-50 text-amber-700">เข้าสาย+ไม่ครบเวลา ${a.lateShort || 0} วัน</span><span class="tsd-chip bg-violet-50 text-violet-700">ส่วนเกิน ${f1(hrs(a.otMin))} ชม.</span></div>` : '<span class="text-xs text-slate-400">ยังไม่มีข้อมูล</span>'}</div>
                 <div class="h-56 relative"><canvas id="tsd-chart-detail"></canvas></div>
                 ${D.mode === 'month' ? `<div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-3">${[['#10b981', 'ทำงานครบเวลา'], ['#f59e0b', 'ทำงานไม่ครบเวลา'], ['#8b5cf6', 'ทำงานนอกสถานที่'], ['#0ea5e9', 'ลา'], ['#64748b', 'ไม่มีบันทึก']].map(x => `<span class="flex items-center gap-1.5 text-[10.5px] text-slate-500 font-semibold"><i class="inline-block w-3 h-3 rounded" style="background:${x[0]}"></i>${x[1]}</span>`).join('')}</div>` : ''}
                 <div class="mt-3 text-right"><button class="text-xs font-bold text-blue-600 hover:underline cursor-pointer" onclick="TS_UI.openSheet('${r.emp.id}')">เปิดไทม์ชีตของ ${esc(nick(r.emp.id) || nm(r.emp).split(' ')[0])} <i class="fa-solid fa-arrow-right ml-1"></i></button></div></div>`;
@@ -4223,7 +4224,7 @@
                 <div class="bento-card p-5 text-left"><h3 class="font-bold text-slate-900 text-sm mb-3"><i class="fa-solid fa-chart-line text-blue-600 mr-2"></i>ชั่วโมงทำงานรายเดือนของทีม ปี พ.ศ. ${beY(D.year)}</h3><div class="h-64 relative"><canvas id="tsd-chart-year"></canvas></div></div>
                 ${yearMatrixHTML(rows)}`;
             root.innerHTML = `<div class="space-y-4">${heroHTML(rows)}${empty}${highlightsHTML(rows)}${tableHTML(rows)}${charts}<div id="tsd-detail">${detailHTML(rows)}</div></div>`;
-            setTimeout(() => drawCharts(rows), 30);
+            const modeNow = D.mode; setTimeout(() => { if (D.mode === modeNow) drawCharts(rows); }, 30);   // ข้ามถ้าสลับโหมดไปแล้วก่อนวาดกราฟ
         }
         function drawCharts(rows) {
             const have = rows.filter(r => r.has); const label = r => nick(r.emp.id) || nm(r.emp).split(' ')[0];
@@ -4265,8 +4266,8 @@
             }
         }
         function dExport() {
-            const rows = dashData(); const head = ['พนักงาน', 'ตำแหน่ง', 'วันทำงาน', 'วันทำการ', 'ชั่วโมงรวม', 'ชั่วโมงเป้าหมาย', '% เทียบเป้า', 'เข้างานเฉลี่ย', 'ออกงานเฉลี่ย', 'จำนวนครั้งหลัง 08:30', 'ชม.ส่วนเกิน', 'วันลา', 'วันที่ไม่มีบันทึก'];
-            const aoa = [head].concat(sortRows(rows).map(r => r.has ? [nm(r.emp), posEn(r.emp), r.a.worked, r.a.exp, +hrs(r.a.totalMin).toFixed(2), +hrs(r.a.targetMin).toFixed(2), +r.a.pct.toFixed(1), r.a.avgIn != null ? fmtT(Math.round(r.a.avgIn)) : '', r.a.avgOut != null ? fmtT(Math.round(r.a.avgOut)) : '', r.a.late, +hrs(r.a.otMin).toFixed(2), parseFloat(r.a.leave.toFixed(2)), r.a.missing || 0] : [nm(r.emp), posEn(r.emp), 'ยังไม่มีข้อมูล']));
+            const rows = dashData(); const head = ['พนักงาน', 'ตำแหน่ง', 'วันทำงาน', 'วันทำการ', 'ชั่วโมงรวม', 'ชั่วโมงเป้าหมาย', '% เทียบเป้า', 'เข้างานเฉลี่ย', 'ออกงานเฉลี่ย', 'วันเข้าสายและทำงานไม่ครบเวลา', 'ชม.ส่วนเกิน', 'วันลา', 'วันที่ไม่มีบันทึก'];
+            const aoa = [head].concat(sortRows(rows).map(r => r.has ? [nm(r.emp), posEn(r.emp), r.a.worked, r.a.exp, +hrs(r.a.totalMin).toFixed(2), +hrs(r.a.targetMin).toFixed(2), +r.a.pct.toFixed(1), r.a.avgIn != null ? fmtT(Math.round(r.a.avgIn)) : '', r.a.avgOut != null ? fmtT(Math.round(r.a.avgOut)) : '', r.a.lateShort || 0, +hrs(r.a.otMin).toFixed(2), parseFloat(r.a.leave.toFixed(2)), r.a.missing || 0] : [nm(r.emp), posEn(r.emp), 'ยังไม่มีข้อมูล']));
             const ws = XLSX.utils.aoa_to_sheet(aoa); ws['!cols'] = head.map((h, i) => ({ wch: i < 2 ? 28 : 14 }));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, D.mode === 'month' ? `สรุป_${D.key}` : `สรุปปี_${beY(D.year)}`);
             XLSX.writeFile(wb, D.mode === 'month' ? `Dashboard_Timesheet_${D.key}.xlsx` : `Dashboard_Timesheet_${D.year}.xlsx`);
