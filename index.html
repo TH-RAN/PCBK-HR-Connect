@@ -611,7 +611,7 @@
                                     </div>
 
                                     <div class="flex items-center justify-between pt-1 text-[11px] text-slate-600">
-                                        <span>อายุงาน: <strong id="bento-stat-tenure" class="text-slate-900 font-bold">-</strong></span>
+                                        <div class="leading-tight"><span>อายุงาน: <strong id="bento-stat-tenure" class="text-slate-900 font-bold">-</strong></span><span id="bento-stat-startdate" class="block text-[10px] text-slate-400 mt-0.5"></span></div>
                                         <button type="button" onclick="quickApplyLeaveForCurrent()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-xl transition shadow-xs cursor-pointer flex items-center space-x-1">
                                             <i class="fa-solid fa-file-pen text-[10px]"></i>
                                             <span>ยื่นใบลา</span>
@@ -1722,6 +1722,7 @@
                                 <div class="text-right">
                                     <span class="text-[10px] text-slate-400 block">อายุงาน</span>
                                     <strong class="text-slate-700 font-bold">${tenure}</strong>
+                                    ${(emp.startDate && emp.startDate !== '-') ? `<span class="text-[10px] text-slate-400 block mt-0.5">เริ่มงาน ${emp.startDate}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -1967,6 +1968,8 @@
 
             const tenureEl = document.getElementById('bento-stat-tenure');
             if (tenureEl) tenureEl.innerText = calculateWorkTenure(emp.startDate);
+            const startEl = document.getElementById('bento-stat-startdate');
+            if (startEl) startEl.innerText = (emp.startDate && emp.startDate !== '-') ? `เริ่มงาน ${emp.startDate}` : '';
 
             const quotas = getEmpRemainingQuotas(emp.id);
             
@@ -3492,8 +3495,8 @@
         const MOVABLE_HOL = {'2026-03-03':'วันมาฆบูชา'};
 
         // ---------- storage ----------
-        let store = { cycles: {}, holidays: {}, backup: {} };
-        try { const raw = localStorage.getItem(LS_KEY); if (raw) { const p = JSON.parse(raw); store.cycles = p.cycles || {}; store.holidays = p.holidays || {}; store.backup = p.backup || {}; } } catch (e) {}
+        let store = { cycles: {}, holidays: {}, backup: {}, holidaysAt: 0 };
+        try { const raw = localStorage.getItem(LS_KEY); if (raw) { const p = JSON.parse(raw); store.cycles = p.cycles || {}; store.holidays = p.holidays || {}; store.backup = p.backup || {}; store.holidaysAt = p.holidaysAt || 0; } } catch (e) {}
         function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch (e) {} }
         const ck = (emp, key) => `${emp}|${key}`;
         function getCyc(emp, key) { return store.cycles[ck(emp, key)] || null; }
@@ -3515,6 +3518,17 @@
                 paintSync();
             }, 700);
         }
+        // วันหยุดเพิ่มเติม (แอดมินเพิ่ม) ซิงก์ขึ้นคลาวด์เป็นเอกสารเดียว เพื่อให้ทุกคนเห็นตรงกันบนไทม์ชีตของตัวเอง
+        let holTimer = null;
+        function pushHolidays() {
+            clearTimeout(holTimer);
+            holTimer = setTimeout(async () => {
+                if (!window.tsCloud) { syncState = 'local'; paintSync(); return; }
+                try { syncState = 'syncing'; paintSync(); await window.tsCloud.save('_holidays', 'all', { holidays: store.holidays, updatedAt: store.holidaysAt }); syncState = 'ok'; }
+                catch (e) { console.warn('holiday cloud save failed', e); syncState = 'local'; }
+                paintSync();
+            }, 500);
+        }
         let lastPull = 0;
         async function pullCloud(force) {
             if (!window.tsCloud || (!force && Date.now() - lastPull < 45000)) return;
@@ -3522,8 +3536,16 @@
             try {
                 const docs = await window.tsCloud.loadAll(); let changed = false;
                 const nDays = c => (c && c.days) ? Object.keys(c.days).length : 0;
+                let holDoc = false;
                 docs.forEach(d => {
-                    if (!d || !d.data) return; const k = ck(d.empId, d.key); const loc = store.cycles[k];
+                    if (!d || !d.data) return;
+                    if (String(d.empId) === '_holidays') {
+                        holDoc = true; const cu = d.data.updatedAt || 0, lu = store.holidaysAt || 0;
+                        if (cu > lu) { store.holidays = d.data.holidays || {}; store.holidaysAt = cu; changed = true; }
+                        else if (lu > cu) pushHolidays();
+                        return;
+                    }
+                    const k = ck(d.empId, d.key); const loc = store.cycles[k];
                     // สำเนา "ว่าง" บนคลาวด์ (ที่ไม่ได้มาจากการกด "ล้างรอบนี้") ต้องไม่ลบข้อมูลจริงในเครื่อง → ส่งข้อมูลในเครื่องกลับขึ้นคลาวด์
                     if (loc && nDays(loc) > 0 && nDays(d.data) === 0 && !d.data.cleared) { loc.updatedAt = Date.now(); touch(String(d.empId), d.key); changed = true; return; }
                     if (!loc || (d.data.updatedAt || 0) > (loc.updatedAt || 0)) {
@@ -3531,6 +3553,7 @@
                         store.cycles[k] = d.data; changed = true;
                     }
                 });
+                if (!holDoc && Object.keys(store.holidays).length) { if (!store.holidaysAt) store.holidaysAt = Date.now(); pushHolidays(); }   // วันหยุดที่เคยเพิ่มไว้ในเครื่องนี้ → ส่งขึ้นคลาวด์ครั้งแรก
                 syncState = 'ok'; if (changed) { persist(); renderActive(); }
             } catch (e) { syncState = 'local'; }
             paintSync();
@@ -4071,8 +4094,8 @@
             document.body.appendChild(m);
         }
         function refreshHol() { const el = document.getElementById('ts-hol-list'); if (!el) return; holidays(); }
-        function addHoliday() { const d = document.getElementById('ts-hol-date').value, n = document.getElementById('ts-hol-name').value.trim(); if (!d || !n) return; store.holidays[d] = n; persist(); refreshHol(); renderActive(); }
-        function delHoliday(d) { delete store.holidays[d]; persist(); refreshHol(); renderActive(); }
+        function addHoliday() { const d = document.getElementById('ts-hol-date').value, n = document.getElementById('ts-hol-name').value.trim(); if (!d || !n) return; store.holidays[d] = n; store.holidaysAt = Date.now(); persist(); pushHolidays(); refreshHol(); renderActive(); }
+        function delHoliday(d) { delete store.holidays[d]; store.holidaysAt = Date.now(); persist(); pushHolidays(); refreshHol(); renderActive(); }
 
         // =====================================================================
         //                       WORKFORCE DASHBOARD
