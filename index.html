@@ -749,6 +749,9 @@
                                     <button type="button" onclick="setCalendarMode('week')" id="cal-mode-btn-week" class="px-3.5 py-1.5 rounded-lg text-slate-600 font-medium cursor-pointer text-xs">สัปดาห์</button>
                                     <button type="button" onclick="setCalendarMode('day')" id="cal-mode-btn-day" class="px-3.5 py-1.5 rounded-lg text-slate-600 font-medium cursor-pointer text-xs">วัน</button>
                                 </div>
+                                <button type="button" id="cal-add-event-btn" onclick="openAddEventModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl shadow-xs cursor-pointer flex items-center space-x-1.5">
+                                    <i class="fa-solid fa-plus text-[10px]"></i><span>เพิ่มกิจกรรม</span>
+                                </button>
                                 <div class="flex items-center space-x-1">
                                     <button type="button" onclick="changeCalendarOffset(-1)" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs"><i class="fa-solid fa-chevron-left"></i></button>
                                     <button type="button" onclick="resetCalendarToToday()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">วันนี้</button>
@@ -2313,20 +2316,10 @@
                 const isMeet = item.type === 'meeting';
                 const dateParts = item.date.split('-');
                 const dayMonth = `${parseInt(dateParts[2])} ${getLiveDateData().thaiMonthsShort[parseInt(dateParts[1]) - 1]}`;
-
-                const isLong = item.title.length > 20;
-                let titleContent = `<span class="font-bold text-slate-800 text-xs block truncate">${item.title}</span>`;
-                if (isLong) {
-                    titleContent = `
-                        <div class="marquee-wrapper">
-                            <div class="marquee-track">
-                                <span class="font-bold text-slate-800 text-xs inline-block mr-12">${item.title}</span>
-                                <span class="font-bold text-slate-800 text-xs inline-block mr-12">${item.title}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-
+                const emp = employees.find(x => String(x.id) === String(item.empId));
+                const avatar = emp
+                    ? `<img src="${getEmployeeAvatar(emp.id)}" alt="" class="w-7 h-7 rounded-full object-cover bg-white border border-slate-200 shrink-0" onerror="handleImageError(this,'${emp.id}')">`
+                    : `<span class="w-7 h-7 rounded-full ${isMeet ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'} flex items-center justify-center shrink-0 text-[10px]"><i class="fa-solid ${isMeet ? 'fa-calendar-check' : 'fa-user-clock'}"></i></span>`;
                 const clickAttr = item.isRequest ? `openItemDetailModal('${item.id}', true)` : `openItemDetailModal('${item.id}', false)`;
 
                 container.innerHTML += `
@@ -2336,12 +2329,26 @@
                             <span class="text-[9px] text-slate-600 font-mono mt-0.5 block">${item.startTime || '08:30'}</span>
                         </div>
                         <div class="h-5 w-0.5 ${isMeet ? 'bg-amber-400' : 'bg-blue-500'} rounded-full shrink-0"></div>
+                        ${avatar}
                         <div class="min-w-0 flex-1 leading-tight overflow-hidden">
-                            ${titleContent}
+                            <span class="sched-title font-bold text-slate-800 text-xs block truncate">${item.title}</span>
                             <span class="text-[10px] text-slate-400 block truncate">${item.empName}</span>
                         </div>
                     </div>
                 `;
+            });
+            setTimeout(() => fitScheduleMarquee(container), 0);
+            if (!container.__io && 'IntersectionObserver' in window) { container.__io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) fitScheduleMarquee(container); }); container.__io.observe(container); }
+        }
+
+        // ชื่อกิจกรรมเลื่อนวนเฉพาะเมื่อยาวเกินกล่อง (ถ้าพอดีก็แสดงนิ่ง)
+        function fitScheduleMarquee(container) {
+            container.querySelectorAll('.sched-title').forEach(el => {
+                if (!el.clientWidth || el.scrollWidth <= el.clientWidth + 1) return;
+                const text = el.textContent; const w = document.createElement('div'); w.className = 'marquee-wrapper';
+                const tr = document.createElement('div'); tr.className = 'marquee-track';
+                for (let i = 0; i < 2; i++) { const sp = document.createElement('span'); sp.className = 'font-bold text-slate-800 text-xs inline-block mr-12'; sp.textContent = text; tr.appendChild(sp); }
+                w.appendChild(tr); el.replaceWith(w);
             });
         }
 
@@ -2459,6 +2466,7 @@
                     else btn.className = "px-3.5 py-1.5 rounded-lg text-slate-600 font-medium cursor-pointer text-xs";
                 }
             });
+            const addBtn = document.getElementById('cal-add-event-btn'); if (addBtn) addBtn.classList.toggle('hidden', mode === 'day');
             renderInteractiveCalendar();
         }
 
