@@ -3527,6 +3527,7 @@
         // ---------- storage ----------
         let store = { cycles: {}, holidays: {}, backup: {}, holidaysAt: 0 };
         try { const raw = localStorage.getItem(LS_KEY); if (raw) { const p = JSON.parse(raw); store.cycles = p.cycles || {}; store.holidays = p.holidays || {}; store.backup = p.backup || {}; store.holidaysAt = p.holidaysAt || 0; } } catch (e) {}
+        Object.keys(store.cycles).forEach(k => { if (!/^[^|]+\|\d{4}-\d{2}$/.test(k) || k.startsWith('_holidays')) delete store.cycles[k]; });
         function persist() { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch (e) {} }
         const ck = (emp, key) => `${emp}|${key}`;
         function getCyc(emp, key) { return store.cycles[ck(emp, key)] || null; }
@@ -3575,6 +3576,7 @@
                         else if (lu > cu) pushHolidays();
                         return;
                     }
+                    if (!/^\d{4}-\d{2}$/.test(String(d.key))) return;
                     const k = ck(d.empId, d.key); const loc = store.cycles[k];
                     // สำเนา "ว่าง" บนคลาวด์ (ที่ไม่ได้มาจากการกด "ล้างรอบนี้") ต้องไม่ลบข้อมูลจริงในเครื่อง → ส่งข้อมูลในเครื่องกลับขึ้นคลาวด์
                     if (loc && nDays(loc) > 0 && nDays(d.data) === 0 && !d.data.cleared) { loc.updatedAt = Date.now(); touch(String(d.empId), d.key); changed = true; return; }
@@ -4020,6 +4022,7 @@
             const tmr = todayD(); tmr.setDate(tmr.getDate() + 1);
             const keys = [curCycle(), cycleOf(tmr), sel.key];   // วันที่ 21 ของเดือน → เพิ่มรอบถัดไป (22–21) ให้เลือกยื่นไทม์ชีต
             Object.keys(store.cycles).forEach(k => keys.push(k.split('|')[1]));
+            for (let i = keys.length - 1; i >= 0; i--) if (!/^\d{4}-\d{2}$/.test(String(keys[i]))) keys.splice(i, 1);
             const [cy, cm] = curCycle().split('-').map(Number); const back = new Date(cy, cm - 12, 1);
             keys.push(`${back.getFullYear()}-${pad(back.getMonth() + 1)}`);
             const sorted = keys.slice().sort();
