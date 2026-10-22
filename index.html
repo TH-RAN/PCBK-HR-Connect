@@ -351,14 +351,14 @@
         .tsd-cell { width:100%; aspect-ratio:1/1; min-width:15px; border-radius:5px; }
         .tsd-chip { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; padding:5px 10px; border-radius:99px; }
         #ts-print-root { display:none; }
+        #ts-print-root.ts-measure { display:block; position:fixed; left:-30000px; top:0; visibility:hidden; }
         @media print {
             body.ts-printing > *:not(#ts-print-root) { display:none !important; }
             body.ts-printing { background:#fff !important; padding:0 !important; display:block !important; }
             body.ts-printing #ts-print-root { display:block !important; }
-            body.ts-printing .ts-paper { border:none; min-width:0 !important; width:100% !important; padding:0; }
-            body.ts-printing .ts-tbl th, body.ts-printing .ts-tbl td { font-size:9px; padding:2px 3px; min-width:0 !important; }
-            body.ts-printing .ts-tbl td.ts-note { min-width:0; }
-            @page { size:A4 portrait; margin:10mm; }
+            body.ts-printing, body.ts-printing * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            body.ts-printing .ts-paper { zoom:1 !important; }
+            body.ts-printing .ts-print-fit input { pointer-events:none; }
         }
     </style>
 </head>
@@ -3397,9 +3397,9 @@
                         data: {
                             labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'],
                             datasets: [
-                                { label: 'ลาพักร้อน', data: vacMonthly, backgroundColor: '#0284c7', borderRadius: 4 },
-                                { label: 'ลาป่วย', data: sickMonthly, backgroundColor: '#64748b', borderRadius: 4 },
-                                { label: 'นอกสถานที่', data: offsiteMonthly, backgroundColor: '#10b981', borderRadius: 4 }
+                                { label: 'ลาพักร้อน', data: vacMonthly, backgroundColor: '#0ea5e9', borderRadius: 4 },
+                                { label: 'ลาป่วย', data: sickMonthly, backgroundColor: '#0369a1', borderRadius: 4 },
+                                { label: 'นอกสถานที่', data: offsiteMonthly, backgroundColor: '#8b5cf6', borderRadius: 4 }
                             ]
                         },
                         options: {
@@ -3422,7 +3422,7 @@
                             labels: ['ลาพักร้อน', 'ลาป่วย', 'ทำงานนอกสถานที่'],
                             datasets: [{
                                 data: hasData ? [totalVac, totalSick, totalOff] : [1, 0, 0],
-                                backgroundColor: ['#0284c7', '#64748b', '#10b981'],
+                                backgroundColor: ['#0ea5e9', '#0369a1', '#8b5cf6'],
                                 borderWidth: 2
                             }]
                         },
@@ -4064,6 +4064,7 @@
             const bk = store.backup && store.backup[ck(sel.emp, sel.key)];
             const restore = (bk && editable && Object.keys(bk.days || {}).length) ? `<div class="mb-3 p-3 rounded-2xl bg-sky-50 border border-sky-100 text-sky-800 text-xs font-semibold flex items-center justify-between gap-3"><span><i class="fa-solid fa-clock-rotate-left mr-1.5"></i>มีข้อมูลฉบับก่อนหน้าของรอบนี้เก็บไว้ในเครื่องนี้ (${Object.keys(bk.days).length} วัน)</span><button type="button" onclick="TS_UI.restoreBackup()" class="px-3 py-1.5 rounded-xl bg-sky-600 text-white font-bold cursor-pointer">กู้คืนฉบับนั้น</button></div>` : '';
             document.getElementById('ts-sheet-wrap').innerHTML = banner + restore + note + sheetHTML(sel.emp, sel.key, editable);
+            fitSheet();
             paintSync(); pullCloud(false);
         }
         function edit(iso, f, v) {
@@ -4136,11 +4137,32 @@
         function printSheet() {
             let root = document.getElementById('ts-print-root');
             if (!root) { root = document.createElement('div'); root.id = 'ts-print-root'; document.body.appendChild(root); }
-            root.innerHTML = sheetHTML(sel.emp, sel.key, false);
+            root.innerHTML = '<div class="ts-print-fit">' + sheetHTML(sel.emp, sel.key, true) + '</div>';   // หน้าตาเดียวกับตารางบนเว็บ (ช่องเวลา/หัวตารางเหมือนเดิม)
+            const fit = root.firstChild; root.classList.add('ts-measure'); fit.style.cssText = 'width:max-content';
+            const w = fit.scrollWidth, h = fit.scrollHeight; root.classList.remove('ts-measure');
+            const landscape = w / h > 1.05; const pw = landscape ? 1062 : 733, ph = landscape ? 733 : 1062;   // A4 ลบขอบ 8 มม. (พิกเซล @96dpi)
+            const sc = Math.min(pw / w, ph / h, 1) * 0.96;   // เผื่อขอบเล็กน้อย กันล้นไปหน้าที่สอง
+            fit.style.cssText = `width:${w}px;transform:scale(${sc});transform-origin:top left`;
+            root.style.cssText = `width:${Math.ceil(w * sc)}px;height:${Math.ceil(h * sc)}px;overflow:hidden`;
+            let ps = document.getElementById('ts-page-style'); if (!ps) { ps = document.createElement('style'); ps.id = 'ts-page-style'; document.head.appendChild(ps); }
+            ps.textContent = `@page { size: A4 ${landscape ? 'landscape' : 'portrait'}; margin: 8mm; }`;
             document.body.classList.add('ts-printing');
-            const done = () => { document.body.classList.remove('ts-printing'); root.innerHTML = ''; window.removeEventListener('afterprint', done); };
+            const done = () => { document.body.classList.remove('ts-printing'); root.innerHTML = ''; root.removeAttribute('style'); window.removeEventListener('afterprint', done); };
             window.addEventListener('afterprint', done); setTimeout(() => window.print(), 80);
         }
+
+        // ตารางไทม์ชีตบนจอ: ย่อให้พอดีความกว้างกรอบ ไม่ต้องเลื่อนซ้ายขวา
+        function fitSheet() {
+            const wrap = document.getElementById('ts-sheet-wrap'); const paper = wrap && wrap.querySelector('.ts-paper'); if (!paper) return;
+            paper.style.zoom = '';
+            const cs = getComputedStyle(wrap); const avail = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+            let z = 1;
+            for (let i = 0; i < 4 && avail > 50; i++) {   // วัดซ้ำจนพอดีกรอบ (ความกว้างขั้นต่ำของคอลัมน์ไม่ย่อเป็นเส้นตรง)
+                const nat = paper.getBoundingClientRect().width; if (nat <= avail + 1) break;
+                z = Math.max(0.3, z * avail / nat); paper.style.zoom = String(z);
+            }
+        }
+        let fitTimer = null; window.addEventListener('resize', () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitSheet, 150); });
 
         // ---------- holiday manager (admin) ----------
         function holidays() {
